@@ -37,7 +37,10 @@ var currentScene;
  * Game life cycles
  */
 
-function preload() {}
+function preload() {
+	this.load.image('bg', 'assets/bg.png');
+	this.load.image('platform', 'assets/platform.png');
+}
 
 function create() {
 	currentScene = this;
@@ -50,10 +53,35 @@ function create() {
 
 	this.scale.setGameSize(width, height);
 
+	let bg = this.add.image(width / 2, height - height / 2, 'bg');
+	bg.displayWidth = width;
+	bg.scaleY = bg.scaleX;
+
 	platforms = this.physics.add.staticGroup();
 
-	platform = this.add.rectangle(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 0xff0000);
-	platforms.add(platform);
+	// platform = this.add.rectangle(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 0xff0000);
+	// platforms.add(platform);
+
+	let sprite = this.add.image(width / 2, height - height * 0.02, 'platform');
+	sprite.displayWidth = width;
+	sprite.scaleY = sprite.scaleX;
+
+	var shape = this.make.graphics();
+
+	shape.fillStyle(0xffffff);
+
+	shape.beginPath();
+
+	shape.fillRect((width - boundingWidth * 0.85) / 2, height - height * 0.08, boundingWidth * 0.85, boundingHeight);
+	var mask = shape.createGeometryMask();
+
+	sprite.setMask(mask);
+
+	platforms.add(sprite);
+
+	// let image = platforms.create(width / 2, height - height * 0.05, 'platform');
+	// image.width = boundingWidth * 0.85;
+	// image.height = boundingHeight * 0.1;
 }
 
 function update() {}
