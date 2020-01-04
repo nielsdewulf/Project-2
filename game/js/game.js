@@ -33,6 +33,9 @@ var otherPlayerData = {
 var alive = true;
 var currentScene;
 
+var pengiun;
+var enemies;
+
 /**
  * Game life cycles
  */
@@ -99,7 +102,7 @@ function create() {
 	 */
 	player = this.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 	// player.displayWidth = ;
-	player.scaleY = player.scaleX = boundingWidth / 1920;
+	player.scaleY = player.scaleX = boundingWidth / 1400;
 
 	this.physics.add.existing(player);
 	player.setDepth(10);
@@ -110,6 +113,39 @@ function create() {
 	this.physics.add.collider(player, platforms);
 
 	cursors = this.input.keyboard.createCursorKeys();
+
+	/**
+	 * Sliding object
+	 */
+
+	enemies = [];
+
+	pengiun = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player');
+	pengiun.scaleY = pengiun.scaleX = boundingWidth / 3000;
+
+	this.physics.add.existing(pengiun);
+	pengiun.setDepth(10);
+	pengiun.body.bounce.x = 0.2;
+	pengiun.body.bounce.y = 0.2;
+	pengiun.body.setCollideWorldBounds = true;
+	this.physics.add.collider(pengiun, platforms);
+	enemies.push(pengiun);
+
+	/**
+	 * Falling object
+	 */
+	ice = this.physics.add.sprite(width / 2, 0, 'player');
+	ice.scaleY = ice.scaleX = boundingWidth / 3000;
+
+	this.physics.add.existing(ice);
+	ice.setDepth(10);
+	ice.body.bounce.x = 0.2;
+	ice.body.bounce.y = 0.2;
+	// ice.body.setCollideWorldBounds = true;
+	// this.physics.add.collider(ice, platforms);
+	enemies.push(ice);
+
+	this.physics.add.overlap(player, enemies, die, null, this);
 
 	/**
 	 * Click event
@@ -180,11 +216,18 @@ function create() {
 		}); // start gyroscope detection
 }
 
-function update() {}
+function update() {
+	pengiun.body.velocity.x = width * 0.15;
+}
 
 /**
  * Game Utility functions
  */
+
+function die() {
+	console.warn('YOU DIED');
+	document.querySelector('canvas').classList.add('died');
+}
 
 const calcWidthHeight = () => {
 	let width = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
