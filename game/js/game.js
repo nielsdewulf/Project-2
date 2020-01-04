@@ -39,7 +39,8 @@ var currentScene;
 
 function preload() {
 	this.load.image('bg', 'assets/bg.png');
-	this.load.image('platform', 'assets/platform.png');
+	this.load.image('platform', 'assets/block_snow_1_mid_3@3x.png');
+	this.load.image('player', 'assets/player.png');
 }
 
 function create() {
@@ -48,40 +49,135 @@ function create() {
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
 
+	/**
+	 * Resize listeners
+	 */
 	window.removeEventListener('resize', resize);
 	window.addEventListener('resize', resize);
 
 	this.scale.setGameSize(width, height);
 
+	/**
+	 * Background
+	 */
 	let bg = this.add.image(width / 2, height - height / 2, 'bg');
 	bg.displayWidth = width;
 	bg.scaleY = bg.scaleX;
 
+	/**
+	 * Platform
+	 */
 	platforms = this.physics.add.staticGroup();
 
 	// platform = this.add.rectangle(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 0xff0000);
 	// platforms.add(platform);
 
-	let sprite = this.add.image(width / 2, height - height * 0.02, 'platform');
-	sprite.displayWidth = width;
-	sprite.scaleY = sprite.scaleX;
+	// var container = this.add.container(width / 2, height - height * 0.05);
 
-	var shape = this.make.graphics();
+	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 'platform');
+	ts.tileScaleX = 0.7;
+	ts.tileScaleY = 0.7;
+	// let sprite = this.add.image(width / 2, height - height * 0.02, 'platform');
+	// sprite.displayWidth = width;
+	// sprite.scaleY = sprite.scaleX;
 
-	shape.fillStyle(0xffffff);
+	// var shape = this.make.graphics();
 
-	shape.beginPath();
+	// shape.fillStyle(0xffffff);
 
-	shape.fillRect((width - boundingWidth * 0.85) / 2, height - height * 0.08, boundingWidth * 0.85, boundingHeight);
-	var mask = shape.createGeometryMask();
+	// shape.beginPath();
 
-	sprite.setMask(mask);
+	// shape.fillRect((width - boundingWidth * 0.85) / 2, 0, boundingWidth * 0.85, boundingHeight);
+	// var mask = shape.createGeometryMask();
 
-	platforms.add(sprite);
+	// sprite.setMask(mask);
 
-	// let image = platforms.create(width / 2, height - height * 0.05, 'platform');
-	// image.width = boundingWidth * 0.85;
-	// image.height = boundingHeight * 0.1;
+	platforms.add(ts);
+
+	/**
+	 * Player
+	 */
+	player = this.physics.add.sprite(width / 2, height - height * 0.5, 'player');
+	// player.displayWidth = ;
+	player.scaleY = player.scaleX = boundingWidth / 1920;
+
+	this.physics.add.existing(player);
+	player.setDepth(10);
+	player.body.bounce.x = 0.2;
+	player.body.bounce.y = 0.2;
+
+	player.body.setCollideWorldBounds = true;
+	this.physics.add.collider(player, platforms);
+
+	cursors = this.input.keyboard.createCursorKeys();
+
+	/**
+	 * Click event
+	 */
+	this.input.on(
+		'pointerup',
+		function(pointer) {
+			if (this.scale.isFullscreen) {
+				this.scale.stopFullscreen();
+				noSleep.disable();
+				// On stop fulll screen
+			} else {
+				this.scale.startFullscreen();
+				noSleep.enable();
+				// On start fulll screen
+			}
+			screen.orientation.lock('landscape-primary');
+		},
+		this
+	);
+
+	/**
+	 * Gyroscope
+	 */
+
+	let text = this.add.text(0, 0, 'Test', {
+		font: '65px Arial',
+		fill: '#ff0044',
+		align: 'center'
+	});
+	var gn = new GyroNorm();
+	gn.init()
+		.then(function() {
+			gn.start(function(data) {
+				if (window.orientation === -90) {
+					if (data.do.beta > 15) {
+						player.body.velocity.x = width * -0.1;
+					} else if (data.do.beta < -15) {
+						player.body.velocity.x = width * 0.1;
+					} else {
+						player.body.velocity.x = 0;
+					}
+					text.setText(data.do.beta);
+				} else if (window.orientation === 90) {
+					if (data.do.beta > 15) {
+						player.body.velocity.x = width * 0.1;
+					} else if (data.do.beta < -15) {
+						player.body.velocity.x = width * -0.1;
+					} else {
+						player.body.velocity.x = 0;
+					}
+					text.setText(data.do.beta);
+				} else {
+					if (data.do.gamma > 15) {
+						player.body.velocity.x = width * 0.1;
+					} else if (data.do.gamma < -15) {
+						player.body.velocity.x = width * -0.1;
+					} else {
+						player.body.velocity.x = 0;
+					}
+					text.setText(data.do.gamma);
+				}
+			});
+		})
+		.catch(function(e) {
+			gyroscope = false;
+			// Catch if the DeviceOrientation or DeviceMotion is not supported by the browser or device
+		}); // start gyroscope detection
 }
 
 function update() {}
