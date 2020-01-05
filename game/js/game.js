@@ -30,8 +30,19 @@ var otherPlayerData = {
 	y: 0
 };
 
+var icicleConfig = {
+	minSpawnOffset: 1.15,
+	maxSpawnOffset: 0.85
+};
+
 var alive = true;
 var currentScene;
+
+var penguinsLEFT = [];
+var penguinsRIGHT = [];
+
+var enemies = [];
+var lastTimeSpawn = new Date().getTime();
 
 /**
  * Game life cycles
@@ -40,6 +51,8 @@ var currentScene;
 function preload() {
 	this.load.image('bg', 'assets/bg.png');
 	this.load.image('platform', 'assets/block_snow_1_mid_3@3x.png');
+	// this.load.image('platform', 'assets/.png');
+
 	this.load.image('player', 'assets/player.png');
 }
 
@@ -61,7 +74,7 @@ function create() {
 	 * Background
 	 */
 	let bg = this.add.image(width / 2, height - height / 2, 'bg');
-	bg.displayWidth = width;
+	bg.displayWidth = width > height ? width : height;
 	bg.scaleY = bg.scaleX;
 
 	/**
@@ -69,17 +82,39 @@ function create() {
 	 */
 	platforms = this.physics.add.staticGroup();
 
-	// platform = this.add.rectangle(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 0xff0000);
-	// platforms.add(platform);
-
+	// platform = this.add.rectangle((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 0xff0000);
+	// // platforms.add(platform);
+	// platform.setOrigin(0, 0);
+	// platform.setDepth(1000);
 	// var container = this.add.container(width / 2, height - height * 0.05);
 
-	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 'platform');
-	ts.tileScaleX = 0.7;
-	ts.tileScaleY = 0.7;
-	// let sprite = this.add.image(width / 2, height - height * 0.02, 'platform');
-	// sprite.displayWidth = width;
-	// sprite.scaleY = sprite.scaleX;
+	/**
+	 * Left platform edge
+	 */
+
+	let sprite = this.add.tileSprite((width - boundingWidth * 0.55) / 2, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 'platform');
+	// sprite.displayWidth = (boundingWidth / 1344) * 192;
+	sprite.tileScaleX = sprite.tileScaleY = boundingWidth / 1348;
+	// ts.tileScaleY = boundingWidth / 1354;
+	sprite.setOrigin(1, 0);
+	// spritexd.displayHeight = boundingHeight * 0.1;
+
+	// spritexd.scaleY = spritexd.scaleX = boundingWidth / 1344;
+	platforms.add(sprite);
+
+	/**
+	 * Right platform edge
+	 */
+	let spritexd = this.add.tileSprite((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55 - 0.5, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 'platform');
+	// sprite.displayWidth = (boundingWidth / 1344) * 192;
+	spritexd.tileScaleX = spritexd.tileScaleY = boundingWidth / 1400;
+	spritexd.setDepth(1);
+	// ts.tileScaleY = boundingWidth / 1354;
+	spritexd.setOrigin(0, 0);
+	// spritexd.displayHeight = boundingHeight * 0.1;
+
+	// spritexd.scaleY = spritexd.scaleX = boundingWidth / 1344;
+	platforms.add(spritexd);
 
 	// var shape = this.make.graphics();
 
@@ -87,11 +122,21 @@ function create() {
 
 	// shape.beginPath();
 
-	// shape.fillRect((width - boundingWidth * 0.85) / 2, 0, boundingWidth * 0.85, boundingHeight);
+	// shape.fillRect((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192);
+	// // shape.setOrigin(0, 0);
 	// var mask = shape.createGeometryMask();
 
-	// sprite.setMask(mask);
+	// spritexd.setMask(mask);
 
+	/**
+	 * Middle platform
+	 */
+	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.55, boundingHeight * 0.1, 'platform');
+	ts.tilePositionX = 0;
+	ts.tilePositionY = 0;
+	ts.tileScaleX = boundingWidth / 1400;
+	ts.tileScaleY = boundingWidth / 1400;
+	ts.setDepth(1000);
 	platforms.add(ts);
 
 	/**
@@ -99,7 +144,7 @@ function create() {
 	 */
 	player = this.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 	// player.displayWidth = ;
-	player.scaleY = player.scaleX = boundingWidth / 1920;
+	player.scaleY = player.scaleX = boundingWidth / 1400;
 
 	this.physics.add.existing(player);
 	player.setDepth(10);
@@ -112,21 +157,57 @@ function create() {
 	cursors = this.input.keyboard.createCursorKeys();
 
 	/**
+	 * Sliding object
+	 */
+
+	let pengiun = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player');
+	pengiun.scaleY = pengiun.scaleX = boundingWidth / 3000;
+
+	this.physics.add.existing(pengiun);
+	pengiun.setDepth(10);
+	pengiun.body.bounce.x = 0.2;
+	pengiun.body.bounce.y = 0.2;
+	pengiun.body.setCollideWorldBounds = true;
+	this.physics.add.collider(pengiun, platforms);
+	enemies.push(pengiun);
+	penguinsRIGHT.push(pengiun);
+	/**
+	 * Falling object
+	 */
+	let x = Math.random() * ((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85 - (width - boundingWidth * 0.85) / 2) + (width - boundingWidth * 0.85) / 2;
+	console.warn('REEEEEE: ' + x);
+	ice = this.physics.add.sprite(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset, 0, 'player');
+	ice.scaleY = ice.scaleX = boundingWidth / 3000;
+
+	this.physics.add.existing(ice);
+	ice.setDepth(10);
+	ice.body.bounce.x = 0.2;
+	ice.body.bounce.y = 0.2;
+	// ice.body.setCollideWorldBounds = true;
+	// this.physics.add.collider(ice, platforms);
+	enemies.push(ice);
+
+	this.physics.add.overlap(player, enemies, die, null, this);
+
+	/**
 	 * Click event
 	 */
 	this.input.on(
 		'pointerup',
 		function(pointer) {
-			if (this.scale.isFullscreen) {
-				this.scale.stopFullscreen();
-				noSleep.disable();
-				// On stop fulll screen
-			} else {
-				this.scale.startFullscreen();
-				noSleep.enable();
-				// On start fulll screen
+			// if (this.scale.isFullscreen) {
+			// 	this.scale.stopFullscreen();
+			// 	noSleep.disable();
+			// 	// On stop fulll screen
+			// } else {
+			// 	this.scale.startFullscreen();
+			// 	noSleep.enable();
+			// 	// On start fulll screen
+			// }
+			// screen.orientation.lock('landscape-primary');
+			if (player.body.touching.down) {
+				player.body.velocity.y = boundingHeight * 6;
 			}
-			screen.orientation.lock('landscape-primary');
 		},
 		this
 	);
@@ -146,27 +227,27 @@ function create() {
 			gn.start(function(data) {
 				if (window.orientation === -90) {
 					if (data.do.beta > 15) {
-						player.body.velocity.x = width * -0.1;
+						player.body.velocity.x = boundingWidth * -0.3;
 					} else if (data.do.beta < -15) {
-						player.body.velocity.x = width * 0.1;
+						player.body.velocity.x = boundingWidth * 0.3;
 					} else {
 						player.body.velocity.x = 0;
 					}
 					text.setText(data.do.beta);
 				} else if (window.orientation === 90) {
 					if (data.do.beta > 15) {
-						player.body.velocity.x = width * 0.1;
+						player.body.velocity.x = boundingWidth * 0.3;
 					} else if (data.do.beta < -15) {
-						player.body.velocity.x = width * -0.1;
+						player.body.velocity.x = boundingWidth * -0.3;
 					} else {
 						player.body.velocity.x = 0;
 					}
 					text.setText(data.do.beta);
 				} else {
 					if (data.do.gamma > 15) {
-						player.body.velocity.x = width * 0.1;
+						player.body.velocity.x = boundingWidth * 0.3;
 					} else if (data.do.gamma < -15) {
-						player.body.velocity.x = width * -0.1;
+						player.body.velocity.x = boundingWidth * -0.3;
 					} else {
 						player.body.velocity.x = 0;
 					}
@@ -180,11 +261,76 @@ function create() {
 		}); // start gyroscope detection
 }
 
-function update() {}
+function update() {
+	// pengiun.body.velocity.x = width * 0.15;
+	penguinsLEFT.forEach((el, i) => {
+		el.body.velocity.x = width * 0.15 * -1;
+	});
+	penguinsRIGHT.forEach((el, i) => {
+		el.body.velocity.x = width * 0.15;
+	});
+	let random = Math.random() * (8000 - 15000) + 8000;
+	if (new Date().getTime() - lastTimeSpawn > random) {
+		console.log(new Date().getTime() - lastTimeSpawn, random);
+		if (Math.random() > 0.2) {
+			console.warn('RESPAWNING');
+			if (Math.random() <= 0.8) {
+				/**
+				 * Spawn icicle
+				 */
+				console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
+				let x =
+					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - (width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset +
+					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
+
+				ice = this.physics.add.sprite(x, 0, 'player');
+				ice.scaleY = ice.scaleX = boundingWidth / 3000;
+
+				this.physics.add.existing(ice);
+				ice.setDepth(10);
+				ice.body.bounce.x = 0.2;
+				ice.body.bounce.y = 0.2;
+				// ice.body.setCollideWorldBounds = true;
+				// this.physics.add.collider(ice, platforms);
+				enemies.push(ice);
+			} else {
+				/**
+				 * Spawn pengiun
+				 */
+				let x;
+				let list;
+				if (Math.random() <= 0.5) {
+					x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
+					list = penguinsLEFT;
+				} else {
+					x = (width - boundingWidth * 0.85) / 2;
+					list = penguinsRIGHT;
+				}
+				let pengiun = this.physics.add.sprite(x, height - height * 0.2, 'player');
+				pengiun.scaleY = pengiun.scaleX = boundingWidth / 3000;
+
+				this.physics.add.existing(pengiun);
+				pengiun.setDepth(10);
+				pengiun.body.bounce.x = 0.2;
+				pengiun.body.bounce.y = 0.2;
+				pengiun.body.setCollideWorldBounds = true;
+				this.physics.add.collider(pengiun, platforms);
+				enemies.push(pengiun);
+				list.push(pengiun);
+			}
+		}
+		lastTimeSpawn = new Date().getTime();
+	}
+}
 
 /**
  * Game Utility functions
  */
+
+function die() {
+	console.warn('YOU DIED');
+	// document.querySelector('canvas').classList.add('died');
+}
 
 const calcWidthHeight = () => {
 	let width = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
@@ -213,6 +359,8 @@ const resize = () => {
 };
 
 const init = () => {
+	screen.orientation.lock('landscape-primary');
+
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
