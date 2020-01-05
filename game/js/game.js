@@ -38,8 +38,8 @@ var icicleConfig = {
 var alive = true;
 var currentScene;
 
-var pengiunsLEFT = [];
-var pengiunsRIGHT = [];
+var penguinsLEFT = [];
+var penguinsRIGHT = [];
 
 var enemies = [];
 var lastTimeSpawn = new Date().getTime();
@@ -170,7 +170,7 @@ function create() {
 	pengiun.body.setCollideWorldBounds = true;
 	this.physics.add.collider(pengiun, platforms);
 	enemies.push(pengiun);
-	pengiunsRIGHT.push(pengiun);
+	penguinsRIGHT.push(pengiun);
 	/**
 	 * Falling object
 	 */
@@ -263,10 +263,10 @@ function create() {
 
 function update() {
 	// pengiun.body.velocity.x = width * 0.15;
-	pengiunsLEFT.forEach((el, i) => {
+	penguinsLEFT.forEach((el, i) => {
 		el.body.velocity.x = width * 0.15 * -1;
 	});
-	pengiunsRIGHT.forEach((el, i) => {
+	penguinsRIGHT.forEach((el, i) => {
 		el.body.velocity.x = width * 0.15;
 	});
 	let random = Math.random() * (8000 - 15000) + 8000;
@@ -301,10 +301,10 @@ function update() {
 				let list;
 				if (Math.random() <= 0.5) {
 					x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
-					list = pengiunsLEFT;
+					list = penguinsLEFT;
 				} else {
 					x = (width - boundingWidth * 0.85) / 2;
-					list = pengiunsRIGHT;
+					list = penguinsRIGHT;
 				}
 				let pengiun = this.physics.add.sprite(x, height - height * 0.2, 'player');
 				pengiun.scaleY = pengiun.scaleX = boundingWidth / 3000;
