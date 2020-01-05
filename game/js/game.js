@@ -74,32 +74,47 @@ function create() {
 	 */
 	platforms = this.physics.add.staticGroup();
 
-	// platform = this.add.rectangle(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 0xff0000);
-	// platforms.add(platform);
-
+	// platform = this.add.rectangle((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 0xff0000);
+	// // platforms.add(platform);
+	// platform.setOrigin(0, 0);
+	// platform.setDepth(1000);
 	// var container = this.add.container(width / 2, height - height * 0.05);
 
-	let sprite = this.add.image((width - boundingWidth * 0.85) / 2, height - height * 0.099, 'platform');
-	// sprite.displayWidth = boundingWidth;
+	let sprite = this.add.tileSprite((width - boundingWidth * 0.55) / 2, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 'platform');
+	// sprite.displayWidth = (boundingWidth / 1344) * 192;
+	sprite.tileScaleX = sprite.tileScaleY = boundingWidth / 1354;
+	// ts.tileScaleY = boundingWidth / 1354;
 	sprite.setOrigin(1, 0);
-	sprite.displayHeight = boundingHeight * 0.1;
+	// spritexd.displayHeight = boundingHeight * 0.1;
 
-	sprite.scaleY = sprite.scaleX = boundingWidth / 2000;
+	// spritexd.scaleY = spritexd.scaleX = boundingWidth / 1344;
+	platforms.add(sprite);
 
-	// var shape = this.make.graphics();
+	let spritexd = this.add.tileSprite((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 'platform');
+	// sprite.displayWidth = (boundingWidth / 1344) * 192;
+	spritexd.tileScaleX = spritexd.tileScaleY = boundingWidth / 1354;
+	// ts.tileScaleY = boundingWidth / 1354;
+	spritexd.setOrigin(0, 0);
+	// spritexd.displayHeight = boundingHeight * 0.1;
 
-	// shape.fillStyle(0xffffff);
+	// spritexd.scaleY = spritexd.scaleX = boundingWidth / 1344;
+	platforms.add(spritexd);
 
-	// shape.beginPath();
+	var shape = this.make.graphics();
 
-	// shape.fillRect((width - boundingWidth * 0.85) / 2, 0, boundingWidth * 0.85, boundingHeight);
-	// var mask = shape.createGeometryMask();
+	shape.fillStyle(0xffffff);
 
-	// sprite.setMask(mask);
+	shape.beginPath();
 
-	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 'platform');
-	ts.tileScaleX = boundingWidth / 2000;
-	ts.tileScaleY = boundingWidth / 2000;
+	shape.fillRect((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192);
+	// shape.setOrigin(0, 0);
+	var mask = shape.createGeometryMask();
+
+	spritexd.setMask(mask);
+
+	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.55, boundingHeight * 0.1, 'platform');
+	ts.tileScaleX = boundingWidth / 1354;
+	ts.tileScaleY = boundingWidth / 1354;
 	platforms.add(ts);
 
 	/**
@@ -231,7 +246,7 @@ function update() {
 
 function die() {
 	console.warn('YOU DIED');
-	document.querySelector('canvas').classList.add('died');
+	// document.querySelector('canvas').classList.add('died');
 }
 
 const calcWidthHeight = () => {
