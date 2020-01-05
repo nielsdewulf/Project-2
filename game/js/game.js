@@ -55,6 +55,7 @@ function preload() {
 
 	this.load.image('player', 'assets/player.png');
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
+	this.load.image('icicle', 'assets/IcicleAfloat.png');
 }
 
 function create() {
@@ -209,7 +210,7 @@ function create() {
 			// }
 			// screen.orientation.lock('landscape-primary');
 			if (player.body.touching.down) {
-				player.body.velocity.y = boundingHeight * 6;
+				player.body.velocity.y = 600 - -1 * ((boundingHeight / 1080) * 1200);
 			}
 		},
 		this
@@ -286,8 +287,8 @@ function update() {
 					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - (width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset +
 					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
 
-				ice = this.physics.add.sprite(x, 0, 'player');
-				ice.scaleY = ice.scaleX = boundingWidth / 3000;
+				ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
+				ice.scaleY = ice.scaleX = boundingWidth / 4000;
 
 				this.physics.add.existing(ice);
 				ice.setDepth(500);
