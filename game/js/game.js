@@ -54,10 +54,15 @@ function preload() {
 	// this.load.image('platform', 'assets/.png');
 
 	this.load.image('player', 'assets/player.png');
+	this.load.image('penguin', 'assets/PenguinAfloat.png');
 }
 
 function create() {
 	currentScene = this;
+
+	enemies = [];
+	penguinsLEFT = [];
+	penguinsRIGHT = [];
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
@@ -108,7 +113,6 @@ function create() {
 	let spritexd = this.add.tileSprite((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55 - 0.5, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 'platform');
 	// sprite.displayWidth = (boundingWidth / 1344) * 192;
 	spritexd.tileScaleX = spritexd.tileScaleY = boundingWidth / 1400;
-	spritexd.setDepth(1);
 	// ts.tileScaleY = boundingWidth / 1354;
 	spritexd.setOrigin(0, 0);
 	// spritexd.displayHeight = boundingHeight * 0.1;
@@ -136,7 +140,6 @@ function create() {
 	ts.tilePositionY = 0;
 	ts.tileScaleX = boundingWidth / 1400;
 	ts.tileScaleY = boundingWidth / 1400;
-	ts.setDepth(1000);
 	platforms.add(ts);
 
 	/**
@@ -156,38 +159,38 @@ function create() {
 
 	cursors = this.input.keyboard.createCursorKeys();
 
-	/**
-	 * Sliding object
-	 */
+	// /**
+	//  * Sliding object
+	//  */
 
-	let pengiun = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player');
-	pengiun.scaleY = pengiun.scaleX = boundingWidth / 3000;
+	// let penguin = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player');
+	// penguin.scaleY = penguin.scaleX = boundingWidth / 3000;
 
-	this.physics.add.existing(pengiun);
-	pengiun.setDepth(10);
-	pengiun.body.bounce.x = 0.2;
-	pengiun.body.bounce.y = 0.2;
-	pengiun.body.setCollideWorldBounds = true;
-	this.physics.add.collider(pengiun, platforms);
-	enemies.push(pengiun);
-	penguinsRIGHT.push(pengiun);
-	/**
-	 * Falling object
-	 */
-	let x = Math.random() * ((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85 - (width - boundingWidth * 0.85) / 2) + (width - boundingWidth * 0.85) / 2;
-	console.warn('REEEEEE: ' + x);
-	ice = this.physics.add.sprite(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset, 0, 'player');
-	ice.scaleY = ice.scaleX = boundingWidth / 3000;
+	// this.physics.add.existing(penguin);
+	// penguin.setDepth(10);
+	// penguin.body.bounce.x = 0.2;
+	// penguin.body.bounce.y = 0.2;
+	// penguin.body.setCollideWorldBounds = true;
+	// this.physics.add.collider(penguin, platforms);
+	// enemies.push(penguin);
+	// penguinsRIGHT.push(penguin);
+	// /**
+	//  * Falling object
+	//  */
+	// let x = Math.random() * ((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85 - (width - boundingWidth * 0.85) / 2) + (width - boundingWidth * 0.85) / 2;
+	// console.warn('REEEEEE: ' + x);
+	// ice = this.physics.add.sprite(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset, 0, 'player');
+	// ice.scaleY = ice.scaleX = boundingWidth / 3000;
 
-	this.physics.add.existing(ice);
-	ice.setDepth(10);
-	ice.body.bounce.x = 0.2;
-	ice.body.bounce.y = 0.2;
-	// ice.body.setCollideWorldBounds = true;
-	// this.physics.add.collider(ice, platforms);
-	enemies.push(ice);
+	// this.physics.add.existing(ice);
+	// ice.setDepth(10);
+	// ice.body.bounce.x = 0.2;
+	// ice.body.bounce.y = 0.2;
+	// // ice.body.setCollideWorldBounds = true;
+	// // this.physics.add.collider(ice, platforms);
+	// enemies.push(ice);
 
-	this.physics.add.overlap(player, enemies, die, null, this);
+	// this.physics.add.overlap(player, enemies, die, null, this);
 
 	/**
 	 * Click event
@@ -262,7 +265,7 @@ function create() {
 }
 
 function update() {
-	// pengiun.body.velocity.x = width * 0.15;
+	// penguin.body.velocity.x = width * 0.15;
 	penguinsLEFT.forEach((el, i) => {
 		el.body.velocity.x = width * 0.15 * -1;
 	});
@@ -287,7 +290,7 @@ function update() {
 				ice.scaleY = ice.scaleX = boundingWidth / 3000;
 
 				this.physics.add.existing(ice);
-				ice.setDepth(10);
+				ice.setDepth(500);
 				ice.body.bounce.x = 0.2;
 				ice.body.bounce.y = 0.2;
 				// ice.body.setCollideWorldBounds = true;
@@ -295,28 +298,31 @@ function update() {
 				enemies.push(ice);
 			} else {
 				/**
-				 * Spawn pengiun
+				 * Spawn penguin
 				 */
 				let x;
 				let list;
+				let flip = true;
 				if (Math.random() <= 0.5) {
 					x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
 					list = penguinsLEFT;
+					flip = false;
 				} else {
 					x = (width - boundingWidth * 0.85) / 2;
 					list = penguinsRIGHT;
 				}
-				let pengiun = this.physics.add.sprite(x, height - height * 0.2, 'player');
-				pengiun.scaleY = pengiun.scaleX = boundingWidth / 3000;
+				let penguin = this.physics.add.sprite(x, height - height * 0.2, 'penguin');
+				penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
+				penguin.flipX = flip;
 
-				this.physics.add.existing(pengiun);
-				pengiun.setDepth(10);
-				pengiun.body.bounce.x = 0.2;
-				pengiun.body.bounce.y = 0.2;
-				pengiun.body.setCollideWorldBounds = true;
-				this.physics.add.collider(pengiun, platforms);
-				enemies.push(pengiun);
-				list.push(pengiun);
+				this.physics.add.existing(penguin);
+				penguin.setDepth(1000);
+				penguin.body.bounce.x = 0.5;
+				penguin.body.bounce.y = 0.5;
+				penguin.body.setCollideWorldBounds = true;
+				this.physics.add.collider(penguin, platforms);
+				enemies.push(penguin);
+				list.push(penguin);
 			}
 		}
 		lastTimeSpawn = new Date().getTime();
