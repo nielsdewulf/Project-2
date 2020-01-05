@@ -43,6 +43,8 @@ var enemies;
 function preload() {
 	this.load.image('bg', 'assets/bg.png');
 	this.load.image('platform', 'assets/block_snow_1_mid_3@3x.png');
+	// this.load.image('platform', 'assets/.png');
+
 	this.load.image('player', 'assets/player.png');
 }
 
@@ -64,7 +66,7 @@ function create() {
 	 * Background
 	 */
 	let bg = this.add.image(width / 2, height - height / 2, 'bg');
-	bg.displayWidth = width;
+	bg.displayWidth = width > height ? width : height;
 	bg.scaleY = bg.scaleX;
 
 	/**
@@ -77,12 +79,12 @@ function create() {
 
 	// var container = this.add.container(width / 2, height - height * 0.05);
 
-	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 'platform');
-	ts.tileScaleX = 0.7;
-	ts.tileScaleY = 0.7;
-	// let sprite = this.add.image(width / 2, height - height * 0.02, 'platform');
-	// sprite.displayWidth = width;
-	// sprite.scaleY = sprite.scaleX;
+	let sprite = this.add.image((width - boundingWidth * 0.85) / 2, height - height * 0.099, 'platform');
+	// sprite.displayWidth = boundingWidth;
+	sprite.setOrigin(1, 0);
+	sprite.displayHeight = boundingHeight * 0.1;
+
+	sprite.scaleY = sprite.scaleX = boundingWidth / 2000;
 
 	// var shape = this.make.graphics();
 
@@ -95,6 +97,9 @@ function create() {
 
 	// sprite.setMask(mask);
 
+	ts = this.add.tileSprite(width / 2, height - height * 0.05, boundingWidth * 0.85, boundingHeight * 0.1, 'platform');
+	ts.tileScaleX = boundingWidth / 2000;
+	ts.tileScaleY = boundingWidth / 2000;
 	platforms.add(ts);
 
 	/**
@@ -182,27 +187,27 @@ function create() {
 			gn.start(function(data) {
 				if (window.orientation === -90) {
 					if (data.do.beta > 15) {
-						player.body.velocity.x = width * -0.1;
+						player.body.velocity.x = boundingWidth * -0.1;
 					} else if (data.do.beta < -15) {
-						player.body.velocity.x = width * 0.1;
+						player.body.velocity.x = boundingWidth * 0.1;
 					} else {
 						player.body.velocity.x = 0;
 					}
 					text.setText(data.do.beta);
 				} else if (window.orientation === 90) {
 					if (data.do.beta > 15) {
-						player.body.velocity.x = width * 0.1;
+						player.body.velocity.x = boundingWidth * 0.1;
 					} else if (data.do.beta < -15) {
-						player.body.velocity.x = width * -0.1;
+						player.body.velocity.x = boundingWidth * -0.1;
 					} else {
 						player.body.velocity.x = 0;
 					}
 					text.setText(data.do.beta);
 				} else {
 					if (data.do.gamma > 15) {
-						player.body.velocity.x = width * 0.1;
+						player.body.velocity.x = boundingWidth * 0.1;
 					} else if (data.do.gamma < -15) {
-						player.body.velocity.x = width * -0.1;
+						player.body.velocity.x = boundingWidth * -0.1;
 					} else {
 						player.body.velocity.x = 0;
 					}
@@ -256,6 +261,8 @@ const resize = () => {
 };
 
 const init = () => {
+	screen.orientation.lock('landscape-primary');
+
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
