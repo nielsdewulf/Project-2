@@ -94,7 +94,7 @@ function create() {
 	let bg = this.add.image(width / 2, height - height / 2, 'bg');
 	bg.displayWidth = width > height ? width : height;
 
-	bg.scaleY = bg.scaleX = boundingWidth / 6300;
+	bg.scaleY = bg.scaleX = boundingWidth / 6000;
 	// bg.alpha = 0.5;
 
 	/**
