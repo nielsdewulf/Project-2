@@ -69,7 +69,7 @@ function preload() {
 
 	// this.load.image('player', 'assets/player.png');
 
-	this.load.spritesheet('player', 'assets/AvatarAfloatOne.png', { frameWidth: 354.822, frameHeight: 359 });
+	this.load.spritesheet('player', 'assets/AvatarAfloatOne.png', { frameWidth: 355.5, frameHeight: 359 });
 
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
@@ -180,8 +180,8 @@ function create() {
 
 	this.physics.add.existing(player);
 	player.setDepth(100);
-	player.body.bounce.x = 0.1;
-	player.body.bounce.y = 0.1;
+	// player.body.bounce.x = 0.1;
+	// player.body.bounce.y = 0.1;
 
 	player.body.setCollideWorldBounds = true;
 	this.physics.add.collider(player, platforms);
@@ -193,21 +193,30 @@ function create() {
         frames: [ { key: 'player', frame: 0 } ],
         frameRate: 10,
     });
-
+	this.anims.create({
+        key: 'leftJump',
+        frames: [ { key: 'player', frame: 3 } ],
+        frameRate: 10,
+    });
     this.anims.create({
         key: 'turn',
         frames: [ { key: 'player', frame: 1 } ],
         frameRate: 20
 	});
 	this.anims.create({
-        key: 'jump',
-        frames: [ { key: 'player', frame: 3 } ],
-        frameRate: 20
+        key: 'turnJump',
+        frames: [ { key: 'player', frame: 4 } ],
+        frameRate:  5
     });
 
     this.anims.create({
         key: 'right',
         frames: [ { key: 'player', frame: 2 } ],
+        frameRate: 10,
+	});
+	this.anims.create({
+        key: 'rightJump',
+        frames: [ { key: 'player', frame: 5 } ],
         frameRate: 10,
     });
 	// /**
@@ -690,7 +699,15 @@ function update() {
 			// player.anims.play('turn');
 		}
 		if(!player.body.touching.down){
-			if(player.body.velocity.x === 0)player.anims.play('jump');
+			if(player.body.velocity.x === 0){
+				player.anims.play('turnJump')
+
+			}else{
+				if(player.body.velocity.x > 0)player.anims.play('rightJump');
+				if(player.body.velocity.x < 0)player.anims.play('leftJump');
+			}
+			
+
 		}
 		if (cursors.up.isDown && player.body.touching.down) {
 			player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
@@ -840,7 +857,9 @@ function update() {
 				// console.log('Standstill');
 			}
 			if(!otherPlayer.body.touching.down){
-				if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('jump');
+				if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('turnJump');
+				if(otherPlayer.body.velocity.x > 0)otherPlayer.anims.play('rightJump');
+				if(otherPlayer.body.velocity.x < 0)otherPlayer.anims.play('leftJump');
 			}
 			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
 				otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
@@ -906,8 +925,8 @@ function initMqtt(gameObj) {
 				otherPlayer.setDepth(10);
 				otherPlayer.alpha = 0.2;
 
-				otherPlayer.body.bounce.x = 0.1;
-				otherPlayer.body.bounce.y = 0.1;
+				// otherPlayer.body.bounce.x = 0.1;
+				// otherPlayer.body.bounce.y = 0.1;
 
 				otherPlayer.body.setCollideWorldBounds = true;
 				gameObj.physics.add.collider(otherPlayer, platforms);
@@ -999,8 +1018,8 @@ function initMqtt(gameObj) {
 					otherPlayer.setDepth(10);
 					otherPlayer.alpha = 0.2;
 
-					otherPlayer.body.bounce.x = 0.1;
-					otherPlayer.body.bounce.y = 0.1;
+					// otherPlayer.body.bounce.x = 0.1;
+					// otherPlayer.body.bounce.y = 0.1;
 
 					otherPlayer.body.setCollideWorldBounds = true;
 					gameObj.physics.add.collider(otherPlayer, platforms);
