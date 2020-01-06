@@ -1,5 +1,7 @@
 var clientId = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 
+var lobbyId = 'abcdefg';
+
 var width, height;
 
 var boundingWidth, boundingHeight;
@@ -269,7 +271,7 @@ function create() {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							'aaa',
+							lobbyId,
 							JSON.stringify({
 								clientId: clientId,
 								isJumping: true,
@@ -331,7 +333,7 @@ function create() {
 							if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -359,7 +361,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -386,7 +388,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: false,
@@ -416,7 +418,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -443,7 +445,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -470,7 +472,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: false,
@@ -500,7 +502,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -526,7 +528,7 @@ function create() {
 							if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -552,7 +554,7 @@ function create() {
 							if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: false,
@@ -615,7 +617,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: true,
@@ -643,7 +645,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: true,
@@ -671,7 +673,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: false,
@@ -702,7 +704,7 @@ function update() {
 				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isJumping: true,
@@ -757,7 +759,7 @@ function update() {
 
 					let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							status: 'newEnemy',
@@ -804,7 +806,7 @@ function update() {
 					enemiesSpawned++;
 					let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							status: 'newEnemy',
@@ -846,7 +848,7 @@ function update() {
 				// console.log('Jumping');
 			}
 		}catch{
-			
+
 		}
 		
 	}
@@ -872,12 +874,12 @@ function initMqtt(gameObj) {
 		protocolId: 'MQTT'
 	});
 	client.on('connect', function() {
-		client.subscribe('aaa', function(err) {
+		client.subscribe(lobbyId, function(err) {
 			if (!err) {
 				connectedCloud = true;
 				console.warn('Connected');
 				client.publish(
-					'aaa',
+					lobbyId,
 					JSON.stringify({
 						clientId: clientId,
 						status: 'connected'
@@ -915,7 +917,7 @@ function initMqtt(gameObj) {
 		if (data.status != undefined && data.status === 'connected') {
 			host = false;
 			client.publish(
-				'aaa',
+				lobbyId,
 				JSON.stringify({
 					clientId: data.clientId,
 					status: 'connectionRequest'
