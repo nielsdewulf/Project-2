@@ -1,5 +1,7 @@
 var clientId = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
 
+var lobbyId = 'abcdefg';
+
 var width, height;
 
 var boundingWidth, boundingHeight;
@@ -65,7 +67,10 @@ function preload() {
 
 	// this.load.image('platform', 'assets/.png');
 
-	this.load.image('player', 'assets/player.png');
+	// this.load.image('player', 'assets/player.png');
+
+	this.load.spritesheet('player', 'assets/AvatarAfloatOne.png', { frameWidth: 354.822, frameHeight: 359 });
+
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
 }
@@ -94,7 +99,7 @@ function create() {
 	let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
 	// bg.displayWidth = width < height ? width : height;
 
-	bg.tileScaleX = bg.tileScaleY = width / 7500;
+	bg.tileScaleX = bg.tileScaleY = width > height* 1.77 ? width/7500 : height/7500;
 
 	// bg.alpha = 0.5;
 
@@ -171,18 +176,40 @@ function create() {
 	 */
 	player = this.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 	// player.displayWidth = ;
-	player.scaleY = player.scaleX = boundingWidth / 1400;
+	player.scaleY = player.scaleX = boundingWidth / 3000;
 
 	this.physics.add.existing(player);
-	player.setDepth(10);
-	player.body.bounce.x = 0.2;
-	player.body.bounce.y = 0.2;
+	player.setDepth(100);
+	player.body.bounce.x = 0.1;
+	player.body.bounce.y = 0.1;
 
 	player.body.setCollideWorldBounds = true;
 	this.physics.add.collider(player, platforms);
 
 	cursors = this.input.keyboard.createCursorKeys();
 
+	this.anims.create({
+        key: 'left',
+        frames: [ { key: 'player', frame: 0 } ],
+        frameRate: 10,
+    });
+
+    this.anims.create({
+        key: 'turn',
+        frames: [ { key: 'player', frame: 1 } ],
+        frameRate: 20
+	});
+	this.anims.create({
+        key: 'jump',
+        frames: [ { key: 'player', frame: 3 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'right',
+        frames: [ { key: 'player', frame: 2 } ],
+        frameRate: 10,
+    });
 	// /**
 	//  * Sliding object
 	//  */
@@ -244,7 +271,7 @@ function create() {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							'aaa',
+							lobbyId,
 							JSON.stringify({
 								clientId: clientId,
 								isJumping: true,
@@ -295,6 +322,8 @@ function create() {
 				if (window.orientation === -90) {
 					if (data.do.beta > 6) {
 						player.body.velocity.x = boundingWidth * -0.3;
+						player.anims.play('left');
+
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -304,7 +333,7 @@ function create() {
 							if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -320,6 +349,8 @@ function create() {
 						}
 					} else if (data.do.beta < -6) {
 						player.body.velocity.x = boundingWidth * 0.3;
+						player.anims.play('right');
+
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -330,7 +361,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -346,6 +377,7 @@ function create() {
 						}
 					} else {
 						player.body.velocity.x = 0;
+						player.anims.play('turn');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -356,7 +388,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: false,
@@ -375,6 +407,7 @@ function create() {
 				} else if (window.orientation === 90) {
 					if (data.do.beta > 6) {
 						player.body.velocity.x = boundingWidth * 0.3;
+						player.anims.play('right');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -385,7 +418,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -401,6 +434,7 @@ function create() {
 						}
 					} else if (data.do.beta < -6) {
 						player.body.velocity.x = boundingWidth * -0.3;
+						player.anims.play('left');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -411,7 +445,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -427,6 +461,7 @@ function create() {
 						}
 					} else {
 						player.body.velocity.x = 0;
+						player.anims.play('turn');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -437,7 +472,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: false,
@@ -456,6 +491,7 @@ function create() {
 				} else {
 					if (data.do.gamma > 6) {
 						player.body.velocity.x = boundingWidth * 0.3;
+						player.anims.play('right');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -466,7 +502,7 @@ function create() {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -482,6 +518,7 @@ function create() {
 						}
 					} else if (data.do.gamma < -6) {
 						player.body.velocity.x = boundingWidth * -0.3;
+						player.anims.play('left');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -491,7 +528,7 @@ function create() {
 							if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: true,
@@ -507,6 +544,7 @@ function create() {
 						}
 					} else {
 						player.body.velocity.x = 0;
+						player.anims.play('turn');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -516,7 +554,7 @@ function create() {
 							if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 								let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 								client.publish(
-									'aaa',
+									lobbyId,
 									JSON.stringify({
 										clientId: clientId,
 										isRunning: false,
@@ -569,7 +607,7 @@ function update() {
 	if (!gyroscope) {
 		if (cursors.left.isDown && !cursors.right.isDown) {
 			player.body.velocity.x = boundingWidth * -0.3;
-
+			player.anims.play('left');
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -579,7 +617,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: true,
@@ -597,6 +635,7 @@ function update() {
 			// player.anims.play('left', true);
 		} else if (cursors.right.isDown) {
 			player.body.velocity.x = boundingWidth * 0.3;
+			player.anims.play('right');
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -606,7 +645,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: true,
@@ -624,7 +663,7 @@ function update() {
 			// player.anims.play('right', true);
 		} else {
 			player.body.velocity.x = 0;
-
+			player.anims.play('turn');
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -634,7 +673,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: false,
@@ -650,8 +689,12 @@ function update() {
 			}
 			// player.anims.play('turn');
 		}
+		if(!player.body.touching.down){
+			if(player.body.velocity.x === 0)player.anims.play('jump');
+		}
 		if (cursors.up.isDown && player.body.touching.down) {
 			player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
+			
 
 			if (connectedCloud) {
 				let newPlayerData = {
@@ -661,7 +704,7 @@ function update() {
 				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							isJumping: true,
@@ -716,7 +759,7 @@ function update() {
 
 					let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							status: 'newEnemy',
@@ -763,7 +806,7 @@ function update() {
 					enemiesSpawned++;
 					let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
 					client.publish(
-						'aaa',
+						lobbyId,
 						JSON.stringify({
 							clientId: clientId,
 							status: 'newEnemy',
@@ -781,22 +824,33 @@ function update() {
 	//   enemiesText.setText(enemiesSpawned);
 	scoreText.setText(enemiesSpawned);
 
-	if (otherPlayer != undefined) {
-		if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
-			otherPlayer.body.velocity.x = boundingWidth * -0.3;
-			// console.log('Running left');
-		} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
-			otherPlayer.body.velocity.x = boundingWidth * 0.3;
-			// console.log('Running right');
-		} else {
-			otherPlayer.body.velocity.x = 0;
-			// console.log('Standstill');
+	if (otherPlayer !== undefined) {
+		try{
+			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
+				otherPlayer.body.velocity.x = boundingWidth * -0.3;
+				otherPlayer.anims.play('left');
+				// console.log('Running left');
+			} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
+				otherPlayer.body.velocity.x = boundingWidth * 0.3;
+				otherPlayer.anims.play('right');
+				// console.log('Running right');
+			} else {
+				otherPlayer.body.velocity.x = 0;
+				otherPlayer.anims.play('turn');
+				// console.log('Standstill');
+			}
+			if(!otherPlayer.body.touching.down){
+				if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('jump');
+			}
+			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
+				otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
+				otherPlayerData.isJumping = false;
+				// console.log('Jumping');
+			}
+		}catch{
+
 		}
-		if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
-			otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
-			otherPlayerData.isJumping = false;
-			// console.log('Jumping');
-		}
+		
 	}
 }
 
@@ -820,12 +874,12 @@ function initMqtt(gameObj) {
 		protocolId: 'MQTT'
 	});
 	client.on('connect', function() {
-		client.subscribe('aaa', function(err) {
+		client.subscribe(lobbyId, function(err) {
 			if (!err) {
 				connectedCloud = true;
 				console.warn('Connected');
 				client.publish(
-					'aaa',
+					lobbyId,
 					JSON.stringify({
 						clientId: clientId,
 						status: 'connected'
@@ -846,14 +900,14 @@ function initMqtt(gameObj) {
 				multiplayer = true;
 				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 				// player.displayWidth = ;
-				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 1400;
+				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 
 				gameObj.physics.add.existing(otherPlayer);
 				otherPlayer.setDepth(10);
 				otherPlayer.alpha = 0.2;
 
-				otherPlayer.body.bounce.x = 0.2;
-				otherPlayer.body.bounce.y = 0.2;
+				otherPlayer.body.bounce.x = 0.1;
+				otherPlayer.body.bounce.y = 0.1;
 
 				otherPlayer.body.setCollideWorldBounds = true;
 				gameObj.physics.add.collider(otherPlayer, platforms);
@@ -863,7 +917,7 @@ function initMqtt(gameObj) {
 		if (data.status != undefined && data.status === 'connected') {
 			host = false;
 			client.publish(
-				'aaa',
+				lobbyId,
 				JSON.stringify({
 					clientId: data.clientId,
 					status: 'connectionRequest'
@@ -939,14 +993,14 @@ function initMqtt(gameObj) {
 					multiplayer = true;
 					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 					// player.displayWidth = ;
-					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 1400;
+					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 
 					gameObj.physics.add.existing(otherPlayer);
 					otherPlayer.setDepth(10);
 					otherPlayer.alpha = 0.2;
 
-					otherPlayer.body.bounce.x = 0.2;
-					otherPlayer.body.bounce.y = 0.2;
+					otherPlayer.body.bounce.x = 0.1;
+					otherPlayer.body.bounce.y = 0.1;
 
 					otherPlayer.body.setCollideWorldBounds = true;
 					gameObj.physics.add.collider(otherPlayer, platforms);
