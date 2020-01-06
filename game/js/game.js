@@ -91,10 +91,11 @@ function create() {
 	/**
 	 * Background
 	 */
-	let bg = this.add.image(width / 2, height - height / 2, 'bg');
-	bg.displayWidth = width > height ? width : height;
+	let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
+	// bg.displayWidth = width < height ? width : height;
 
-	bg.scaleY = bg.scaleX = boundingWidth / 6300;
+	bg.tileScaleX = bg.tileScaleY = width / 7500;
+
 	// bg.alpha = 0.5;
 
 	/**
