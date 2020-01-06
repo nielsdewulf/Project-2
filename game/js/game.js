@@ -12,7 +12,7 @@ var noSleep = new NoSleep();
 var client;
 
 var multiplayer = false;
-var host = false;
+var host = true;
 var connectedCloud = false;
 
 var started = false;
@@ -94,8 +94,8 @@ function create() {
 	let bg = this.add.image(width / 2, height - height / 2, 'bg');
 	bg.displayWidth = width > height ? width : height;
 
-	bg.scaleY = bg.scaleX = boundingWidth / 1600;
-	bg.alpha = 0.5;
+	bg.scaleY = bg.scaleX = boundingWidth / 6300;
+	// bg.alpha = 0.5;
 
 	/**
 	 * World events
@@ -556,10 +556,10 @@ function update() {
 	//   });
 	if (started) {
 		penguinsLEFT.forEach((el, i) => {
-			el.body.velocity.x = width * 0.2 * -1;
+			el.body.velocity.x = boundingWidth * 0.2 * -1;
 		});
 		penguinsRIGHT.forEach((el, i) => {
-			el.body.velocity.x = width * 0.2;
+			el.body.velocity.x = boundingWidth * 0.2;
 		});
 	}
 	/**
@@ -567,7 +567,7 @@ function update() {
 	 */
 	if (!gyroscope) {
 		if (cursors.left.isDown && !cursors.right.isDown) {
-			player.body.velocity.x = width * -0.1;
+			player.body.velocity.x = boundingWidth * -0.3;
 
 			if (connectedCloud) {
 				let newPlayerData = {
@@ -595,7 +595,7 @@ function update() {
 
 			// player.anims.play('left', true);
 		} else if (cursors.right.isDown) {
-			player.body.velocity.x = width * 0.1;
+			player.body.velocity.x = boundingWidth * 0.3;
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -683,14 +683,14 @@ function update() {
 	if ((host || !multiplayer) && started) {
 		let random = Math.random() * (8000 - 15000) + 8000;
 		if (new Date().getTime() - lastTimeSpawn > random) {
-			console.log(new Date().getTime() - lastTimeSpawn, random);
+			// console.log(new Date().getTime() - lastTimeSpawn, random);
 			if (Math.random() > 0.2) {
-				console.warn('RESPAWNING');
+				// console.warn('RESPAWNING');
 				if (Math.random() <= 0.8) {
 					/**
 					 * Spawn icicle
 					 */
-					console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
+					// console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
 					let x =
 						Math.random() *
 							(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
@@ -782,10 +782,10 @@ function update() {
 
 	if (otherPlayer != undefined) {
 		if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
-			otherPlayer.body.velocity.x = width * -0.1;
+			otherPlayer.body.velocity.x = boundingWidth * -0.3;
 			// console.log('Running left');
 		} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
-			otherPlayer.body.velocity.x = width * 0.1;
+			otherPlayer.body.velocity.x = boundingWidth * 0.3;
 			// console.log('Running right');
 		} else {
 			otherPlayer.body.velocity.x = 0;
@@ -813,7 +813,7 @@ function addScore(enemy) {
 }
 
 function initMqtt(gameObj) {
-	client = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
+	client = mqtt.connect(`ws://mct-mqtt.westeurope.cloudapp.azure.com`, {
 		//wss://mqtt.funergydev.com:9001
 		//51.105.206.206
 		protocolId: 'MQTT'
@@ -838,7 +838,7 @@ function initMqtt(gameObj) {
 
 	client.on('message', function(topic, message) {
 		let data = JSON.parse(message);
-		console.log(data);
+		// console.log(data);
 
 		if (data.status != undefined && data.status === 'connectionRequest') {
 			if (data.clientId === clientId && !multiplayer) {
@@ -860,7 +860,7 @@ function initMqtt(gameObj) {
 		}
 		if (data.clientId === clientId) return;
 		if (data.status != undefined && data.status === 'connected') {
-			host = true;
+			host = false;
 			client.publish(
 				'aaa',
 				JSON.stringify({
@@ -933,7 +933,7 @@ function initMqtt(gameObj) {
 				let [x, y] = getRealPositions(data.x, data.y);
 				otherPlayerData.x = x;
 				otherPlayerData.y = y;
-				console.warn(x, y);
+				// console.warn(x, y);
 				if (otherPlayer == undefined) {
 					multiplayer = true;
 					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
