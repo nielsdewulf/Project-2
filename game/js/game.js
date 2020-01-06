@@ -15,6 +15,7 @@ var multiplayer = false;
 var host = false;
 var connectedCloud = false;
 
+var started = false;
 var platforms;
 
 var player;
@@ -553,12 +554,14 @@ function update() {
 	//       }
 
 	//   });
-	penguinsLEFT.forEach((el, i) => {
-		el.body.velocity.x = width * 0.2 * -1;
-	});
-	penguinsRIGHT.forEach((el, i) => {
-		el.body.velocity.x = width * 0.2;
-	});
+	if (started) {
+		penguinsLEFT.forEach((el, i) => {
+			el.body.velocity.x = width * 0.2 * -1;
+		});
+		penguinsRIGHT.forEach((el, i) => {
+			el.body.velocity.x = width * 0.2;
+		});
+	}
 	/**
 	 * START DEBUG
 	 */
@@ -677,7 +680,7 @@ function update() {
 	 * END DEBUG
 	 */
 
-	if (host || !multiplayer) {
+	if ((host || !multiplayer) && started) {
 		let random = Math.random() * (8000 - 15000) + 8000;
 		if (new Date().getTime() - lastTimeSpawn > random) {
 			console.log(new Date().getTime() - lastTimeSpawn, random);
@@ -917,6 +920,9 @@ function initMqtt(gameObj) {
 				list.push(penguin);
 				enemiesSpawned++;
 			}
+		}
+		if (data.status != undefined && data.status === 'start') {
+			started = true;
 		}
 		if (data.status != undefined && data.status === 'movement') {
 			if (data.isRunning != undefined) otherPlayerData.isRunning = data.isRunning;
