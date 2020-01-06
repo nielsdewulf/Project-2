@@ -233,7 +233,7 @@ function create() {
 			// }
 			// screen.orientation.lock('landscape-primary');
 			if (player.body.touching.down) {
-				player.body.velocity.y = -400;
+				player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
 
 				if (connectedCloud) {
 					let newPlayerData = {
@@ -651,7 +651,7 @@ function update() {
 			// player.anims.play('turn');
 		}
 		if (cursors.up.isDown && player.body.touching.down) {
-			player.body.velocity.y = -400;
+			player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
 
 			if (connectedCloud) {
 				let newPlayerData = {
@@ -793,7 +793,7 @@ function update() {
 			// console.log('Standstill');
 		}
 		if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
-			otherPlayer.body.velocity.y = -400; //((player.height + boundingHeight) / 2) * 1.2 * -1
+			otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
 			otherPlayerData.isJumping = false;
 			// console.log('Jumping');
 		}
@@ -1019,7 +1019,7 @@ const init = () => {
 			default: 'arcade',
 			arcade: {
 				gravity: {
-					y: 700
+					y: height
 				},
 				debug: false
 			}
