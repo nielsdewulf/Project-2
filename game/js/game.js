@@ -65,7 +65,10 @@ function preload() {
 
 	// this.load.image('platform', 'assets/.png');
 
-	this.load.image('player', 'assets/player.png');
+	// this.load.image('player', 'assets/player.png');
+
+	this.load.spritesheet('player', 'assets/AvatarAfloatOne.png', { frameWidth: 354.822, frameHeight: 359 });
+
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
 }
@@ -171,18 +174,40 @@ function create() {
 	 */
 	player = this.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 	// player.displayWidth = ;
-	player.scaleY = player.scaleX = boundingWidth / 1400;
+	player.scaleY = player.scaleX = boundingWidth / 3000;
 
 	this.physics.add.existing(player);
-	player.setDepth(10);
-	player.body.bounce.x = 0.2;
-	player.body.bounce.y = 0.2;
+	player.setDepth(100);
+	player.body.bounce.x = 0.1;
+	player.body.bounce.y = 0.1;
 
 	player.body.setCollideWorldBounds = true;
 	this.physics.add.collider(player, platforms);
 
 	cursors = this.input.keyboard.createCursorKeys();
 
+	this.anims.create({
+        key: 'left',
+        frames: [ { key: 'player', frame: 0 } ],
+        frameRate: 10,
+    });
+
+    this.anims.create({
+        key: 'turn',
+        frames: [ { key: 'player', frame: 1 } ],
+        frameRate: 20
+	});
+	this.anims.create({
+        key: 'jump',
+        frames: [ { key: 'player', frame: 3 } ],
+        frameRate: 20
+    });
+
+    this.anims.create({
+        key: 'right',
+        frames: [ { key: 'player', frame: 2 } ],
+        frameRate: 10,
+    });
 	// /**
 	//  * Sliding object
 	//  */
@@ -295,6 +320,8 @@ function create() {
 				if (window.orientation === -90) {
 					if (data.do.beta > 6) {
 						player.body.velocity.x = boundingWidth * -0.3;
+						player.anims.play('left');
+
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -320,6 +347,8 @@ function create() {
 						}
 					} else if (data.do.beta < -6) {
 						player.body.velocity.x = boundingWidth * 0.3;
+						player.anims.play('right');
+
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -346,6 +375,7 @@ function create() {
 						}
 					} else {
 						player.body.velocity.x = 0;
+						player.anims.play('turn');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -375,6 +405,7 @@ function create() {
 				} else if (window.orientation === 90) {
 					if (data.do.beta > 6) {
 						player.body.velocity.x = boundingWidth * 0.3;
+						player.anims.play('right');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -401,6 +432,7 @@ function create() {
 						}
 					} else if (data.do.beta < -6) {
 						player.body.velocity.x = boundingWidth * -0.3;
+						player.anims.play('left');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -427,6 +459,7 @@ function create() {
 						}
 					} else {
 						player.body.velocity.x = 0;
+						player.anims.play('turn');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -456,6 +489,7 @@ function create() {
 				} else {
 					if (data.do.gamma > 6) {
 						player.body.velocity.x = boundingWidth * 0.3;
+						player.anims.play('right');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -482,6 +516,7 @@ function create() {
 						}
 					} else if (data.do.gamma < -6) {
 						player.body.velocity.x = boundingWidth * -0.3;
+						player.anims.play('left');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -507,6 +542,7 @@ function create() {
 						}
 					} else {
 						player.body.velocity.x = 0;
+						player.anims.play('turn');
 						if (connectedCloud) {
 							let newPlayerData = {
 								clientId: clientId,
@@ -569,7 +605,7 @@ function update() {
 	if (!gyroscope) {
 		if (cursors.left.isDown && !cursors.right.isDown) {
 			player.body.velocity.x = boundingWidth * -0.3;
-
+			player.anims.play('left');
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -597,6 +633,7 @@ function update() {
 			// player.anims.play('left', true);
 		} else if (cursors.right.isDown) {
 			player.body.velocity.x = boundingWidth * 0.3;
+			player.anims.play('right');
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -624,7 +661,7 @@ function update() {
 			// player.anims.play('right', true);
 		} else {
 			player.body.velocity.x = 0;
-
+			player.anims.play('turn');
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -650,8 +687,12 @@ function update() {
 			}
 			// player.anims.play('turn');
 		}
+		if(!player.body.touching.down){
+			if(player.body.velocity.x === 0)player.anims.play('jump');
+		}
 		if (cursors.up.isDown && player.body.touching.down) {
 			player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
+			
 
 			if (connectedCloud) {
 				let newPlayerData = {
@@ -782,15 +823,22 @@ function update() {
 	scoreText.setText(enemiesSpawned);
 
 	if (otherPlayer != undefined) {
+		
 		if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
 			otherPlayer.body.velocity.x = boundingWidth * -0.3;
+			otherPlayer.anims.play('left');
 			// console.log('Running left');
 		} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
 			otherPlayer.body.velocity.x = boundingWidth * 0.3;
+			otherPlayer.anims.play('right');
 			// console.log('Running right');
 		} else {
 			otherPlayer.body.velocity.x = 0;
+			otherPlayer.anims.play('turn');
 			// console.log('Standstill');
+		}
+		if(!otherPlayer.body.touching.down){
+			if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('jump');
 		}
 		if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
 			otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
@@ -846,14 +894,14 @@ function initMqtt(gameObj) {
 				multiplayer = true;
 				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 				// player.displayWidth = ;
-				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 1400;
+				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 
 				gameObj.physics.add.existing(otherPlayer);
 				otherPlayer.setDepth(10);
 				otherPlayer.alpha = 0.2;
 
-				otherPlayer.body.bounce.x = 0.2;
-				otherPlayer.body.bounce.y = 0.2;
+				otherPlayer.body.bounce.x = 0.1;
+				otherPlayer.body.bounce.y = 0.1;
 
 				otherPlayer.body.setCollideWorldBounds = true;
 				gameObj.physics.add.collider(otherPlayer, platforms);
@@ -939,14 +987,14 @@ function initMqtt(gameObj) {
 					multiplayer = true;
 					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
 					// player.displayWidth = ;
-					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 1400;
+					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 
 					gameObj.physics.add.existing(otherPlayer);
 					otherPlayer.setDepth(10);
 					otherPlayer.alpha = 0.2;
 
-					otherPlayer.body.bounce.x = 0.2;
-					otherPlayer.body.bounce.y = 0.2;
+					otherPlayer.body.bounce.x = 0.1;
+					otherPlayer.body.bounce.y = 0.1;
 
 					otherPlayer.body.setCollideWorldBounds = true;
 					gameObj.physics.add.collider(otherPlayer, platforms);
