@@ -97,7 +97,7 @@ function create() {
 	let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
 	// bg.displayWidth = width < height ? width : height;
 
-	bg.tileScaleX = bg.tileScaleY = width / 7500;
+	bg.tileScaleX = bg.tileScaleY = width > height* 1.77 ? width/7500 : height/7500;
 
 	// bg.alpha = 0.5;
 
@@ -822,29 +822,33 @@ function update() {
 	//   enemiesText.setText(enemiesSpawned);
 	scoreText.setText(enemiesSpawned);
 
-	if (otherPlayer != undefined) {
+	if (otherPlayer !== undefined) {
+		try{
+			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
+				otherPlayer.body.velocity.x = boundingWidth * -0.3;
+				otherPlayer.anims.play('left');
+				// console.log('Running left');
+			} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
+				otherPlayer.body.velocity.x = boundingWidth * 0.3;
+				otherPlayer.anims.play('right');
+				// console.log('Running right');
+			} else {
+				otherPlayer.body.velocity.x = 0;
+				otherPlayer.anims.play('turn');
+				// console.log('Standstill');
+			}
+			if(!otherPlayer.body.touching.down){
+				if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('jump');
+			}
+			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
+				otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
+				otherPlayerData.isJumping = false;
+				// console.log('Jumping');
+			}
+		}catch{
+			
+		}
 		
-		if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
-			otherPlayer.body.velocity.x = boundingWidth * -0.3;
-			otherPlayer.anims.play('left');
-			// console.log('Running left');
-		} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
-			otherPlayer.body.velocity.x = boundingWidth * 0.3;
-			otherPlayer.anims.play('right');
-			// console.log('Running right');
-		} else {
-			otherPlayer.body.velocity.x = 0;
-			otherPlayer.anims.play('turn');
-			// console.log('Standstill');
-		}
-		if(!otherPlayer.body.touching.down){
-			if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('jump');
-		}
-		if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
-			otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
-			otherPlayerData.isJumping = false;
-			// console.log('Jumping');
-		}
 	}
 }
 
