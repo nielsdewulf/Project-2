@@ -25,7 +25,10 @@ namespace afloat
             {
                 int? top = null;
                 if(req.Query.ContainsKey("top"))
-                top = int.Parse(req.Query["top"]);
+                {
+                    top = int.Parse(req.Query["top"]);
+                }
+                log.LogError(top.ToString());
 
                 using (SqlConnection connection = new SqlConnection())
                 {
@@ -35,9 +38,12 @@ namespace afloat
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
-                        command.CommandText = @"SELECT * from Game order by Score desc";
+                        command.CommandText = @"SELECT ";
                         if(top!=null)
-                            command.CommandText+=$" limit {top}";
+                            command.CommandText+=$" top {top} ";
+                        command.CommandText += $"* from Leaderboard order by Score desc;";
+                        log.LogError($" limit {top}");
+
                         var result = await command.ExecuteReaderAsync();
                         while (await result.ReadAsync())
                         {

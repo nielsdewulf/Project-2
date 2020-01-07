@@ -46,7 +46,7 @@ namespace afloat
                                 GameId = Guid.Parse(result["GameId"].ToString()),
                                 PlayerCount = int.Parse(result["PlayerCount"].ToString()),
                                 Status = int.Parse(result["Status"].ToString()),
-                                Timestamp = long.Parse(result["Timestamp"].ToString())
+                                DateTime = DateTime.Parse(result["DateTime"].ToString())
                             };
 
                             list.Add(game);

@@ -20,12 +20,13 @@ namespace afloat
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "game")] HttpRequest req,
             ILogger log)
         {
-            string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
-            string stream = await new StreamReader(req.Body).ReadToEndAsync();
-            Game game = JsonConvert.DeserializeObject<Game>(stream);
-            game.GameId = Guid.NewGuid();
             try
             {
+                string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
+                string stream = await new StreamReader(req.Body).ReadToEndAsync();
+                Game game = JsonConvert.DeserializeObject<Game>(stream);
+                game.GameId = Guid.NewGuid();
+
                 using (SqlConnection connection = new SqlConnection())
                 {
                     connection.ConnectionString = connectionString;
@@ -33,17 +34,17 @@ namespace afloat
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
-                        command.CommandText = $@"insert into Game values(@id,@count,@status,@timestamp);";
+                        command.CommandText = $@"insert into Game values(@id,@status,@count,@timestamp)";
                         command.Parameters.AddWithValue("@id", game.GameId);
                         command.Parameters.AddWithValue("@count", game.PlayerCount);
                         command.Parameters.AddWithValue("@status", game.Status);
-                        command.Parameters.AddWithValue("@timestamp", game.Timestamp);
-
+                        command.Parameters.AddWithValue("@timestamp", game.DateTime);
                         await command.ExecuteNonQueryAsync();
 
                     }
-                    return new OkObjectResult(new Dictionary<string,string>(){{"GameId",game.GameId.ToString()}});
                 }
+                return new OkObjectResult(new Dictionary<string, string>() { { "GameId", game.GameId.ToString() } });
+
             }
             catch (Exception ex)
             {

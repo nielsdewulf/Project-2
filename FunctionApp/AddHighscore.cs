@@ -32,7 +32,7 @@ namespace afloat
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
-                        command.CommandText = $@"insert into Highscore values(@id,@name,@gameid,@score,@avatar);";
+                        command.CommandText = $@"insert into Leaderboard values(@id,@name,@gameid,@score,@avatar);";
                         command.Parameters.AddWithValue("@id", highscore.PlayerId);
                         command.Parameters.AddWithValue("@name", highscore.Name);
                         command.Parameters.AddWithValue("@gameid", highscore.GameId);
