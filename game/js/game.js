@@ -81,7 +81,7 @@ function preload() {
 
 	this.load.spritesheet('player1', 'assets/AvatarAfloatOne.png', { frameWidth: 355.5, frameHeight: 359 });
 	this.load.spritesheet('player2', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
-	this.load.spritesheet('player3', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
+	this.load.spritesheet('player3', 'assets/AvatarAfloatThree.png', { frameWidth: 355.5, frameHeight: 357 });
 	this.load.spritesheet('player4', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
 
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
@@ -997,10 +997,10 @@ function initMqtt(gameObj) {
 	client.on('message', function(topic, message) {
 		let data = JSON.parse(message);
 		// console.log(data);
+		if (data.clientId === clientId) return;
 
 		if (data.status != undefined && data.status === 'connectionRequest') {
 			console.warn(`Connection request from: ${data.clientId}`);
-			console.warn(`Preparing to spawn player: ${data.clientId}`);
 			if (!multiplayer) {
 				multiplayer = true;
 				otherPlayerData.avatar = avatars[data.avatar];
@@ -1021,7 +1021,6 @@ function initMqtt(gameObj) {
 				gameObj.physics.add.collider(otherPlayer, platforms);
 			}
 		}
-		if (data.clientId === clientId) return;
 		if (data.status != undefined && data.status === 'connected') {
 			host = false;
 			console.warn(`User Connected: ${data.clientId}`);
@@ -1029,11 +1028,30 @@ function initMqtt(gameObj) {
 			client.publish(
 				lobbyId,
 				JSON.stringify({
-					clientId: data.clientId,
+					clientId: clientId,
 					status: 'connectionRequest',
 					avatar: avatars.indexOf(avatar)
 				})
 			);
+			if (!multiplayer) {
+				multiplayer = true;
+				otherPlayerData.avatar = avatars[data.avatar];
+				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
+
+				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
+				// player.displayWidth = ;
+				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+
+				gameObj.physics.add.existing(otherPlayer);
+				otherPlayer.setDepth(10);
+				otherPlayer.alpha = 0.2;
+
+				// otherPlayer.body.bounce.x = 0.1;
+				// otherPlayer.body.bounce.y = 0.1;
+
+				otherPlayer.body.setCollideWorldBounds = true;
+				gameObj.physics.add.collider(otherPlayer, platforms);
+			}
 		}
 		if (data.status != undefined && data.status === 'newEnemy') {
 			if (data.type === 'icicle') {
@@ -1087,6 +1105,11 @@ function initMqtt(gameObj) {
 				if (alive) score++;
 			}
 		}
+		if (data.status != undefined && data.status === 'disconnect') {
+			otherPlayer.destroy();
+			multiplayer = false;
+			host = true;
+		}
 		if (data.status != undefined && data.status === 'start') {
 			started = true;
 		}
@@ -1138,6 +1161,15 @@ const endGame = () => {
 		location.reload();
 	}, 1000);
 };
+const disconnectMultiplayer = () => {
+	client.publish(
+		lobbyId,
+		JSON.stringify({
+			clientId: clientId,
+			status: 'disconnect'
+		})
+	);
+};
 
 const getNormalizedPositions = (xb, yb) => {
 	let x = ((xb - (width - boundingWidth * 0.85) / 2) / boundingWidth) * 100;
@@ -1184,6 +1216,17 @@ const init = () => {
 		avatar = avatars[0];
 	}
 
+	window.addEventListener('beforeunload', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+			endGame();
+		}
+	});
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
