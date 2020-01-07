@@ -1037,6 +1037,10 @@ function initMqtt(gameObj) {
 		}
 		if (data.status != undefined && data.status === 'died') {
 			otherPlayer.destroy();
+			otherPlayerData.alive = false;
+			if (!alive) {
+				endGame();
+			}
 		}
 		if (data.status != undefined && data.status === 'movement') {
 			if (data.isRunning != undefined) otherPlayerData.isRunning = data.isRunning;
@@ -1084,8 +1088,18 @@ function die() {
 				status: 'died'
 			})
 		);
+		if (!otherPlayerData.alive) {
+			endGame();
+		}
+	} else {
+		endGame();
 	}
 }
+const endGame = () => {
+	setTimeout(() => {
+		location.reload();
+	}, 1000);
+};
 
 const getNormalizedPositions = (xb, yb) => {
 	let x = ((xb - (width - boundingWidth * 0.85) / 2) / boundingWidth) * 100;
