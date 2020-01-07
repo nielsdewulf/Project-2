@@ -905,7 +905,7 @@ function update() {
 	//   enemiesText.setText(score);
 	// scoreText.setText(score);
 
-	if (multiplayer && otherPlayerData.alive && otherPlayer !== undefined) {
+	if (multiplayer && otherPlayerData.alive) {
 		try {
 			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
 				otherPlayer.body.velocity.x = boundingWidth * -0.3;
@@ -1109,7 +1109,7 @@ function initMqtt(gameObj) {
 			}
 		}
 		if (data.status != undefined && data.status === 'disconnect') {
-			otherPlayer.destroy();
+			otherPlayer.setActive(false).setVisible(false);
 			multiplayer = false;
 			host = true;
 		}
@@ -1117,7 +1117,7 @@ function initMqtt(gameObj) {
 			started = true;
 		}
 		if (data.status != undefined && data.status === 'died') {
-			otherPlayer.destroy();
+			otherPlayer.setActive(false).setVisible(false);
 			otherPlayerData.alive = false;
 			if (!alive) {
 				endGame();
@@ -1143,7 +1143,8 @@ function die() {
 	if (!alive) return;
 	alive = false;
 	document.querySelector('canvas').classList.add('died');
-	player.destroy();
+	player.setActive(false);
+	player.setVisible(false);
 	if (multiplayer) {
 		client.publish(
 			lobbyId,
