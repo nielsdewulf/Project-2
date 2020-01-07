@@ -20,7 +20,15 @@ var connectedCloud = false;
 var started = false;
 var platforms;
 
+var avatars = [
+	{ key: 'player1', crop: true },
+	{ key: 'player2', crop: false },
+	{ key: 'player3', crop: false },
+	{ key: 'player4', crop: false }
+];
+
 var player;
+var avatar = avatars[1];
 var beforePlayerData = {
 	clientId: clientId,
 	isRunning: false,
@@ -28,6 +36,7 @@ var beforePlayerData = {
 };
 var otherPlayer;
 var otherPlayerData = {
+	avatar: avatars[0],
 	score: 0,
 	alive: true,
 	isRunning: false,
@@ -68,9 +77,12 @@ function preload() {
 
 	// this.load.image('platform', 'assets/.png');
 
-	// this.load.image('player', 'assets/player.png');
+	// this.load.image('player1', 'assets/player.png');
 
-	this.load.spritesheet('player', 'assets/AvatarAfloatOne.png', { frameWidth: 355.5, frameHeight: 359 });
+	this.load.spritesheet('player1', 'assets/AvatarAfloatOne.png', { frameWidth: 355.5, frameHeight: 359 });
+	this.load.spritesheet('player2', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
+	this.load.spritesheet('player3', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
+	this.load.spritesheet('player4', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
 
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
@@ -175,7 +187,7 @@ function create() {
 	/**
 	 * Player
 	 */
-	player = this.physics.add.sprite(width / 2, height - height * 0.5, 'player');
+	player = this.physics.add.sprite(width / 2, height - height * 0.5, avatar.key);
 	// player.displayWidth = ;
 	player.scaleY = player.scaleX = boundingWidth / 3000;
 
@@ -188,43 +200,45 @@ function create() {
 	this.physics.add.collider(player, platforms);
 
 	cursors = this.input.keyboard.createCursorKeys();
+	avatars.forEach((el, i) => {
+		this.anims.create({
+			key: 'left' + i,
+			frames: [{ key: el.key, frame: 0 }],
+			frameRate: 10
+		});
+		this.anims.create({
+			key: 'leftJump' + i,
+			frames: [{ key: el.key, frame: 3 }],
+			frameRate: 10
+		});
+		this.anims.create({
+			key: 'turn' + i,
+			frames: [{ key: el.key, frame: 1 }],
+			frameRate: 20
+		});
+		this.anims.create({
+			key: 'turnJump' + i,
+			frames: [{ key: el.key, frame: 4 }],
+			frameRate: 5
+		});
 
-	this.anims.create({
-		key: 'left',
-		frames: [{ key: 'player', frame: 0 }],
-		frameRate: 10
-	});
-	this.anims.create({
-		key: 'leftJump',
-		frames: [{ key: 'player', frame: 3 }],
-		frameRate: 10
-	});
-	this.anims.create({
-		key: 'turn',
-		frames: [{ key: 'player', frame: 1 }],
-		frameRate: 20
-	});
-	this.anims.create({
-		key: 'turnJump',
-		frames: [{ key: 'player', frame: 4 }],
-		frameRate: 5
+		this.anims.create({
+			key: 'right' + i,
+			frames: [{ key: el.key, frame: 2 }],
+			frameRate: 10
+		});
+		this.anims.create({
+			key: 'rightJump' + i,
+			frames: [{ key: el.key, frame: 5 }],
+			frameRate: 10
+		});
 	});
 
-	this.anims.create({
-		key: 'right',
-		frames: [{ key: 'player', frame: 2 }],
-		frameRate: 10
-	});
-	this.anims.create({
-		key: 'rightJump',
-		frames: [{ key: 'player', frame: 5 }],
-		frameRate: 10
-	});
 	// /**
 	//  * Sliding object
 	//  */
 
-	// let penguin = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player');
+	// let penguin = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player1');
 	// penguin.scaleY = penguin.scaleX = boundingWidth / 3000;
 
 	// this.physics.add.existing(penguin);
@@ -240,7 +254,7 @@ function create() {
 	//  */
 	// let x = Math.random() * ((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85 - (width - boundingWidth * 0.85) / 2) + (width - boundingWidth * 0.85) / 2;
 	// console.warn('REEEEEE: ' + x);
-	// ice = this.physics.add.sprite(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset, 0, 'player');
+	// ice = this.physics.add.sprite(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset, 0, 'player1');
 	// ice.scaleY = ice.scaleX = boundingWidth / 3000;
 
 	// this.physics.add.existing(ice);
@@ -333,9 +347,11 @@ function create() {
 					if (window.orientation === -90) {
 						if (data.do.beta > 6) {
 							player.body.velocity.x = boundingWidth * -0.3;
-							player.anims.play('left');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('left' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 
 							if (connectedCloud) {
 								let newPlayerData = {
@@ -362,9 +378,11 @@ function create() {
 							}
 						} else if (data.do.beta < -6) {
 							player.body.velocity.x = boundingWidth * 0.3;
-							player.anims.play('right');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('right' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 
 							if (connectedCloud) {
 								let newPlayerData = {
@@ -392,9 +410,11 @@ function create() {
 							}
 						} else {
 							player.body.velocity.x = 0;
-							player.anims.play('turn');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('turn' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -424,9 +444,11 @@ function create() {
 					} else if (window.orientation === 90) {
 						if (data.do.beta > 6) {
 							player.body.velocity.x = boundingWidth * 0.3;
-							player.anims.play('right');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('right' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -453,9 +475,11 @@ function create() {
 							}
 						} else if (data.do.beta < -6) {
 							player.body.velocity.x = boundingWidth * -0.3;
-							player.anims.play('left');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('left' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -482,9 +506,11 @@ function create() {
 							}
 						} else {
 							player.body.velocity.x = 0;
-							player.anims.play('turn');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('turn' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -514,9 +540,11 @@ function create() {
 					} else {
 						if (data.do.gamma > 6) {
 							player.body.velocity.x = boundingWidth * 0.3;
-							player.anims.play('right');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('right' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -543,9 +571,11 @@ function create() {
 							}
 						} else if (data.do.gamma < -6) {
 							player.body.velocity.x = boundingWidth * -0.3;
-							player.anims.play('left');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('left' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -571,9 +601,11 @@ function create() {
 							}
 						} else {
 							player.body.velocity.x = 0;
-							player.anims.play('turn');
-							player.setCrop(0, 72.248, player.width, 286.752);
-							player.height = 286.752;
+							player.anims.play('turn' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
 							if (connectedCloud) {
 								let newPlayerData = {
 									clientId: clientId,
@@ -637,9 +669,11 @@ function update() {
 	if (!gyroscope && alive) {
 		if (cursors.left.isDown && !cursors.right.isDown) {
 			player.body.velocity.x = boundingWidth * -0.3;
-			player.anims.play('left');
-			player.height = 286.752;
-			player.setCrop(0, 72.248, player.width, 286.752);
+			player.anims.play('left' + avatars.indexOf(avatar));
+			if (avatar.crop) {
+				player.height = 286.752;
+				player.setCrop(0, 72.248, player.width, 286.752);
+			}
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -667,9 +701,11 @@ function update() {
 			// player.anims.play('left', true);
 		} else if (cursors.right.isDown) {
 			player.body.velocity.x = boundingWidth * 0.3;
-			player.anims.play('right');
-			player.height = 286.752;
-			player.setCrop(0, 72.248, player.width, 286.752);
+			player.anims.play('right' + avatars.indexOf(avatar));
+			if (avatar.crop) {
+				player.height = 286.752;
+				player.setCrop(0, 72.248, player.width, 286.752);
+			}
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -697,9 +733,11 @@ function update() {
 			// player.anims.play('right', true);
 		} else {
 			player.body.velocity.x = 0;
-			player.anims.play('turn');
-			player.height = 286.752;
-			player.setCrop(0, 72.248, player.width, 286.752);
+			player.anims.play('turn' + avatars.indexOf(avatar));
+			if (avatar.crop) {
+				player.height = 286.752;
+				player.setCrop(0, 72.248, player.width, 286.752);
+			}
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
@@ -730,10 +768,10 @@ function update() {
 			player.height = 359;
 
 			if (player.body.velocity.x === 0) {
-				player.anims.play('turnJump');
+				player.anims.play('turnJump' + avatars.indexOf(avatar));
 			} else {
-				if (player.body.velocity.x > 0) player.anims.play('rightJump');
-				if (player.body.velocity.x < 0) player.anims.play('leftJump');
+				if (player.body.velocity.x > 0) player.anims.play('rightJump' + avatars.indexOf(avatar));
+				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
 			}
 		}
 		if (cursors.up.isDown && player.body.touching.down) {
@@ -756,7 +794,7 @@ function update() {
 							y: y
 						})
 					);
-					console.log('send jump');
+					// console.log('send jump');
 					beforePlayerData = newPlayerData;
 				}
 			}
@@ -867,41 +905,49 @@ function update() {
 	//   enemiesText.setText(score);
 	// scoreText.setText(score);
 
-	if (otherPlayer !== undefined) {
+	if (multiplayer && otherPlayerData.alive && otherPlayer !== undefined) {
 		try {
 			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
 				otherPlayer.body.velocity.x = boundingWidth * -0.3;
-				otherPlayer.anims.play('left');
-				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
-				otherPlayer.height = 286.752;
+				otherPlayer.anims.play('left' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
+					otherPlayer.height = 286.752;
+				}
 				// console.log('Running left');
 			} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
 				otherPlayer.body.velocity.x = boundingWidth * 0.3;
-				otherPlayer.anims.play('right');
-				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
-				otherPlayer.height = 286.752;
+				otherPlayer.anims.play('right' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
+					otherPlayer.height = 286.752;
+				}
 
 				// console.log('Running right');
 			} else {
 				otherPlayer.body.velocity.x = 0;
-				otherPlayer.anims.play('turn');
-				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
-				otherPlayer.height = 286.752;
+				otherPlayer.anims.play('turn' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
+					otherPlayer.height = 286.752;
+				}
 
 				// console.log('Standstill');
 			}
 			if (!otherPlayer.body.touching.down) {
-				if (otherPlayer.body.velocity.x === 0) otherPlayer.anims.play('turnJump');
-				if (otherPlayer.body.velocity.x > 0) otherPlayer.anims.play('rightJump');
-				if (otherPlayer.body.velocity.x < 0) otherPlayer.anims.play('leftJump');
-				otherPlayer.isCropped = false;
-				otherPlayer.height = 359;
+				if (otherPlayer.body.velocity.x === 0) otherPlayer.anims.play('turnJump' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayer.body.velocity.x > 0) otherPlayer.anims.play('rightJump' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayer.body.velocity.x < 0) otherPlayer.anims.play('leftJump' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.isCropped = false;
+					otherPlayer.height = 359;
+				}
 			}
 			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
 				otherPlayer.body.velocity.y = (boundingHeight / 2) * 1.5 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
 				otherPlayerData.isJumping = false;
 
-				console.log('Jumping');
+				// console.log('Jumping');
 			}
 		} catch (ex) {
 			console.error(ex);
@@ -938,7 +984,8 @@ function initMqtt(gameObj) {
 					lobbyId,
 					JSON.stringify({
 						clientId: clientId,
-						status: 'connected'
+						status: 'connected',
+						avatar: avatars.indexOf(avatar)
 					})
 				);
 			} else {
@@ -952,9 +999,14 @@ function initMqtt(gameObj) {
 		// console.log(data);
 
 		if (data.status != undefined && data.status === 'connectionRequest') {
-			if (data.clientId === clientId && !multiplayer) {
+			console.warn(`Connection request from: ${data.clientId}`);
+			console.warn(`Preparing to spawn player: ${data.clientId}`);
+			if (!multiplayer) {
 				multiplayer = true;
-				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
+				otherPlayerData.avatar = avatars[data.avatar];
+				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
+
+				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
 				// player.displayWidth = ;
 				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 
@@ -972,11 +1024,14 @@ function initMqtt(gameObj) {
 		if (data.clientId === clientId) return;
 		if (data.status != undefined && data.status === 'connected') {
 			host = false;
+			console.warn(`User Connected: ${data.clientId}`);
+
 			client.publish(
 				lobbyId,
 				JSON.stringify({
 					clientId: data.clientId,
-					status: 'connectionRequest'
+					status: 'connectionRequest',
+					avatar: avatars.indexOf(avatar)
 				})
 			);
 		}
@@ -1051,23 +1106,6 @@ function initMqtt(gameObj) {
 				let [x, y] = getRealPositions(data.x, data.y);
 				otherPlayerData.x = x;
 				otherPlayerData.y = y;
-				// console.warn(x, y);
-				if (otherPlayer == undefined) {
-					multiplayer = true;
-					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, 'player');
-					// player.displayWidth = ;
-					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-
-					gameObj.physics.add.existing(otherPlayer);
-					otherPlayer.setDepth(10);
-					otherPlayer.alpha = 0.2;
-
-					// otherPlayer.body.bounce.x = 0.1;
-					// otherPlayer.body.bounce.y = 0.1;
-
-					otherPlayer.body.setCollideWorldBounds = true;
-					gameObj.physics.add.collider(otherPlayer, platforms);
-				}
 				otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
 			}
 		}
@@ -1139,6 +1177,12 @@ const resize = () => {
 
 const init = () => {
 	// screen.orientation.lock('landscape-primary');
+
+	var url = new URL(window.location);
+	avatar = avatars[parseInt(url.searchParams.get('avatar'))];
+	if (avatar == undefined) {
+		avatar = avatars[0];
+	}
 
 	[width, height] = calcWidthHeight();
 
