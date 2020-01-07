@@ -1,3 +1,4 @@
+/* Button styling */
 .c-button{
     width: 490px;
     height: 110px;
@@ -19,4 +20,25 @@
     font-weight: 600;
     
     color: white;
+}
+
+
+
+/* Vertical Grid Styling */
+.c-vertical-grid{
+    display: grid;
+    grid-template-rows: repeat(5, 80px);
+    grid-row-gap: 24px;
+}
+
+.c-vertical-grid__box{
+    height: 85px;
+    width: 1548px;
+
+    border-radius: 20px;
+
+    background-color: #5B5BFF;
+
+    display: grid;
+    grid-template-columns: 180px 1189px 180px;
 }
