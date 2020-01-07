@@ -953,6 +953,9 @@ function update() {
 			console.error(ex);
 		}
 	}
+	if (player.body.y > height) {
+		die();
+	}
 }
 
 /**
