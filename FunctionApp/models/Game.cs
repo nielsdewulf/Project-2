@@ -7,6 +7,6 @@ namespace afloat.models
         public Guid GameId { get; set; }
         public int PlayerCount { get; set; }
         public int Status { get; set; }
-        public long Timestamp { get; set; } = new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(); 
+        public DateTime DateTime { get; set; } = DateTime.Now; 
     }
 }

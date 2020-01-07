@@ -19,7 +19,7 @@ namespace afloat
     {
         [FunctionName("ChangeGame")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "game/{GameId}")] HttpRequest req,string GameId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = "game/{GameId}")] HttpRequest req,string GameId,
             ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
