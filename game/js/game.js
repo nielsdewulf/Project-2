@@ -8,7 +8,7 @@ var boundingWidth, boundingHeight;
 
 var screenangle = window.orientation;
 
-var gyroscope = true;
+var gyroscope = false;
 var noSleep = new NoSleep();
 
 var client;
@@ -109,10 +109,12 @@ function create() {
 	/**
 	 * Background
 	 */
-	let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
-	// bg.displayWidth = width < height ? width : height;
+	let bg = this.add.image(width / 2, height - height / 2, 'bg');
+	bg.scaleX = bg.scaleY = width > height * 1.77 ? width / 7500 : height / 7500;
+	// let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
+	// // bg.displayWidth = width < height ? width : height;
 
-	bg.tileScaleX = bg.tileScaleY = width > height * 1.77 ? width / 7500 : height / 7500;
+	// bg.tileScaleX = bg.tileScaleY = width > height * 1.77 ? width / 7500 : height / 7500;
 
 	// bg.alpha = 0.5;
 
@@ -283,6 +285,24 @@ function create() {
 			// 	// On start fulll screen
 			// }
 			// screen.orientation.lock('landscape-primary');
+			var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+			if (iOS && !gyroscope) {
+				DeviceMotionEvent.requestPermission()
+					.then(response => {
+						if (response == 'granted') {
+							gyroscope = true;
+							window.addEventListener(
+								'deviceorientation',
+								function(e) {
+									processGyro(e.alpha, e.beta, e.gamma);
+								},
+								true
+							);
+						}
+					})
+					.catch(console.error);
+			}
+
 			if (player.body.touching.down) {
 				player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
 
@@ -339,6 +359,840 @@ function create() {
 	// 	fill: '#ff0044',
 	// 	align: 'center'
 	// });
+	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	if (!iOS) {
+		if (window.DeviceOrientationEvent) {
+			window.addEventListener(
+				'deviceorientation',
+				function(e) {
+					processGyro(e.alpha, e.beta, e.gamma);
+				},
+				true
+			);
+			gyroscope = true;
+		} else {
+		}
+
+		// initGyroscope();
+	} else {
+		DeviceMotionEvent.requestPermission()
+			.then(response => {
+				if (response == 'granted') {
+					gyroscope = true;
+					window.addEventListener(
+						'deviceorientation',
+						function(e) {
+							processGyro(e.alpha, e.beta, e.gamma);
+						},
+						true
+					);
+				}
+			})
+			.catch(console.error);
+	}
+}
+
+function update() {
+	//   enemies.forEach((el, i) => {
+	//       if (el.body.y > height) {
+	//         console.log('enemy passed');
+	//         enemies.pop(el);
+	//         if (!enemies.includes(el)) {
+	//           if (penguinsRIGHT.includes(el)) penguinsRIGHT.pop(el);
+	//           if (penguinsLEFT.includes(el)) penguinsLEFT.pop(el);
+	//           el.destroy();
+	//         }
+	//         score++;
+	//       }
+
+	//   });
+	if (started) {
+		penguinsLEFT.forEach((el, i) => {
+			el.body.velocity.x = boundingWidth * 0.2 * -1;
+		});
+		penguinsRIGHT.forEach((el, i) => {
+			el.body.velocity.x = boundingWidth * 0.2;
+		});
+	}
+	/**
+	 * START DEBUG
+	 */
+	if (!gyroscope && alive) {
+		if (cursors.left.isDown && !cursors.right.isDown) {
+			player.body.velocity.x = boundingWidth * -0.3;
+			player.anims.play('left' + avatars.indexOf(avatar));
+			if (avatar.crop) {
+				player.height = 286.752;
+				player.setCrop(0, 72.248, player.width, 286.752);
+			}
+			if (connectedCloud) {
+				let newPlayerData = {
+					clientId: clientId,
+					isRunning: true,
+					direction: -1
+				};
+				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+					client.publish(
+						lobbyId,
+						JSON.stringify({
+							clientId: clientId,
+							isRunning: true,
+							direction: -1,
+							status: 'movement',
+
+							x: x,
+							y: y
+						})
+					);
+					beforePlayerData = newPlayerData;
+				}
+			}
+
+			// player.anims.play('left', true);
+		} else if (cursors.right.isDown) {
+			player.body.velocity.x = boundingWidth * 0.3;
+			player.anims.play('right' + avatars.indexOf(avatar));
+			if (avatar.crop) {
+				player.height = 286.752;
+				player.setCrop(0, 72.248, player.width, 286.752);
+			}
+			if (connectedCloud) {
+				let newPlayerData = {
+					clientId: clientId,
+					isRunning: true,
+					direction: 1
+				};
+				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+					client.publish(
+						lobbyId,
+						JSON.stringify({
+							clientId: clientId,
+							isRunning: true,
+							direction: 1,
+							status: 'movement',
+
+							x: x,
+							y: y
+						})
+					);
+					beforePlayerData = newPlayerData;
+				}
+			}
+
+			// player.anims.play('right', true);
+		} else {
+			player.body.velocity.x = 0;
+			player.anims.play('turn' + avatars.indexOf(avatar));
+			if (avatar.crop) {
+				player.height = 286.752;
+				player.setCrop(0, 72.248, player.width, 286.752);
+			}
+			if (connectedCloud) {
+				let newPlayerData = {
+					clientId: clientId,
+					isRunning: false,
+					direction: 0
+				};
+				if (beforePlayerData.isRunning !== newPlayerData.isRunning) {
+					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+					client.publish(
+						lobbyId,
+						JSON.stringify({
+							clientId: clientId,
+							isRunning: false,
+							direction: 0,
+							status: 'movement',
+
+							x: x,
+							y: y
+						})
+					);
+					beforePlayerData = newPlayerData;
+				}
+			}
+			// player.anims.play('turn');
+		}
+		if (!player.body.touching.down) {
+			player.isCropped = false;
+			player.height = 359;
+
+			if (player.body.velocity.x === 0) {
+				player.anims.play('turnJump' + avatars.indexOf(avatar));
+			} else {
+				if (player.body.velocity.x > 0) player.anims.play('rightJump' + avatars.indexOf(avatar));
+				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
+			}
+		}
+		if (cursors.up.isDown && player.body.touching.down) {
+			player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
+
+			if (connectedCloud) {
+				let newPlayerData = {
+					clientId: clientId,
+					isJumping: true
+				};
+				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
+					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+					client.publish(
+						lobbyId,
+						JSON.stringify({
+							clientId: clientId,
+							isJumping: true,
+							status: 'movement',
+							x: x,
+							y: y
+						})
+					);
+					// console.log('send jump');
+					beforePlayerData = newPlayerData;
+				}
+			}
+		}
+	} else {
+		if (!player.body.touching.down) {
+			player.isCropped = false;
+			player.height = 359;
+
+			if (player.body.velocity.x === 0) {
+				player.anims.play('turnJump' + avatars.indexOf(avatar));
+			} else {
+				if (player.body.velocity.x > 0) player.anims.play('rightJump' + avatars.indexOf(avatar));
+				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
+			}
+		}
+	}
+
+	/**
+	 * END DEBUG
+	 */
+
+	if ((host || !multiplayer) && started) {
+		let random = Math.random() * (8000 - 15000) + 8000;
+		if (new Date().getTime() - lastTimeSpawn > random) {
+			// console.log(new Date().getTime() - lastTimeSpawn, random);
+			if (Math.random() > 0.2) {
+				// console.warn('RESPAWNING');
+				if (Math.random() <= 0.8) {
+					/**
+					 * Spawn icicle
+					 */
+					// console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
+					let x =
+						Math.random() *
+							(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
+						((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
+
+					ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
+					ice.scaleY = ice.scaleX = boundingWidth / 6000;
+
+					this.physics.add.existing(ice);
+					ice.setDepth(1000);
+					ice.setOrigin(0.5, 0);
+					ice.body.bounce.x = 0.2;
+					ice.body.bounce.y = 0.2;
+					// ice.body.velocity.y = 500;
+
+					// ice.body.setCollideWorldBounds(true);
+					ice.body.onWorldBounds = true;
+
+					// this.physics.add.collider(ice, platforms);
+					enemies.push(ice);
+					if (alive) score++;
+
+					let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
+					client.publish(
+						lobbyId,
+						JSON.stringify({
+							clientId: clientId,
+							status: 'newEnemy',
+							type: 'icicle',
+							x: xb,
+							y: yb
+						})
+					);
+				} else {
+					/**
+					 * Spawn penguin
+					 */
+					let x;
+					let list;
+					let flip = true;
+
+					//Randomize left/right
+					if (Math.random() <= 0.5) {
+						x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
+						list = penguinsLEFT;
+						flip = false;
+					} else {
+						x = (width - boundingWidth * 0.85) / 2;
+						list = penguinsRIGHT;
+					}
+
+					let penguin = this.physics.add.sprite(x, height - height * 0.2, 'penguin');
+
+					penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
+					penguin.flipX = flip;
+					penguin.setOrigin(0.5, 0);
+
+					this.physics.add.existing(penguin);
+					penguin.setDepth(1000);
+					penguin.body.bounce.x = 0.5;
+					penguin.body.bounce.y = 0.5;
+
+					// penguin.body.setCollideWorldBounds(true);
+					penguin.body.onWorldBounds = true;
+
+					this.physics.add.collider(penguin, platforms);
+					enemies.push(penguin);
+					list.push(penguin);
+					if (alive) score++;
+					let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
+					client.publish(
+						lobbyId,
+						JSON.stringify({
+							clientId: clientId,
+							status: 'newEnemy',
+							type: 'penguin',
+							flip: flip,
+							x: xb,
+							y: yb
+						})
+					);
+				}
+			}
+			lastTimeSpawn = new Date().getTime();
+		}
+	}
+	//   enemiesText.setText(score);
+	// scoreText.setText(score);
+
+	if (multiplayer && otherPlayerData.alive) {
+		try {
+			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
+				otherPlayer.body.velocity.x = boundingWidth * -0.3;
+				otherPlayer.anims.play('left' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
+					otherPlayer.height = 286.752;
+				}
+				// console.log('Running left');
+			} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
+				otherPlayer.body.velocity.x = boundingWidth * 0.3;
+				otherPlayer.anims.play('right' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
+					otherPlayer.height = 286.752;
+				}
+
+				// console.log('Running right');
+			} else {
+				otherPlayer.body.velocity.x = 0;
+				otherPlayer.anims.play('turn' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
+					otherPlayer.height = 286.752;
+				}
+
+				// console.log('Standstill');
+			}
+			if (!otherPlayer.body.touching.down) {
+				if (otherPlayer.body.velocity.x === 0) otherPlayer.anims.play('turnJump' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayer.body.velocity.x > 0) otherPlayer.anims.play('rightJump' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayer.body.velocity.x < 0) otherPlayer.anims.play('leftJump' + avatars.indexOf(otherPlayerData.avatar));
+				if (otherPlayerData.avatar.crop) {
+					otherPlayer.isCropped = false;
+					otherPlayer.height = 359;
+				}
+			}
+			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
+				otherPlayer.body.velocity.y = (boundingHeight / 2) * 1.5 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
+				otherPlayerData.isJumping = false;
+
+				// console.log('Jumping');
+			}
+		} catch (ex) {
+			console.error(ex);
+		}
+	}
+	if (player.body.y > height) {
+		die();
+	}
+}
+
+/**
+ * Game Utility functions
+ */
+// function addScore(enemy) {
+// 	if (enemy.y < height) return;
+// 	if (!alive) return;
+// 	console.log('enemy passed');
+// 	enemies.pop(enemy);
+// 	score++;
+// 	if (!enemies.includes(enemy)) enemy.destroy();
+// 	if (penguinsRIGHT.includes(enemy)) penguinsRIGHT.pop(enemy);
+// 	if (penguinsLEFT.includes(enemy)) penguinsLEFT.pop(enemy);
+// }
+
+function initMqtt(gameObj) {
+	client = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
+		//wss://mqtt.funergydev.com:9001
+		//51.105.206.206
+		protocolId: 'MQTT'
+	});
+	client.on('connect', function() {
+		client.subscribe(lobbyId, function(err) {
+			if (!err) {
+				connectedCloud = true;
+				console.warn('Connected');
+				client.publish(
+					lobbyId,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'connected',
+						avatar: avatars.indexOf(avatar)
+					})
+				);
+			} else {
+				console.log(err);
+			}
+		});
+	});
+
+	client.on('message', function(topic, message) {
+		let data = JSON.parse(message);
+		// console.log(data);
+		if (data.clientId === clientId) return;
+
+		if (data.status != undefined && data.status === 'connectionRequest') {
+			console.warn(`Connection request from: ${data.clientId}`);
+			if (!multiplayer) {
+				multiplayer = true;
+				otherPlayerData.avatar = avatars[data.avatar];
+				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
+
+				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
+				// player.displayWidth = ;
+				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+
+				gameObj.physics.add.existing(otherPlayer);
+				otherPlayer.setDepth(10);
+				otherPlayer.alpha = 0.2;
+
+				// otherPlayer.body.bounce.x = 0.1;
+				// otherPlayer.body.bounce.y = 0.1;
+
+				otherPlayer.body.setCollideWorldBounds = true;
+				gameObj.physics.add.collider(otherPlayer, platforms);
+			}
+		}
+		if (data.status != undefined && data.status === 'connected') {
+			host = false;
+			console.warn(`User Connected: ${data.clientId}`);
+
+			client.publish(
+				lobbyId,
+				JSON.stringify({
+					clientId: clientId,
+					status: 'connectionRequest',
+					avatar: avatars.indexOf(avatar)
+				})
+			);
+			if (!multiplayer) {
+				multiplayer = true;
+				otherPlayerData.avatar = avatars[data.avatar];
+				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
+
+				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
+				// player.displayWidth = ;
+				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+
+				gameObj.physics.add.existing(otherPlayer);
+				otherPlayer.setDepth(10);
+				otherPlayer.alpha = 0.2;
+
+				// otherPlayer.body.bounce.x = 0.1;
+				// otherPlayer.body.bounce.y = 0.1;
+
+				otherPlayer.body.setCollideWorldBounds = true;
+				gameObj.physics.add.collider(otherPlayer, platforms);
+			}
+		}
+		if (data.status != undefined && data.status === 'newEnemy') {
+			if (data.type === 'icicle') {
+				let [x, y] = getRealPositions(data.x, data.y);
+
+				ice = gameObj.physics.add.sprite(x, y, 'icicle');
+				ice.scaleY = ice.scaleX = boundingWidth / 6000;
+
+				gameObj.physics.add.existing(ice);
+				ice.setDepth(1000);
+				ice.setOrigin(0.5, 0);
+				ice.body.bounce.x = 0.2;
+				ice.body.bounce.y = 0.2;
+				// ice.body.velocity.y = 500;
+
+				// ice.body.setCollideWorldBounds(true);
+				ice.body.onWorldBounds = true;
+
+				// this.physics.add.collider(ice, platforms);
+				enemies.push(ice);
+				if (alive) score++;
+			} else if (data.type === 'penguin') {
+				let [x, y] = getRealPositions(data.x, data.y);
+
+				let list;
+
+				//Randomize left/right
+				if (!data.flip) {
+					list = penguinsLEFT;
+				} else {
+					list = penguinsRIGHT;
+				}
+
+				let penguin = gameObj.physics.add.sprite(x, y, 'penguin');
+
+				penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
+				penguin.flipX = data.flip;
+				penguin.setOrigin(0.5, 0);
+
+				gameObj.physics.add.existing(penguin);
+				penguin.setDepth(1000);
+				penguin.body.bounce.x = 0.5;
+				penguin.body.bounce.y = 0.5;
+
+				// penguin.body.setCollideWorldBounds(true);
+				penguin.body.onWorldBounds = true;
+
+				gameObj.physics.add.collider(penguin, platforms);
+				enemies.push(penguin);
+				list.push(penguin);
+				if (alive) score++;
+			}
+		}
+		if (data.status != undefined && data.status === 'disconnect') {
+			otherPlayer.setActive(false).setVisible(false);
+			multiplayer = false;
+			host = true;
+		}
+		if (data.status != undefined && data.status === 'start') {
+			started = true;
+		}
+		if (data.status != undefined && data.status === 'died') {
+			otherPlayer.setActive(false).setVisible(false);
+			otherPlayerData.alive = false;
+			otherPlayerData.score = data.score;
+			if (!alive) {
+				endGame();
+			}
+		}
+		if (data.status != undefined && data.status === 'movement') {
+			if (data.isRunning != undefined) otherPlayerData.isRunning = data.isRunning;
+			if (data.direction != undefined) otherPlayerData.direction = data.direction;
+			if (data.isJumping != undefined) otherPlayerData.isJumping = data.isJumping;
+
+			if (data.x != undefined || data.y != undefined) {
+				let [x, y] = getRealPositions(data.x, data.y);
+				otherPlayerData.x = x;
+				otherPlayerData.y = y;
+				otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
+			}
+		}
+	});
+}
+function processGyro(alpha, beta, gamma) {
+	if (alive) {
+		if (window.orientation === -90) {
+			if (beta > 6) {
+				player.body.velocity.x = boundingWidth * -0.3;
+				player.anims.play('left' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: -1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: -1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else if (beta < -6) {
+				player.body.velocity.x = boundingWidth * 0.3;
+				player.anims.play('right' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: 1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: 1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else {
+				player.body.velocity.x = 0;
+				player.anims.play('turn' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: false,
+						direction: 0
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: false,
+								direction: 0,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			}
+			text.setText(data.do.beta);
+		} else if (window.orientation === 90) {
+			if (beta > 6) {
+				player.body.velocity.x = boundingWidth * 0.3;
+				player.anims.play('right' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: 1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: 1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else if (beta < -6) {
+				player.body.velocity.x = boundingWidth * -0.3;
+				player.anims.play('left' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: -1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: -1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else {
+				player.body.velocity.x = 0;
+				player.anims.play('turn' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: false,
+						direction: 0
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: false,
+								direction: 0,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			}
+			text.setText(data.do.beta);
+		} else {
+			if (gamma > 6) {
+				player.body.velocity.x = boundingWidth * 0.3;
+				player.anims.play('right' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: 1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: 1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else if (gamma < -6) {
+				player.body.velocity.x = boundingWidth * -0.3;
+				player.anims.play('left' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: -1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: -1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else {
+				player.body.velocity.x = 0;
+				player.anims.play('turn' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: false,
+						direction: 0
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: false,
+								direction: 0,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			}
+		}
+	}
+}
+function initGyroscope() {
 	var gn = new GyroNorm();
 	gn.init()
 		.then(function() {
@@ -630,7 +1484,6 @@ function create() {
 								}
 							}
 						}
-						text.setText(data.do.gamma);
 					}
 				}
 			});
@@ -641,512 +1494,20 @@ function create() {
 		}); // start gyroscope detection
 }
 
-function update() {
-	//   enemies.forEach((el, i) => {
-	//       if (el.body.y > height) {
-	//         console.log('enemy passed');
-	//         enemies.pop(el);
-	//         if (!enemies.includes(el)) {
-	//           if (penguinsRIGHT.includes(el)) penguinsRIGHT.pop(el);
-	//           if (penguinsLEFT.includes(el)) penguinsLEFT.pop(el);
-	//           el.destroy();
-	//         }
-	//         score++;
-	//       }
-
-	//   });
-	if (started) {
-		penguinsLEFT.forEach((el, i) => {
-			el.body.velocity.x = boundingWidth * 0.2 * -1;
-		});
-		penguinsRIGHT.forEach((el, i) => {
-			el.body.velocity.x = boundingWidth * 0.2;
-		});
-	}
-	/**
-	 * START DEBUG
-	 */
-	if (!gyroscope && alive) {
-		if (cursors.left.isDown && !cursors.right.isDown) {
-			player.body.velocity.x = boundingWidth * -0.3;
-			player.anims.play('left' + avatars.indexOf(avatar));
-			if (avatar.crop) {
-				player.height = 286.752;
-				player.setCrop(0, 72.248, player.width, 286.752);
-			}
-			if (connectedCloud) {
-				let newPlayerData = {
-					clientId: clientId,
-					isRunning: true,
-					direction: -1
-				};
-				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							isRunning: true,
-							direction: -1,
-							status: 'movement',
-
-							x: x,
-							y: y
-						})
-					);
-					beforePlayerData = newPlayerData;
-				}
-			}
-
-			// player.anims.play('left', true);
-		} else if (cursors.right.isDown) {
-			player.body.velocity.x = boundingWidth * 0.3;
-			player.anims.play('right' + avatars.indexOf(avatar));
-			if (avatar.crop) {
-				player.height = 286.752;
-				player.setCrop(0, 72.248, player.width, 286.752);
-			}
-			if (connectedCloud) {
-				let newPlayerData = {
-					clientId: clientId,
-					isRunning: true,
-					direction: 1
-				};
-				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							isRunning: true,
-							direction: 1,
-							status: 'movement',
-
-							x: x,
-							y: y
-						})
-					);
-					beforePlayerData = newPlayerData;
-				}
-			}
-
-			// player.anims.play('right', true);
-		} else {
-			player.body.velocity.x = 0;
-			player.anims.play('turn' + avatars.indexOf(avatar));
-			if (avatar.crop) {
-				player.height = 286.752;
-				player.setCrop(0, 72.248, player.width, 286.752);
-			}
-			if (connectedCloud) {
-				let newPlayerData = {
-					clientId: clientId,
-					isRunning: false,
-					direction: 0
-				};
-				if (beforePlayerData.isRunning !== newPlayerData.isRunning) {
-					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							isRunning: false,
-							direction: 0,
-							status: 'movement',
-
-							x: x,
-							y: y
-						})
-					);
-					beforePlayerData = newPlayerData;
-				}
-			}
-			// player.anims.play('turn');
-		}
-		if (!player.body.touching.down) {
-			player.isCropped = false;
-			player.height = 359;
-
-			if (player.body.velocity.x === 0) {
-				player.anims.play('turnJump' + avatars.indexOf(avatar));
-			} else {
-				if (player.body.velocity.x > 0) player.anims.play('rightJump' + avatars.indexOf(avatar));
-				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
-			}
-		}
-		if (cursors.up.isDown && player.body.touching.down) {
-			player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
-
-			if (connectedCloud) {
-				let newPlayerData = {
-					clientId: clientId,
-					isJumping: true
-				};
-				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
-					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							isJumping: true,
-							status: 'movement',
-							x: x,
-							y: y
-						})
-					);
-					// console.log('send jump');
-					beforePlayerData = newPlayerData;
-				}
-			}
-		}
-	}
-
-	/**
-	 * END DEBUG
-	 */
-
-	if ((host || !multiplayer) && started) {
-		let random = Math.random() * (8000 - 15000) + 8000;
-		if (new Date().getTime() - lastTimeSpawn > random) {
-			// console.log(new Date().getTime() - lastTimeSpawn, random);
-			if (Math.random() > 0.2) {
-				// console.warn('RESPAWNING');
-				if (Math.random() <= 0.8) {
-					/**
-					 * Spawn icicle
-					 */
-					// console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
-					let x =
-						Math.random() *
-							(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
-						((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
-
-					ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
-					ice.scaleY = ice.scaleX = boundingWidth / 6000;
-
-					this.physics.add.existing(ice);
-					ice.setDepth(1000);
-					ice.setOrigin(0.5, 0);
-					ice.body.bounce.x = 0.2;
-					ice.body.bounce.y = 0.2;
-					// ice.body.velocity.y = 500;
-
-					// ice.body.setCollideWorldBounds(true);
-					ice.body.onWorldBounds = true;
-
-					// this.physics.add.collider(ice, platforms);
-					enemies.push(ice);
-					if (alive) score++;
-
-					let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							status: 'newEnemy',
-							type: 'icicle',
-							x: xb,
-							y: yb
-						})
-					);
-				} else {
-					/**
-					 * Spawn penguin
-					 */
-					let x;
-					let list;
-					let flip = true;
-
-					//Randomize left/right
-					if (Math.random() <= 0.5) {
-						x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
-						list = penguinsLEFT;
-						flip = false;
-					} else {
-						x = (width - boundingWidth * 0.85) / 2;
-						list = penguinsRIGHT;
-					}
-
-					let penguin = this.physics.add.sprite(x, height - height * 0.2, 'penguin');
-
-					penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
-					penguin.flipX = flip;
-					penguin.setOrigin(0.5, 0);
-
-					this.physics.add.existing(penguin);
-					penguin.setDepth(1000);
-					penguin.body.bounce.x = 0.5;
-					penguin.body.bounce.y = 0.5;
-
-					// penguin.body.setCollideWorldBounds(true);
-					penguin.body.onWorldBounds = true;
-
-					this.physics.add.collider(penguin, platforms);
-					enemies.push(penguin);
-					list.push(penguin);
-					if (alive) score++;
-					let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							status: 'newEnemy',
-							type: 'penguin',
-							flip: flip,
-							x: xb,
-							y: yb
-						})
-					);
-				}
-			}
-			lastTimeSpawn = new Date().getTime();
-		}
-	}
-	//   enemiesText.setText(score);
-	// scoreText.setText(score);
-
-	if (multiplayer && otherPlayerData.alive && otherPlayer !== undefined) {
-		try {
-			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
-				otherPlayer.body.velocity.x = boundingWidth * -0.3;
-				otherPlayer.anims.play('left' + avatars.indexOf(otherPlayerData.avatar));
-				if (otherPlayerData.avatar.crop) {
-					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
-					otherPlayer.height = 286.752;
-				}
-				// console.log('Running left');
-			} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
-				otherPlayer.body.velocity.x = boundingWidth * 0.3;
-				otherPlayer.anims.play('right' + avatars.indexOf(otherPlayerData.avatar));
-				if (otherPlayerData.avatar.crop) {
-					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
-					otherPlayer.height = 286.752;
-				}
-
-				// console.log('Running right');
-			} else {
-				otherPlayer.body.velocity.x = 0;
-				otherPlayer.anims.play('turn' + avatars.indexOf(otherPlayerData.avatar));
-				if (otherPlayerData.avatar.crop) {
-					otherPlayer.setCrop(0, 72.248, player.width, 286.752);
-					otherPlayer.height = 286.752;
-				}
-
-				// console.log('Standstill');
-			}
-			if (!otherPlayer.body.touching.down) {
-				if (otherPlayer.body.velocity.x === 0) otherPlayer.anims.play('turnJump' + avatars.indexOf(otherPlayerData.avatar));
-				if (otherPlayer.body.velocity.x > 0) otherPlayer.anims.play('rightJump' + avatars.indexOf(otherPlayerData.avatar));
-				if (otherPlayer.body.velocity.x < 0) otherPlayer.anims.play('leftJump' + avatars.indexOf(otherPlayerData.avatar));
-				if (otherPlayerData.avatar.crop) {
-					otherPlayer.isCropped = false;
-					otherPlayer.height = 359;
-				}
-			}
-			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
-				otherPlayer.body.velocity.y = (boundingHeight / 2) * 1.5 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
-				otherPlayerData.isJumping = false;
-
-				// console.log('Jumping');
-			}
-		} catch (ex) {
-			console.error(ex);
-		}
-	}
-}
-
-/**
- * Game Utility functions
- */
-// function addScore(enemy) {
-// 	if (enemy.y < height) return;
-// 	if (!alive) return;
-// 	console.log('enemy passed');
-// 	enemies.pop(enemy);
-// 	score++;
-// 	if (!enemies.includes(enemy)) enemy.destroy();
-// 	if (penguinsRIGHT.includes(enemy)) penguinsRIGHT.pop(enemy);
-// 	if (penguinsLEFT.includes(enemy)) penguinsLEFT.pop(enemy);
-// }
-
-function initMqtt(gameObj) {
-	client = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
-		//wss://mqtt.funergydev.com:9001
-		//51.105.206.206
-		protocolId: 'MQTT'
-	});
-	client.on('connect', function() {
-		client.subscribe(lobbyId, function(err) {
-			if (!err) {
-				connectedCloud = true;
-				console.warn('Connected');
-				client.publish(
-					lobbyId,
-					JSON.stringify({
-						clientId: clientId,
-						status: 'connected',
-						avatar: avatars.indexOf(avatar)
-					})
-				);
-			} else {
-				console.log(err);
-			}
-		});
-	});
-
-	client.on('message', function(topic, message) {
-		let data = JSON.parse(message);
-		// console.log(data);
-		if (data.clientId === clientId) return;
-
-		if (data.status != undefined && data.status === 'connectionRequest') {
-			console.warn(`Connection request from: ${data.clientId}`);
-			if (!multiplayer) {
-				multiplayer = true;
-				otherPlayerData.avatar = avatars[data.avatar];
-				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
-
-				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-				// player.displayWidth = ;
-				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-
-				gameObj.physics.add.existing(otherPlayer);
-				otherPlayer.setDepth(10);
-				otherPlayer.alpha = 0.2;
-
-				// otherPlayer.body.bounce.x = 0.1;
-				// otherPlayer.body.bounce.y = 0.1;
-
-				otherPlayer.body.setCollideWorldBounds = true;
-				gameObj.physics.add.collider(otherPlayer, platforms);
-			}
-		}
-		if (data.status != undefined && data.status === 'connected') {
-			host = false;
-			console.warn(`User Connected: ${data.clientId}`);
-
-			client.publish(
-				lobbyId,
-				JSON.stringify({
-					clientId: clientId,
-					status: 'connectionRequest',
-					avatar: avatars.indexOf(avatar)
-				})
-			);
-			if (!multiplayer) {
-				multiplayer = true;
-				otherPlayerData.avatar = avatars[data.avatar];
-				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
-
-				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-				// player.displayWidth = ;
-				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-
-				gameObj.physics.add.existing(otherPlayer);
-				otherPlayer.setDepth(10);
-				otherPlayer.alpha = 0.2;
-
-				// otherPlayer.body.bounce.x = 0.1;
-				// otherPlayer.body.bounce.y = 0.1;
-
-				otherPlayer.body.setCollideWorldBounds = true;
-				gameObj.physics.add.collider(otherPlayer, platforms);
-			}
-		}
-		if (data.status != undefined && data.status === 'newEnemy') {
-			if (data.type === 'icicle') {
-				let [x, y] = getRealPositions(data.x, data.y);
-
-				ice = gameObj.physics.add.sprite(x, y, 'icicle');
-				ice.scaleY = ice.scaleX = boundingWidth / 6000;
-
-				gameObj.physics.add.existing(ice);
-				ice.setDepth(1000);
-				ice.setOrigin(0.5, 0);
-				ice.body.bounce.x = 0.2;
-				ice.body.bounce.y = 0.2;
-				// ice.body.velocity.y = 500;
-
-				// ice.body.setCollideWorldBounds(true);
-				ice.body.onWorldBounds = true;
-
-				// this.physics.add.collider(ice, platforms);
-				enemies.push(ice);
-				if (alive) score++;
-			} else if (data.type === 'penguin') {
-				let [x, y] = getRealPositions(data.x, data.y);
-
-				let list;
-
-				//Randomize left/right
-				if (!data.flip) {
-					list = penguinsLEFT;
-				} else {
-					list = penguinsRIGHT;
-				}
-
-				let penguin = gameObj.physics.add.sprite(x, y, 'penguin');
-
-				penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
-				penguin.flipX = data.flip;
-				penguin.setOrigin(0.5, 0);
-
-				gameObj.physics.add.existing(penguin);
-				penguin.setDepth(1000);
-				penguin.body.bounce.x = 0.5;
-				penguin.body.bounce.y = 0.5;
-
-				// penguin.body.setCollideWorldBounds(true);
-				penguin.body.onWorldBounds = true;
-
-				gameObj.physics.add.collider(penguin, platforms);
-				enemies.push(penguin);
-				list.push(penguin);
-				if (alive) score++;
-			}
-		}
-		if (data.status != undefined && data.status === 'disconnect') {
-			otherPlayer.destroy();
-			multiplayer = false;
-			host = true;
-		}
-		if (data.status != undefined && data.status === 'start') {
-			started = true;
-		}
-		if (data.status != undefined && data.status === 'died') {
-			otherPlayer.destroy();
-			otherPlayerData.alive = false;
-			if (!alive) {
-				endGame();
-			}
-		}
-		if (data.status != undefined && data.status === 'movement') {
-			if (data.isRunning != undefined) otherPlayerData.isRunning = data.isRunning;
-			if (data.direction != undefined) otherPlayerData.direction = data.direction;
-			if (data.isJumping != undefined) otherPlayerData.isJumping = data.isJumping;
-
-			if (data.x != undefined || data.y != undefined) {
-				let [x, y] = getRealPositions(data.x, data.y);
-				otherPlayerData.x = x;
-				otherPlayerData.y = y;
-				otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
-			}
-		}
-	});
-}
-
 function die() {
 	console.warn('YOU DIED');
 	if (!alive) return;
 	alive = false;
 	document.querySelector('canvas').classList.add('died');
-	player.destroy();
+	player.setActive(false);
+	player.setVisible(false);
 	if (multiplayer) {
 		client.publish(
 			lobbyId,
 			JSON.stringify({
 				clientId: clientId,
-				status: 'died'
+				status: 'died',
+				score: score
 			})
 		);
 		if (!otherPlayerData.alive) {
@@ -1158,6 +1519,9 @@ function die() {
 }
 const endGame = () => {
 	setTimeout(() => {
+		if (multiplayer) {
+			var scores = [{ currentPlayer: { clientId: clientId, avatar: avatars.indexOf(avatar), score: score } }, { otherPlayer: { avatar: avatars.indexOf(avatar), score: otherPlayerData.score } }];
+		}
 		location.reload();
 	}, 1000);
 };
