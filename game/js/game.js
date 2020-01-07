@@ -82,7 +82,7 @@ function preload() {
 	this.load.spritesheet('player1', 'assets/AvatarAfloatOne.png', { frameWidth: 355.5, frameHeight: 359 });
 	this.load.spritesheet('player2', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
 	this.load.spritesheet('player3', 'assets/AvatarAfloatThree.png', { frameWidth: 355.5, frameHeight: 357 });
-	this.load.spritesheet('player4', 'assets/AvatarAfloatTwo.png', { frameWidth: 355.5, frameHeight: 357 });
+	this.load.spritesheet('player4', 'assets/AvatarAfloatFour.png', { frameWidth: 355.5, frameHeight: 357 });
 
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
