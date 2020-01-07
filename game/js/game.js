@@ -1119,6 +1119,7 @@ function initMqtt(gameObj) {
 		if (data.status != undefined && data.status === 'died') {
 			otherPlayer.setActive(false).setVisible(false);
 			otherPlayerData.alive = false;
+			otherPlayerData.score = data.score;
 			if (!alive) {
 				endGame();
 			}
@@ -1150,7 +1151,8 @@ function die() {
 			lobbyId,
 			JSON.stringify({
 				clientId: clientId,
-				status: 'died'
+				status: 'died',
+				score: score
 			})
 		);
 		if (!otherPlayerData.alive) {
@@ -1162,6 +1164,11 @@ function die() {
 }
 const endGame = () => {
 	setTimeout(() => {
+		if(multiplayer){
+			var scores = [{currentPlayer:{clientId:clientId,avatar:avatars.indexOf(avatar),score:score}},
+				{otherPlayer:{avatar:avatars.indexOf(avatar),score:otherPlayerData.score}}
+			];
+		}
 		location.reload();
 	}, 1000);
 };
