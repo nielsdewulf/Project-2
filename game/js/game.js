@@ -49,8 +49,8 @@ var penguinsRIGHT = [];
 var enemies = [];
 var lastTimeSpawn = new Date().getTime();
 
-let scoreText;
-let enemiesText;
+// let scoreText;
+// let enemiesText;
 let score = 0;
 let enemiesSpawned = 0;
 
@@ -99,7 +99,7 @@ function create() {
 	let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
 	// bg.displayWidth = width < height ? width : height;
 
-	bg.tileScaleX = bg.tileScaleY = width > height* 1.77 ? width/7500 : height/7500;
+	bg.tileScaleX = bg.tileScaleY = width > height * 1.77 ? width / 7500 : height / 7500;
 
 	// bg.alpha = 0.5;
 
@@ -189,36 +189,36 @@ function create() {
 	cursors = this.input.keyboard.createCursorKeys();
 
 	this.anims.create({
-        key: 'left',
-        frames: [ { key: 'player', frame: 0 } ],
-        frameRate: 10,
-    });
-	this.anims.create({
-        key: 'leftJump',
-        frames: [ { key: 'player', frame: 3 } ],
-        frameRate: 10,
-    });
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'player', frame: 1 } ],
-        frameRate: 20
+		key: 'left',
+		frames: [{ key: 'player', frame: 0 }],
+		frameRate: 10
 	});
 	this.anims.create({
-        key: 'turnJump',
-        frames: [ { key: 'player', frame: 4 } ],
-        frameRate:  5
-    });
+		key: 'leftJump',
+		frames: [{ key: 'player', frame: 3 }],
+		frameRate: 10
+	});
+	this.anims.create({
+		key: 'turn',
+		frames: [{ key: 'player', frame: 1 }],
+		frameRate: 20
+	});
+	this.anims.create({
+		key: 'turnJump',
+		frames: [{ key: 'player', frame: 4 }],
+		frameRate: 5
+	});
 
-    this.anims.create({
-        key: 'right',
-        frames: [ { key: 'player', frame: 2 } ],
-        frameRate: 10,
+	this.anims.create({
+		key: 'right',
+		frames: [{ key: 'player', frame: 2 }],
+		frameRate: 10
 	});
 	this.anims.create({
-        key: 'rightJump',
-        frames: [ { key: 'player', frame: 5 } ],
-        frameRate: 10,
-    });
+		key: 'rightJump',
+		frames: [{ key: 'player', frame: 5 }],
+		frameRate: 10
+	});
 	// /**
 	//  * Sliding object
 	//  */
@@ -269,7 +269,7 @@ function create() {
 			// }
 			// screen.orientation.lock('landscape-primary');
 			if (player.body.touching.down) {
-				player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
+				player.body.velocity.y = (boundingHeight / 2) * 1.2 * -1;
 
 				if (connectedCloud) {
 					let newPlayerData = {
@@ -300,11 +300,11 @@ function create() {
 	/**
 	 * Score
 	 */
-	scoreText = this.add.text(width / 2, 0, 'Test', {
-		font: '65px Arial',
-		fill: '#ffffff',
-		align: 'center'
-	});
+	// scoreText = this.add.text(width / 2, 0, 'Test', {
+	// 	font: '65px Arial',
+	// 	fill: '#ffffff',
+	// 	align: 'center'
+	// });
 	//   enemiesText = this.add.text(width / 4, 0, 'Test', {
 	//     font: '65px Arial',
 	//     fill: '#ffffff',
@@ -319,11 +319,11 @@ function create() {
 	 * Gyroscope
 	 */
 
-	let text = this.add.text(0, 0, 'Test', {
-		font: '65px Arial',
-		fill: '#ff0044',
-		align: 'center'
-	});
+	// let text = this.add.text(0, 0, 'Test', {
+	// 	font: '65px Arial',
+	// 	fill: '#ff0044',
+	// 	align: 'center'
+	// });
 	var gn = new GyroNorm();
 	gn.init()
 		.then(function() {
@@ -698,20 +698,16 @@ function update() {
 			}
 			// player.anims.play('turn');
 		}
-		if(!player.body.touching.down){
-			if(player.body.velocity.x === 0){
-				player.anims.play('turnJump')
-
-			}else{
-				if(player.body.velocity.x > 0)player.anims.play('rightJump');
-				if(player.body.velocity.x < 0)player.anims.play('leftJump');
+		if (!player.body.touching.down) {
+			if (player.body.velocity.x === 0) {
+				player.anims.play('turnJump');
+			} else {
+				if (player.body.velocity.x > 0) player.anims.play('rightJump');
+				if (player.body.velocity.x < 0) player.anims.play('leftJump');
 			}
-			
-
 		}
 		if (cursors.up.isDown && player.body.touching.down) {
-			player.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1;
-			
+			player.body.velocity.y = (boundingHeight / 2) * 1.2 * -1;
 
 			if (connectedCloud) {
 				let newPlayerData = {
@@ -839,10 +835,10 @@ function update() {
 		}
 	}
 	//   enemiesText.setText(enemiesSpawned);
-	scoreText.setText(enemiesSpawned);
+	// scoreText.setText(enemiesSpawned);
 
 	if (otherPlayer !== undefined) {
-		try{
+		try {
 			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
 				otherPlayer.body.velocity.x = boundingWidth * -0.3;
 				otherPlayer.anims.play('left');
@@ -856,20 +852,17 @@ function update() {
 				otherPlayer.anims.play('turn');
 				// console.log('Standstill');
 			}
-			if(!otherPlayer.body.touching.down){
-				if(otherPlayer.body.velocity.x === 0)otherPlayer.anims.play('turnJump');
-				if(otherPlayer.body.velocity.x > 0)otherPlayer.anims.play('rightJump');
-				if(otherPlayer.body.velocity.x < 0)otherPlayer.anims.play('leftJump');
+			if (!otherPlayer.body.touching.down) {
+				if (otherPlayer.body.velocity.x === 0) otherPlayer.anims.play('turnJump');
+				if (otherPlayer.body.velocity.x > 0) otherPlayer.anims.play('rightJump');
+				if (otherPlayer.body.velocity.x < 0) otherPlayer.anims.play('leftJump');
 			}
 			if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
-				otherPlayer.body.velocity.y = ((player.height + boundingHeight) / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
+				otherPlayer.body.velocity.y = (boundingHeight / 2) * 1.2 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
 				otherPlayerData.isJumping = false;
 				// console.log('Jumping');
 			}
-		}catch{
-
-		}
-		
+		} catch {}
 	}
 }
 
@@ -1024,7 +1017,7 @@ function initMqtt(gameObj) {
 					otherPlayer.body.setCollideWorldBounds = true;
 					gameObj.physics.add.collider(otherPlayer, platforms);
 				}
-				otherPlayer.setPosition(x + otherPlayer.body.width / 2, y + otherPlayer.body.height / 2);
+				otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
 			}
 		}
 	});
