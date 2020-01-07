@@ -8,7 +8,7 @@ var boundingWidth, boundingHeight;
 
 var screenangle = window.orientation;
 
-var gyroscope = true;
+var gyroscope = false;
 var noSleep = new NoSleep();
 
 var client;
@@ -109,10 +109,12 @@ function create() {
 	/**
 	 * Background
 	 */
-	let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
-	// bg.displayWidth = width < height ? width : height;
+	let bg = this.add.image(width / 2, height - height / 2, 'bg');
+	bg.scaleX = bg.scaleY = width > height * 1.77 ? width / 7500 : height / 7500;
+	// let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
+	// // bg.displayWidth = width < height ? width : height;
 
-	bg.tileScaleX = bg.tileScaleY = width > height * 1.77 ? width / 7500 : height / 7500;
+	// bg.tileScaleX = bg.tileScaleY = width > height * 1.77 ? width / 7500 : height / 7500;
 
 	// bg.alpha = 0.5;
 
@@ -283,6 +285,24 @@ function create() {
 			// 	// On start fulll screen
 			// }
 			// screen.orientation.lock('landscape-primary');
+			var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+			if (iOS && !gyroscope) {
+				DeviceMotionEvent.requestPermission()
+					.then(response => {
+						if (response == 'granted') {
+							gyroscope = true;
+							window.addEventListener(
+								'deviceorientation',
+								function(e) {
+									processGyro(e.alpha, e.beta, e.gamma);
+								},
+								true
+							);
+						}
+					})
+					.catch(console.error);
+			}
+
 			if (player.body.touching.down) {
 				player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
 
@@ -339,306 +359,37 @@ function create() {
 	// 	fill: '#ff0044',
 	// 	align: 'center'
 	// });
-	var gn = new GyroNorm();
-	gn.init()
-		.then(function() {
-			gn.start(function(data) {
-				if (alive) {
-					if (window.orientation === -90) {
-						if (data.do.beta > 6) {
-							player.body.velocity.x = boundingWidth * -0.3;
-							player.anims.play('left' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
+	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	if (!iOS) {
+		if (window.DeviceOrientationEvent) {
+			window.addEventListener(
+				'deviceorientation',
+				function(e) {
+					processGyro(e.alpha, e.beta, e.gamma);
+				},
+				true
+			);
+			gyroscope = true;
+		} else {
+		}
 
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: true,
-									direction: -1
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: true,
-											direction: -1,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						} else if (data.do.beta < -6) {
-							player.body.velocity.x = boundingWidth * 0.3;
-							player.anims.play('right' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: true,
-									direction: 1
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: true,
-											direction: 1,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						} else {
-							player.body.velocity.x = 0;
-							player.anims.play('turn' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: false,
-									direction: 0
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: false,
-											direction: 0,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						}
-						text.setText(data.do.beta);
-					} else if (window.orientation === 90) {
-						if (data.do.beta > 6) {
-							player.body.velocity.x = boundingWidth * 0.3;
-							player.anims.play('right' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: true,
-									direction: 1
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: true,
-											direction: 1,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						} else if (data.do.beta < -6) {
-							player.body.velocity.x = boundingWidth * -0.3;
-							player.anims.play('left' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: true,
-									direction: -1
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: true,
-											direction: -1,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						} else {
-							player.body.velocity.x = 0;
-							player.anims.play('turn' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: false,
-									direction: 0
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: false,
-											direction: 0,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						}
-						text.setText(data.do.beta);
-					} else {
-						if (data.do.gamma > 6) {
-							player.body.velocity.x = boundingWidth * 0.3;
-							player.anims.play('right' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: true,
-									direction: 1
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: true,
-											direction: 1,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						} else if (data.do.gamma < -6) {
-							player.body.velocity.x = boundingWidth * -0.3;
-							player.anims.play('left' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: true,
-									direction: -1
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: true,
-											direction: -1,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						} else {
-							player.body.velocity.x = 0;
-							player.anims.play('turn' + avatars.indexOf(avatar));
-							if (avatar.crop) {
-								player.setCrop(0, 72.248, player.width, 286.752);
-								player.height = 286.752;
-							}
-							if (connectedCloud) {
-								let newPlayerData = {
-									clientId: clientId,
-									isRunning: false,
-									direction: 0
-								};
-								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-									client.publish(
-										lobbyId,
-										JSON.stringify({
-											clientId: clientId,
-											isRunning: false,
-											direction: 0,
-											status: 'movement',
-
-											x: x,
-											y: y
-										})
-									);
-									beforePlayerData = newPlayerData;
-								}
-							}
-						}
-						text.setText(data.do.gamma);
-					}
+		// initGyroscope();
+	} else {
+		DeviceMotionEvent.requestPermission()
+			.then(response => {
+				if (response == 'granted') {
+					gyroscope = true;
+					window.addEventListener(
+						'deviceorientation',
+						function(e) {
+							processGyro(e.alpha, e.beta, e.gamma);
+						},
+						true
+					);
 				}
-			});
-		})
-		.catch(function(e) {
-			gyroscope = false;
-			// Catch if the DeviceOrientation or DeviceMotion is not supported by the browser or device
-		}); // start gyroscope detection
+			})
+			.catch(console.error);
+	}
 }
 
 function update() {
@@ -797,6 +548,18 @@ function update() {
 					// console.log('send jump');
 					beforePlayerData = newPlayerData;
 				}
+			}
+		}
+	} else {
+		if (!player.body.touching.down) {
+			player.isCropped = false;
+			player.height = 359;
+
+			if (player.body.velocity.x === 0) {
+				player.anims.play('turnJump' + avatars.indexOf(avatar));
+			} else {
+				if (player.body.velocity.x > 0) player.anims.play('rightJump' + avatars.indexOf(avatar));
+				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
 			}
 		}
 	}
@@ -1138,6 +901,598 @@ function initMqtt(gameObj) {
 		}
 	});
 }
+function processGyro(alpha, beta, gamma) {
+	if (alive) {
+		if (window.orientation === -90) {
+			if (beta > 6) {
+				player.body.velocity.x = boundingWidth * -0.3;
+				player.anims.play('left' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: -1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: -1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else if (beta < -6) {
+				player.body.velocity.x = boundingWidth * 0.3;
+				player.anims.play('right' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: 1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: 1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else {
+				player.body.velocity.x = 0;
+				player.anims.play('turn' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: false,
+						direction: 0
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: false,
+								direction: 0,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			}
+			text.setText(data.do.beta);
+		} else if (window.orientation === 90) {
+			if (beta > 6) {
+				player.body.velocity.x = boundingWidth * 0.3;
+				player.anims.play('right' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: 1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: 1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else if (beta < -6) {
+				player.body.velocity.x = boundingWidth * -0.3;
+				player.anims.play('left' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: -1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: -1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else {
+				player.body.velocity.x = 0;
+				player.anims.play('turn' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: false,
+						direction: 0
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: false,
+								direction: 0,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			}
+			text.setText(data.do.beta);
+		} else {
+			if (gamma > 6) {
+				player.body.velocity.x = boundingWidth * 0.3;
+				player.anims.play('right' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: 1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: 1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else if (gamma < -6) {
+				player.body.velocity.x = boundingWidth * -0.3;
+				player.anims.play('left' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: true,
+						direction: -1
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: true,
+								direction: -1,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			} else {
+				player.body.velocity.x = 0;
+				player.anims.play('turn' + avatars.indexOf(avatar));
+				if (avatar.crop) {
+					player.setCrop(0, 72.248, player.width, 286.752);
+					player.height = 286.752;
+				}
+				if (connectedCloud) {
+					let newPlayerData = {
+						clientId: clientId,
+						isRunning: false,
+						direction: 0
+					};
+					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+						client.publish(
+							lobbyId,
+							JSON.stringify({
+								clientId: clientId,
+								isRunning: false,
+								direction: 0,
+								status: 'movement',
+
+								x: x,
+								y: y
+							})
+						);
+						beforePlayerData = newPlayerData;
+					}
+				}
+			}
+		}
+	}
+}
+function initGyroscope() {
+	var gn = new GyroNorm();
+	gn.init()
+		.then(function() {
+			gn.start(function(data) {
+				if (alive) {
+					if (window.orientation === -90) {
+						if (data.do.beta > 6) {
+							player.body.velocity.x = boundingWidth * -0.3;
+							player.anims.play('left' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: true,
+									direction: -1
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: true,
+											direction: -1,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						} else if (data.do.beta < -6) {
+							player.body.velocity.x = boundingWidth * 0.3;
+							player.anims.play('right' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: true,
+									direction: 1
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: true,
+											direction: 1,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						} else {
+							player.body.velocity.x = 0;
+							player.anims.play('turn' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: false,
+									direction: 0
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: false,
+											direction: 0,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						}
+						text.setText(data.do.beta);
+					} else if (window.orientation === 90) {
+						if (data.do.beta > 6) {
+							player.body.velocity.x = boundingWidth * 0.3;
+							player.anims.play('right' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: true,
+									direction: 1
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: true,
+											direction: 1,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						} else if (data.do.beta < -6) {
+							player.body.velocity.x = boundingWidth * -0.3;
+							player.anims.play('left' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: true,
+									direction: -1
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: true,
+											direction: -1,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						} else {
+							player.body.velocity.x = 0;
+							player.anims.play('turn' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: false,
+									direction: 0
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: false,
+											direction: 0,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						}
+						text.setText(data.do.beta);
+					} else {
+						if (data.do.gamma > 6) {
+							player.body.velocity.x = boundingWidth * 0.3;
+							player.anims.play('right' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: true,
+									direction: 1
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: true,
+											direction: 1,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						} else if (data.do.gamma < -6) {
+							player.body.velocity.x = boundingWidth * -0.3;
+							player.anims.play('left' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: true,
+									direction: -1
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: true,
+											direction: -1,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						} else {
+							player.body.velocity.x = 0;
+							player.anims.play('turn' + avatars.indexOf(avatar));
+							if (avatar.crop) {
+								player.setCrop(0, 72.248, player.width, 286.752);
+								player.height = 286.752;
+							}
+							if (connectedCloud) {
+								let newPlayerData = {
+									clientId: clientId,
+									isRunning: false,
+									direction: 0
+								};
+								if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+									let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+									client.publish(
+										lobbyId,
+										JSON.stringify({
+											clientId: clientId,
+											isRunning: false,
+											direction: 0,
+											status: 'movement',
+
+											x: x,
+											y: y
+										})
+									);
+									beforePlayerData = newPlayerData;
+								}
+							}
+						}
+					}
+				}
+			});
+		})
+		.catch(function(e) {
+			gyroscope = false;
+			// Catch if the DeviceOrientation or DeviceMotion is not supported by the browser or device
+		}); // start gyroscope detection
+}
 
 function die() {
 	console.warn('YOU DIED');
@@ -1164,10 +1519,8 @@ function die() {
 }
 const endGame = () => {
 	setTimeout(() => {
-		if(multiplayer){
-			var scores = [{currentPlayer:{clientId:clientId,avatar:avatars.indexOf(avatar),score:score}},
-				{otherPlayer:{avatar:avatars.indexOf(avatar),score:otherPlayerData.score}}
-			];
+		if (multiplayer) {
+			var scores = [{ currentPlayer: { clientId: clientId, avatar: avatars.indexOf(avatar), score: score } }, { otherPlayer: { avatar: avatars.indexOf(avatar), score: otherPlayerData.score } }];
 		}
 		location.reload();
 	}, 1000);
