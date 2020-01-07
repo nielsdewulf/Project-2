@@ -127,7 +127,7 @@ function create() {
    * Background
    */
   let bg = this.add.image(width / 2, height - height / 2, 'bg');
-  bg.scaleX = bg.scaleY = width > height * 1.77 ? width / 7500 : height / 7500;
+  bg.scaleX = bg.scaleY = width > height * 1.77 ? width / 7500 : height / 3500;
   // let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
   // // bg.displayWidth = width < height ? width : height;
 
