@@ -48,9 +48,9 @@
 */
 
 html {
-    font-size: 15px; /*=1REM*/
+    font-size: 16px; /*=1REM*/
     line-height: 1.5;
-    font-family: 'Source Sans Pro',Helvetica, arial, sans-serif;
+    font-family: 'Roboto', 'Source Sans Pro',Helvetica, arial, sans-serif;
     color: var(--color-alpha-xx-dark);
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
@@ -58,10 +58,21 @@ html {
     
 }
 
+body {
+    background-image: url("../img/png/Background.png");
+    background-size: cover;
+    background-position: center;
+}
+
 *,
 *:before,
 *:after {
     box-sizing: inherit;
+}
+
+h2 {
+    font-size: 2.3vw;
+    color:#7B7BFF;
 }
 
 /*
@@ -83,61 +94,111 @@ html {
     text-shadow: none;
 } */
 
+
+
+
 /*------------------------------------*\
-#Elements
+#Objects
 \*------------------------------------*/
 
 /*
-Elements: Images
+Objects : Logo
 ---
-Default markup for images to make them responsive
+Styling logo
 */
-
-
-
-
-/*------------------------------------*\
-#OBJECTS
-\*------------------------------------*/
-
-/*
-    Objects: Container
-    ---
-    Creates a horizontal container that sets de global max-width
-*/
-
-.c-app {
-    
-    height:100vh;
-    background-image: url("../img/png/Background.png");
-    background-size: cover;
-    
-}
-.c-app__main {
-    margin-left: auto;
-    margin-right: auto;
-    width:25%;
-    justify-content: space-between;
-
-}
-.c-app__buttons {
-    
-    margin-left: auto;
-    margin-right: auto;
-    width:40%;
-    
-}
 
 .o-logo {
-    margin-left:auto;
-    margin-right: auto;
-    margin-top: 60%;
-    margin-bottom: 25%;
+    margin-bottom: 15%;
     
 }
+
+
+
+
+
+
+
 /*------------------------------------*\
-#COMPONENTS
+#Components
 \*------------------------------------*/
+
+/*
+Components : Page
+---
+Styling default page
+*/
+
+.c-page {   
+    height:100vh;
+    
+}
+
+.c-app__main {
+    width:90vw;
+    height:100%;
+    
+    
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+}
+
+.c-app__start {
+    width: 25.5vw;
+    height:100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    margin-left:auto;
+    margin-right: auto;
+}
+
+
+.c-app__title {
+    font-family: 'Roboto', 'Sans Serif';
+    font-size: 3vw;
+    font-weight: 600;
+    color:white;
+    display: flex;
+    justify-content: center;
+
+    margin-bottom: 2%;
+}
+
+.c-app__lobby {
+    width: 80vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-left: auto;
+    margin-right: auto;
+    
+    
+}
+
+.c-app__avatar {
+    width: 100%;
+    height:81.5vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-left: auto;
+    margin-right: auto;
+    
+    background-color: white;
+    border-radius: 10px;
+}
+
+
 
 /*
     Components: Button
@@ -146,12 +207,15 @@ Default markup for images to make them responsive
 */
 
 .c-button{
-    width: 490px;
-    height: 110px;
-    margin-bottom: 20px;
+    width: 25.5vw;
+    height: 10.37vh;
+    margin-bottom: 5%;
+    justify-self: center;
+    
+    
     
     border: 0;
-    border-radius: 20px;
+    border-radius: 10px;
 
     background-color: #FE5499;
     box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
@@ -163,17 +227,112 @@ Default markup for images to make them responsive
 
 .c-button__title{
     font-family: 'Roboto';
-    font-size: 44px;
+    font-size: 2.30vw;
     font-weight: 600;
-    
-    
     color: white;
+}
+
+.c-button__content {
+    height:100%;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
 }
 
 .c-button__icon {
     height:80%;
     fill: white;
-    margin-right:20px;
-    
-    
 }
+
+.c-buttons {
+    width:75.5vw;
+
+    display: flex;
+    justify-content: space-between;
+}
+
+/*
+Component: Grid
+---
+Vertical Grid Styling 
+ */
+
+.c-vertical-grid{
+    display: grid;
+    grid-template-rows: repeat(5, 80px);
+    grid-row-gap: 24px;
+}
+
+.c-vertical-grid__box{
+    height: 85px;
+    max-width: 100%;
+
+    border-radius: 20px;
+
+    background-color: #5B5BFF;
+
+    display: grid;
+    grid-template-columns: 9.375vw 9.375vw 1fr 9.375vw;
+}
+
+.c-horizontal-grid__text{
+    font-family: 'Roboto';
+    font-size: 32px;
+    line-height: 36px;
+    color: white;
+
+    margin: 0;
+}
+
+.c-horizontal-grid--center{
+    display: flex;
+    align-items: center;
+}
+
+.c-horizontal-grid__place{
+    justify-self: center;
+}
+
+.c-horizontal-grid__icon{
+    justify-self: center;
+}
+
+.c-horizontal-grid__name{
+    margin-left: 60px;
+}
+
+.c-horizontal-grid__score{
+    justify-self: center;
+}
+
+
+/*
+Components: Lobby
+--- 
+Container for Lobby page
+
+*/
+
+.c-lobby {
+    width:100%;
+    height:55vh; 
+    background-color: black;
+    
+    margin-bottom: 5%;
+ }
+
+ /*
+Components: Avatar
+--- 
+Container for avatar choice 
+
+*/
+
+.c-avatar {
+    width:80%;
+    height:55vh; 
+    background-color: black;
+    
+    margin-bottom: 5%;
+ }
