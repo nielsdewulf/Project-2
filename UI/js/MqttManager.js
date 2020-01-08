@@ -9,7 +9,7 @@ var mqttClient = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
 	protocolId: 'MQTT'
 });
 mqttClient.on('connect', function() {
-	client.subscribe(mainId, function(err) {
+	mqttClient.subscribe(mainId, function(err) {
 		if (!err) {
 			console.warn('Connected');
 		} else {

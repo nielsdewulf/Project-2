@@ -818,7 +818,7 @@ function initMqtt(gameObj) {
 		protocolId: 'MQTT'
 	});
 	client.on('connect', function() {
-		client.subscribe(lobbyId, function(err) {
+		client.subscribe(`afloat/lobby/${lobbyId}/game`, function(err) {
 			if (!err) {
 				connectedCloud = true;
 				console.warn('Connected');
