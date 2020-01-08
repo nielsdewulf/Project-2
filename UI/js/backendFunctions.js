@@ -84,6 +84,7 @@ const joinLobby = gameId => {
 		currentLobby = LobbyObj;
 	}
 	playerList = [];
+	playerList.push(currentPlayer);
 	console.log('Joined lobby with id: ' + gameId);
 
 	currentLobby.playerCount++;
@@ -201,7 +202,7 @@ const finaliseConnection = avatarId => {
 const startGame = (multiplayer = false) => {
 	let playersReady = true;
 	playerList.forEach(el => {
-		if (el.status === 'finalising') playersReady = false;
+		if (el.status !== 'connected') playersReady = false;
 	});
 
 	if (multiplayer && playerList.length !== 2) return;
@@ -243,11 +244,16 @@ const init = () => {
 			if (data.clientId === clientId) return;
 			if (data.status === 'newLobby') {
 				showNewLobby(data.lobby);
+				lobbies.push(data.lobby);
+				lobbies.sort(function(a, b) {
+					return a.menuId - b.menuId;
+				});
 			}
 			if (data.status === 'playerUpdate') {
 				// showNewLobby(data.lobby);
 				console.log('Lobby update', data.lobby);
 				let lobby = getLobbyById(data.lobby.gameId);
+				lobby.playerCount = data.lobby.playerCount;
 			}
 		}
 	});
