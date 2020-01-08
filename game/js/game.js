@@ -20,6 +20,7 @@ var connectedCloud = false;
 
 var started = false;
 var platforms;
+var gravity;
 
 var avatars = [
 	{ key: 'player1', crop: true },
@@ -51,10 +52,13 @@ var otherPlayerData = {
 };
 
 var icicleConfig = {
+	gravity: 0.1, //20% of height
 	minSpawnOffset: 1.15,
 	maxSpawnOffset: 0.85
 };
-
+var penguinConfig = {
+	speed: 0.2
+};
 var alive = true;
 var currentScene;
 
@@ -211,8 +215,11 @@ function create() {
 	// player.displayWidth = ;
 	player.scaleY = player.scaleX = boundingWidth / 3000;
 
-	this.physics.add.existing(player);
+	// this.physics.add.existing(player);
 	player.setDepth(100);
+
+	player.setGravityY(gravity);
+
 	// player.body.bounce.x = 0.1;
 	// player.body.bounce.y = 0.1;
 
@@ -466,10 +473,10 @@ function update() {
 	}
 	if (started) {
 		penguinsLEFT.forEach((el, i) => {
-			el.body.velocity.x = boundingWidth * 0.2 * -1;
+			el.body.velocity.x = boundingWidth * penguinConfig.speed * -1;
 		});
 		penguinsRIGHT.forEach((el, i) => {
-			el.body.velocity.x = boundingWidth * 0.2;
+			el.body.velocity.x = boundingWidth * penguinConfig.speed;
 		});
 	}
 	/**
@@ -628,7 +635,7 @@ function update() {
 	 */
 
 	if ((host || !multiplayer) && started) {
-		let random = Math.random() * (8000 - 15000) + 8000;
+		let random = Math.random() * (12000 - 18000) + 8000;
 		if (new Date().getTime() - lastTimeSpawn > random) {
 			// console.log(new Date().getTime() - lastTimeSpawn, random);
 			if (Math.random() > 0.2) {
@@ -645,8 +652,12 @@ function update() {
 
 					ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
 					ice.scaleY = ice.scaleX = boundingWidth / 6000;
+					ice.setGravityY(gravity * icicleConfig.gravity);
 
-					this.physics.add.existing(ice);
+					// ice.setGravityY(0.5);
+					// ice.body.gravity.y = 2;
+					// ice.body.setAllowGravity(false);
+					// this.physics.add.existing(ice);
 					ice.setDepth(1000);
 					ice.setOrigin(0.5, 0);
 					ice.body.bounce.x = 0.2;
@@ -694,6 +705,7 @@ function update() {
 					penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
 					penguin.flipX = flip;
 					penguin.setOrigin(0.5, 0);
+					penguin.setGravityY(gravity);
 
 					this.physics.add.existing(penguin);
 					penguin.setDepth(1000);
@@ -828,8 +840,9 @@ function initMqtt(gameObj) {
 				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
 				// player.displayWidth = ;
 				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+				otherPlayer.setGravityY(gravity);
 
-				gameObj.physics.add.existing(otherPlayer);
+				// gameObj.physics.add.existing(otherPlayer);
 				otherPlayer.setDepth(10);
 				otherPlayer.alpha = 0.2;
 
@@ -860,8 +873,9 @@ function initMqtt(gameObj) {
 				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
 				// player.displayWidth = ;
 				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+				otherPlayer.setGravityY(gravity);
 
-				gameObj.physics.add.existing(otherPlayer);
+				// gameObj.physics.add.existing(otherPlayer);
 				otherPlayer.setDepth(10);
 				otherPlayer.alpha = 0.2;
 
@@ -878,8 +892,10 @@ function initMqtt(gameObj) {
 
 				ice = gameObj.physics.add.sprite(x, y, 'icicle');
 				ice.scaleY = ice.scaleX = boundingWidth / 6000;
-
-				gameObj.physics.add.existing(ice);
+				ice.setGravityY(gravity * icicleConfig.gravity);
+				// ice.setGravityY(2);
+				// ice.body.gravity.y = 2;
+				// gameObj.physics.add.existing(ice);
 				ice.setDepth(1000);
 				ice.setOrigin(0.5, 0);
 				ice.body.bounce.x = 0.2;
@@ -909,6 +925,7 @@ function initMqtt(gameObj) {
 				penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
 				penguin.flipX = data.flip;
 				penguin.setOrigin(0.5, 0);
+				penguin.setGravityY(gravity);
 
 				gameObj.physics.add.existing(penguin);
 				penguin.setDepth(1000);
@@ -1370,6 +1387,7 @@ const resize = () => {
 	// if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
 
 	[width, height] = [newWidth, newHeight];
+	gravity = height;
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
 	console.log('Resize');
 	location.reload();
@@ -1388,6 +1406,7 @@ const initGame = () => {
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
+	gravity = height;
 
 	var config = {
 		type: Phaser.CANVAS,
@@ -1402,9 +1421,9 @@ const initGame = () => {
 		physics: {
 			default: 'arcade',
 			arcade: {
-				gravity: {
-					y: height
-				},
+				// gravity: {
+				// 	y: height
+				// },
 				debug: false
 			}
 		},
