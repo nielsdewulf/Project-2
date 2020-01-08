@@ -1350,8 +1350,9 @@ const getRealPositions = (xb, yb) => {
 	return [x, y];
 };
 const calcWidthHeight = () => {
-	let width = window.innerWidth > window.innerHeight ? window.innerWidth : window.innerHeight;
-	let height = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth;
+	const dpr = window.devicePixelRatio;
+	let width = window.innerWidth > window.innerHeight ? window.innerWidth * dpr : window.innerHeight * dpr;
+	let height = window.innerWidth > window.innerHeight ? window.innerHeight * dpr : window.innerWidth * dpr;
 	return [width, height];
 };
 
@@ -1366,54 +1367,38 @@ const resize = () => {
 	let newBoundingWidth,
 		newBoundingHeight = calcGameBounds(height);
 
-	if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
+	// if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
 
-	width, (height = [newWidth, newHeight]);
-	boundingWidth, (boundingHeight = [newBoundingWidth, newBoundingHeight]);
+	[width, height] = [newWidth, newHeight];
+	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
 	console.log('Resize');
+	location.reload();
+
+	// currentScene.scale.parent.width = Math.round(window.innerWidth);
+	// currentScene.scale.parent.height = Math.round(window.innerHeight);
+
+	// currentScene.scale.canvas.width = width;
+	// currentScene.scale.canvas.height = height;
+	// currentScene.scale.canvas.style.width = Math.round(window.innerWidth) + 'px';
+	// currentScene.scale.canvas.style.height = Math.round(window.innerHeight) + 'px';
 
 	currentScene.scene.restart();
 };
-
-const init = () => {
-	// screen.orientation.lock('landscape-primary');
-
-	var url = new URL(window.location);
-	avatar = avatars[parseInt(url.searchParams.get('avatar'))];
-	if (avatar == undefined) {
-		avatar = avatars[0];
-	}
-
-	// window.addEventListener('beforeunload', () => {
-	//   if (multiplayer && connectedCloud) {
-	//     disconnectMultiplayer();
-	//   }
-	// });
-	// window.addEventListener('blur', () => {
-	//   if (multiplayer && connectedCloud) {
-	//     disconnectMultiplayer();
-	//     endGame();
-	//   }
-	// });
-
-	scoreObject = document.querySelector('.js-current-score');
-	highscoreObject = document.querySelector('.js-highscore');
-	healthObjects = document.querySelectorAll('.js-health-heart');
-
+const initGame = () => {
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
 
 	var config = {
 		type: Phaser.CANVAS,
-		width: 1920,
-		height: 1080,
-		// scale: {
-		// 	parent: 'body',
-		// 	mode: Phaser.Scale.FIT,
-		// 	width: width,
-		// 	height: height
-		// },
+		width: width,
+		height: height,
+		scale: {
+			// parent: 'body',
+			mode: Phaser.Scale.FIT,
+			width: width,
+			height: height
+		},
 		physics: {
 			default: 'arcade',
 			arcade: {
@@ -1429,6 +1414,33 @@ const init = () => {
 			update: update
 		}
 	};
+	var game = new Phaser.Game(config);
+};
+
+const init = () => {
+	// screen.orientation.lock('landscape-primary');
+
+	var url = new URL(window.location);
+	avatar = avatars[parseInt(url.searchParams.get('avatar'))];
+	if (avatar == undefined) {
+		avatar = avatars[0];
+	}
+
+	window.addEventListener('beforeunload', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+			endGame();
+		}
+	});
+
+	scoreObject = document.querySelector('.js-current-score');
+	highscoreObject = document.querySelector('.js-highscore');
+	healthObjects = document.querySelectorAll('.js-health-heart');
 
 	document.documentElement.addEventListener('click', () => {
 		if (!isFullscreen) {
@@ -1436,14 +1448,13 @@ const init = () => {
 				document.documentElement.requestFullscreen();
 				screen.orientation.lock('landscape');
 			} catch {}
-
+			try {
+				ScreenOrientation.lock('landscape');
+			} catch {}
 			noSleep.enable();
 			isFullscreen = true;
 			setTimeout(() => {
-				try {
-					ScreenOrientation.lock('landscape');
-				} catch {}
-				var game = new Phaser.Game(config);
+				initGame();
 			}, 500);
 		}
 	});
