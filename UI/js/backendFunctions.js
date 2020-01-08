@@ -20,6 +20,7 @@ const showNewLobby = data => {
 	console.log('New lobby with id: ' + data.gameId, data);
 };
 const createNewLobbyCallback = data => {
+	console.error(data);
 	let obj = {
 		clientId: clientId,
 		status: 'newLobby',
@@ -28,7 +29,10 @@ const createNewLobbyCallback = data => {
 	// console.log(obj);
 	mqttClient.publish(mainId, JSON.stringify(obj));
 	showNewLobby(obj.lobby);
-
+	lobbies.push(obj.lobby);
+	lobbies.sort(function(a, b) {
+		return a.menuId - b.menuId;
+	});
 	joinLobby(obj.lobby.gameId);
 };
 const createNewLobby = () => {
@@ -43,7 +47,7 @@ const createNewLobby = () => {
 		Status: 0
 	};
 
-	handleData('https://project2mct.azurewebsites.net/api/game/', createNewLobbyCallback, 'POST', JSON.stringify(message));
+	handleData('https://project2mct.azurewebsites.net/api/game/', createNewLobbyCallback, 'POST', '{"PlayerCount":0,"Status":0}');
 };
 const getlobbiesCallback = data => {
 	lobbies = data;
@@ -66,10 +70,22 @@ const getlobbies = () => {
 	handleData('https://project2mct.azurewebsites.net/api/game/?status=0', getlobbiesCallback);
 };
 const joinLobby = gameId => {
-	console.log('Joined lobby with id: ' + gameId);
+	if (currentLobby !== undefined) {
+		leaveLobby();
+	}
+	let LobbyObj = getLobbyById(gameId);
+	if (LobbyObj === undefined) {
+		console.log('Lobby does not exist');
+		return;
+	} else if (LobbyObj.playerCount == 2) {
+		console.log("Cannot join lobby that's already full");
+		return;
+	} else {
+		currentLobby = LobbyObj;
+	}
 	playerList = [];
-	currentLobby = getLobbyById(gameId);
-	console.log(currentLobby);
+	console.log('Joined lobby with id: ' + gameId);
+
 	currentLobby.playerCount++;
 	mqttClient.publish(
 		mainId,
@@ -142,9 +158,10 @@ const joinLobby = gameId => {
 		playerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, , 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, data => {}, 'PUT', JSON.stringify(message));
 };
 const leaveLobby = () => {
+	console.log('leftLobby');
 	mqttClient.publish(
 		`afloat/lobby/${lobbyId}`,
 		JSON.stringify({
@@ -166,7 +183,7 @@ const leaveLobby = () => {
 		PlayerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'P', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 	currentLobby = undefined;
 };
 const finaliseConnection = avatarId => {
@@ -211,12 +228,12 @@ const getLobbyById = id => {
 };
 const init = () => {
 	window.addEventListener('beforeunload', () => {
-		if (currentLobby) {
+		if (currentLobby !== undefined) {
 			leaveLobby();
 		}
 	});
 	window.addEventListener('blur', () => {
-		if (currentLobby) {
+		if (currentLobby !== undefined) {
 			leaveLobby();
 		}
 	});
@@ -230,6 +247,7 @@ const init = () => {
 			if (data.status === 'playerUpdate') {
 				// showNewLobby(data.lobby);
 				console.log('Lobby update', data.lobby);
+				let lobby = getLobbyById(data.lobby.gameId);
 			}
 		}
 	});
@@ -251,13 +269,10 @@ const handleData = function(url, callback = data => {}, method = 'GET', body = n
 			if (!response.ok) {
 				throw Error(`Problem with fetch(). Status Code: ${response.status}`);
 			} else {
-				return response.json();
+				return response.text();
 			}
 		})
-		.then(function(jsonObject) {
-			callback(jsonObject);
-		})
-		.catch(function(error) {
-			console.error(`Error ${error}`);
+		.then(function(textObject) {
+			if (textObject != '') callback(JSON.parse(textObject));
 		});
 };
