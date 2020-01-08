@@ -119,6 +119,7 @@ function create() {
 	[width, height] = calcWidthHeight();
 
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
+	gravity = height;
 
 	/**
 	 * Resize listeners
@@ -127,6 +128,11 @@ function create() {
 	window.addEventListener('resize', resize);
 
 	this.scale.setGameSize(width, height);
+	this.scale.resize(width, height);
+	console.log(width, height);
+	this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
+
+	this.scale.refresh();
 
 	/**
 	 * Background
@@ -801,6 +807,11 @@ function addScore() {
 }
 
 function initMqtt(gameObj) {
+	if (connectedCloud) {
+		client.end(true);
+		// client.close();
+	}
+
 	client = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
 		//wss://mqtt.funergydev.com:9001
 		//51.105.206.206
@@ -1342,8 +1353,33 @@ const endGame = () => {
 					}
 				}
 			];
+			otherPlayerData = {
+				avatar: avatars[0],
+				score: 0,
+				alive: true,
+				isRunning: false,
+				direction: 0,
+				isJumping: false,
+				x: 0,
+				y: 0
+			};
+			otherPlayer = undefined;
+			beforePlayerData = {
+				clientId: clientId,
+				isRunning: false,
+				direction: 0
+			};
 		}
-		location.reload();
+		// location.reload();
+		currentScene.scene.restart();
+		started = false;
+		healthObjects.forEach(el => {
+			el.classList.remove('c-game-overlay__heart--dead');
+		});
+		score = 0;
+		alive = true;
+		scoreObject.innerHTML = 0;
+		document.querySelector('canvas').classList.remove('died');
 	}, 1000);
 };
 const disconnectMultiplayer = () => {
@@ -1382,15 +1418,16 @@ const resize = () => {
 		newHeight = calcWidthHeight();
 
 	let newBoundingWidth,
-		newBoundingHeight = calcGameBounds(height);
+		newBoundingHeight = calcGameBounds(newHeight);
 
 	// if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
 
 	[width, height] = [newWidth, newHeight];
-	gravity = height;
+	// console.log(grv)
+
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
 	console.log('Resize');
-	location.reload();
+	// location.reload();
 
 	// currentScene.scale.parent.width = Math.round(window.innerWidth);
 	// currentScene.scale.parent.height = Math.round(window.innerHeight);
@@ -1400,7 +1437,7 @@ const resize = () => {
 	// currentScene.scale.canvas.style.width = Math.round(window.innerWidth) + 'px';
 	// currentScene.scale.canvas.style.height = Math.round(window.innerHeight) + 'px';
 
-	currentScene.scene.restart();
+	// currentScene.scene.restart();
 };
 const initGame = () => {
 	[width, height] = calcWidthHeight();
@@ -1413,7 +1450,7 @@ const initGame = () => {
 		width: width,
 		height: height,
 		scale: {
-			// parent: 'body',
+			parent: 'body',
 			mode: Phaser.Scale.FIT,
 			width: width,
 			height: height
@@ -1445,17 +1482,17 @@ const init = () => {
 		avatar = avatars[0];
 	}
 
-	window.addEventListener('beforeunload', () => {
-		if (multiplayer && connectedCloud) {
-			disconnectMultiplayer();
-		}
-	});
-	window.addEventListener('blur', () => {
-		if (multiplayer && connectedCloud) {
-			disconnectMultiplayer();
-			endGame();
-		}
-	});
+	// window.addEventListener('beforeunload', () => {
+	// 	if (multiplayer && connectedCloud) {
+	// 		disconnectMultiplayer();
+	// 	}
+	// });
+	// window.addEventListener('blur', () => {
+	// 	if (multiplayer && connectedCloud) {
+	// 		disconnectMultiplayer();
+	// 		endGame();
+	// 	}
+	// });
 
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
