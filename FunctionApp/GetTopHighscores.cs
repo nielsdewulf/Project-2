@@ -13,9 +13,9 @@ using afloat.models;
 
 namespace afloat
 {
-    public static class GetTop5Highscores
+    public static class GetTopHighscores
     {
-        [FunctionName("GetTop5Highscores")]
+        [FunctionName("GetTopHighscores")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "scores")] HttpRequest req,
             ILogger log)
@@ -40,8 +40,7 @@ namespace afloat
                         command.CommandText = @"SELECT ";
                         if (top != null)
                         {
-                            command.CommandText += $" top @top ";
-                            command.Parameters.AddWithValue("@top", top);
+                            command.CommandText += $" top {top} ";
 
                         }
 
@@ -68,7 +67,7 @@ namespace afloat
             catch (Exception ex)
             {
 
-                log.LogError(ex, "Error at GetTop5Highscores");
+                log.LogError(ex, "Error at GetTopHighscores");
                 return new StatusCodeResult(500);
             }
         }
