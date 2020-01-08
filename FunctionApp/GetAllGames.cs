@@ -21,12 +21,12 @@ namespace afloat
             ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
-            
+
             try
             {
-                 int? status = null;
-                if(req.Query.ContainsKey("status"))
-                status = int.Parse(req.Query["status"]);
+                int? status = null;
+                if (req.Query.ContainsKey("status"))
+                    status = int.Parse(req.Query["status"]);
                 using (SqlConnection connection = new SqlConnection())
                 {
                     List<Game> list = new List<Game>();
@@ -36,8 +36,12 @@ namespace afloat
                     {
                         command.Connection = connection;
                         command.CommandText = @"SELECT * from Game";
-                        if(status!=null)
-                            command.CommandText+=$" where Status = {status}";
+                        if (status != null)
+                        {
+                            command.CommandText += $" where Status = @status";
+                            command.Parameters.AddWithValue("@status", status);
+
+                        }
                         var result = await command.ExecuteReaderAsync();
                         while (await result.ReadAsync())
                         {
@@ -46,7 +50,8 @@ namespace afloat
                                 GameId = Guid.Parse(result["GameId"].ToString()),
                                 PlayerCount = int.Parse(result["PlayerCount"].ToString()),
                                 Status = int.Parse(result["Status"].ToString()),
-                                DateTime = DateTime.Parse(result["DateTime"].ToString())
+                                DateTime = DateTime.Parse(result["DateTime"].ToString()),
+                                MenuId = int.Parse(result["MenuId"].ToString())
                             };
 
                             list.Add(game);
