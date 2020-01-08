@@ -205,3 +205,90 @@
     background-image: url('./VlamAvatarIcon.png');
     background-size: cover;
 }
+
+
+
+/* Scoreboard Popup Styling */
+.c-scoreboard-popup{
+    background-color: black;
+
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.c-scoreboard-popup__box{
+    width: 1400px;
+    background-color: white;
+    height: 760px;
+
+    border-radius: 20px;
+    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.c-scoreboard-popup__image{
+    width: 1120px;
+    height: 358px;
+
+    margin-top: -80px;
+}
+
+.c-scoreboard-popup__content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.c-scoreboard-popup__description{
+    font-family: 'Roboto';
+    font-size: 32px;
+    color: #707070;
+}
+
+.c-scoreboard-popup__question{
+    font-family: 'Roboto';
+    font-size: 36px;
+    color: #707070;
+}
+
+.c-scoreboard-popup__name-input{
+    width: 800px;
+    height: 80px;
+
+    background-color: #E2E2E2;
+
+    border: none;
+    border-radius: 20px;
+
+    margin-bottom: 50px;
+}
+
+
+.c-scoreboard-popup__button{
+    width: 490px;
+    height: 110px;
+
+    border: 0;
+    border-radius: 20px;
+
+    background-color: #E70000;
+    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
+}
+
+.c-scoreboard-popup__button:focus{
+    box-shadow: none;
+}
+
+.c-scoreboard-popup__button-title{
+    font-family: 'Roboto';
+    font-size: 44px;
+    font-weight: 600;
+    
+    color: white;
+}
