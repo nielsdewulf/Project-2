@@ -1,3 +1,11 @@
+/* html{
+    box-sizing: border-box;
+}
+
+* {
+    box-sizing: inherit;
+} */
+
 /* Button styling */
 .c-button{
     width: 490px;
@@ -133,4 +141,67 @@
     text-align: center;
 
     margin: 0;
+}
+
+
+
+/* Avatar Choice Element */
+.c-avatarchoice{
+    display: flex;
+}
+
+.o-hide-accessible{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+
+    box-sizing: border-box;
+}
+
+.c-avatarchoice__option + .c-avatarchoice__option{
+    margin-left: 80px;
+}
+
+.c-avatarchoice__label{
+    height: 256px;
+    width: 256px;
+
+    margin: 0;
+}
+
+.c-avatarchoice__radio:checked + .c-avatarchoice__label div{
+    box-shadow: inset 0px 0px 0px 10px rgba(123,123,255,1);
+    border-radius: 50%;
+
+    box-sizing: border-box;
+}
+
+.c-avatarchoice__image{
+    height: 256px;
+    width: 256px;
+}
+
+.c-avatar0-icon{
+    background-image: url('./JelleyAvatarIcon.png');
+    background-size: cover;
+}
+
+.c-avatar1-icon{
+    background-image: url('./StokeleyAvatarIcon.png');
+    background-size: cover;
+}
+
+.c-avatar2-icon{
+    background-image: url('./SpikeyIcon.png');
+    background-size: cover;
+}
+
+.c-avatar3-icon{
+    background-image: url('./VlamAvatarIcon.png');
+    background-size: cover;
 }
