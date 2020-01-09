@@ -8,8 +8,8 @@ let lobbyId = undefined;
 var mqttClient = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
 	protocolId: 'MQTT'
 });
-mqttClient.on('connect', function () {
-	mqttClient.subscribe(mainId, function (err) {
+mqttClient.on('connect', function() {
+	mqttClient.subscribe(mainId, function(err) {
 		if (!err) {
 			console.warn('Connected');
 		} else {
@@ -17,7 +17,6 @@ mqttClient.on('connect', function () {
 		}
 	});
 });
-
 
 /**
  * Make sure MQTT Manager is loaded before this
@@ -53,11 +52,11 @@ const createNewLobbyCallback = data => {
 	};
 	// console.log(obj);
 	mqttClient.publish(mainId, JSON.stringify(obj));
-	showNewLobby(obj.lobby);
 	lobbies.push(obj.lobby);
-	lobbies.sort(function (a, b) {
+	lobbies.sort(function(a, b) {
 		return a.menuId - b.menuId;
 	});
+	showNewLobbies(lobbies);
 	joinLobby(obj.lobby.gameId);
 };
 const createNewLobby = () => {
@@ -76,7 +75,7 @@ const createNewLobby = () => {
 };
 const getlobbiesCallback = data => {
 	lobbies = data;
-	lobbies.sort(function (a, b) {
+	lobbies.sort(function(a, b) {
 		return a.menuId - b.menuId;
 	});
 	showNewLobbies(data);
@@ -138,7 +137,7 @@ const joinLobby = gameId => {
 		playerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, data => { }, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, data => {}, 'PUT', JSON.stringify(message));
 };
 const leaveLobby = () => {
 	if (currentLobby.status === 2) return;
@@ -164,7 +163,7 @@ const leaveLobby = () => {
 		PlayerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => { }, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 	currentLobby = undefined;
 };
 const finaliseConnection = avatarId => {
@@ -210,7 +209,7 @@ const loadGame = () => {
 	let message = {
 		status: 1
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => { }, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 
 	console.log('Started Game');
 };
@@ -218,7 +217,7 @@ const endGameLobby = () => {
 	let message = {
 		status: 2
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => { }, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 	leaveLobby();
 };
 const getLobbyById = id => {
@@ -238,7 +237,7 @@ var leaderboard = undefined;
 
 const getTopHighscoresCallback = data => {
 	leaderboard = data;
-	leaderboard.sort(function (a, b) {
+	leaderboard.sort(function(a, b) {
 		return b.score - a.score;
 	});
 	showLeaderboard(leaderboard);
@@ -259,16 +258,16 @@ const initBackend = () => {
 	// 	}
 	// });
 	getTopHighscores(5);
-	mqttClient.on('message', function (topic, message) {
+	mqttClient.on('message', function(topic, message) {
 		if (topic === mainId) {
 			let data = JSON.parse(message);
 			if (data.clientId === clientId) return;
 			if (data.status === 'newLobby') {
-				showNewLobby(data.lobby);
 				lobbies.push(data.lobby);
-				lobbies.sort(function (a, b) {
+				lobbies.sort(function(a, b) {
 					return a.menuId - b.menuId;
 				});
+				showNewLobbies(lobbies);
 			}
 			if (data.status === 'playerUpdate') {
 				// showNewLobby(data.lobby);
@@ -284,11 +283,10 @@ const initBackend = () => {
 				lobby.status = data.lobby.status;
 				lobbies.pop(lobby);
 				showNewLobbies(lobbies);
-
 			}
 		}
 	});
-	mqttClient.on('message', function (topic, message) {
+	mqttClient.on('message', function(topic, message) {
 		if (lobbyId !== undefined && topic === `afloat/lobby/${lobbyId}`) {
 			let data = JSON.parse(message);
 			if (data.clientId === clientId) return;
@@ -328,7 +326,9 @@ const initBackend = () => {
 			}
 			if (data.status === 'startGameLobby') {
 				console.log('Started Game');
-				initialiseNewGame(true);
+				document.querySelector('.js-main__lobby').classList.add('c-hidden');
+				initialiseNewGame(currentPlayer.avatar, true);
+				document.querySelector('.js-game').classList.remove('c-hidden');
 			}
 			if (data.status === 'disconnect') {
 				playerList = [];
@@ -341,24 +341,24 @@ const initBackend = () => {
 	// joinLobby('663580E9-46C8-4637-BB78-05688B9604E4');
 };
 
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
 	initBackend();
 });
 
-const handleData = function (url, callback = data => { }, method = 'GET', body = null) {
+const handleData = function(url, callback = data => {}, method = 'GET', body = null) {
 	fetch(url, {
 		method: method,
 		body: body,
 		headers: { 'content-type': 'application/json' }
 	})
-		.then(function (response) {
+		.then(function(response) {
 			if (!response.ok) {
 				throw Error(`Problem with fetch(). Status Code: ${response.status}`);
 			} else {
 				return response.text();
 			}
 		})
-		.then(function (textObject) {
+		.then(function(textObject) {
 			if (textObject != '') callback(JSON.parse(textObject));
 		});
 };

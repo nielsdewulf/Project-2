@@ -306,7 +306,7 @@ function create() {
 	 */
 	this.input.on(
 		'pointerup',
-		function (pointer) {
+		function(pointer) {
 			if (!isFullscreen) {
 				this.scale.stopFullscreen();
 				screen.orientation.lock('landscape-primary');
@@ -335,7 +335,7 @@ function create() {
 								gyroscope = true;
 								window.addEventListener(
 									'deviceorientation',
-									function (e) {
+									function(e) {
 										processGyro(e.alpha, e.beta, e.gamma);
 									},
 									true
@@ -346,7 +346,7 @@ function create() {
 				} else {
 					// non iOS 13+
 				}
-			} catch { }
+			} catch {}
 
 			if (player.body.touching.down) {
 				player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
@@ -411,7 +411,7 @@ function create() {
 		if (window.DeviceOrientationEvent) {
 			window.addEventListener(
 				'deviceorientation',
-				function (e) {
+				function(e) {
 					processGyro(e.alpha, e.beta, e.gamma);
 				},
 				true
@@ -429,7 +429,7 @@ function create() {
 						gyroscope = true;
 						window.addEventListener(
 							'deviceorientation',
-							function (e) {
+							function(e) {
 								processGyro(e.alpha, e.beta, e.gamma);
 							},
 							true
@@ -442,7 +442,7 @@ function create() {
 			if (window.DeviceOrientationEvent) {
 				window.addEventListener(
 					'deviceorientation',
-					function (e) {
+					function(e) {
 						processGyro(e.alpha, e.beta, e.gamma);
 					},
 					true
@@ -678,7 +678,7 @@ function update() {
 					// console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
 					let x =
 						Math.random() *
-						(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
+							(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
 						((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
 
 					ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
@@ -847,7 +847,7 @@ function initMqtt(gameObj) {
 	// 	//51.105.206.206
 	// 	protocolId: 'MQTT'
 	// });
-	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function (err) {
+	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function(err) {
 		if (!err) {
 			// console.log(`afloat/lobby/${lobbyId}/game`);
 			connectedCloud = true;
@@ -876,7 +876,7 @@ function initMqtt(gameObj) {
 		}
 	});
 	if (!setupMqttGameListener) {
-		mqttClient.on('message', function (topic, message) {
+		mqttClient.on('message', function(topic, message) {
 			if (topic == `afloat/lobby/${lobbyId}/game`) {
 				let data = JSON.parse(message);
 				// console.log(data);
@@ -1391,15 +1391,18 @@ const endGame = () => {
 			var scores = [
 				{
 					avatar: avatars.indexOf(avatar),
-					score: score
-
+					score: score,
+					offlinePlayer: true
 				},
 				{
-					avatar: avatars.indexOf(avatar),
-					score: otherPlayerData.score
-
+					avatar: avatars.indexOf(otherPlayerData.avatar),
+					score: otherPlayerData.score,
+					offlinePlayer: false
 				}
 			];
+			scores.sort(function(a, b) {
+				return b.score - a.score;
+			});
 			showResults(scores);
 			otherPlayerData = {
 				avatar: avatars[0],
@@ -1422,12 +1425,10 @@ const endGame = () => {
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 		} else {
-
 			showResults([
 				{
 					avatar: avatars.indexOf(avatar),
 					score: score
-
 				}
 			]);
 		}
@@ -1527,7 +1528,9 @@ const resize = () => {
 
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
 	// console.log('Resize');
-	// location.reload();
+	disconnectMultiplayer();
+	leaveLobby();
+	location.reload();
 
 	// currentScene.scale.parent.width = Math.round(window.innerWidth);
 	// currentScene.scale.parent.height = Math.round(window.innerHeight);
@@ -1619,10 +1622,10 @@ const initFramework = () => {
 			try {
 				document.documentElement.requestFullscreen();
 				screen.orientation.lock('landscape');
-			} catch { }
+			} catch {}
 			try {
 				ScreenOrientation.lock('landscape');
-			} catch { }
+			} catch {}
 			noSleep.enable();
 			isFullscreen = true;
 			setTimeout(() => {
