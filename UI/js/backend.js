@@ -133,7 +133,9 @@ const joinLobby = gameId => {
 			player: currentPlayer
 		})
 	);
-
+	document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
+		el.innerHTML = currentLobby.menuId;
+	});
 	document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
 	document.querySelector('.js-main__avatar-multiplayer').classList.remove('c-hidden');
 
@@ -259,16 +261,16 @@ const getTopHighscores = top => {
 };
 
 const initBackend = () => {
-	// window.addEventListener('beforeunload', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
-	// window.addEventListener('blur', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
+	window.addEventListener('beforeunload', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
 	getTopHighscores(5);
 	mqttClient.on('message', function(topic, message) {
 		if (topic === mainId) {
