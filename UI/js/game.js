@@ -1428,7 +1428,8 @@ const endGame = () => {
 			showResults([
 				{
 					avatar: avatars.indexOf(avatar),
-					score: score
+					score: score,
+					offlinePlayer: true
 				}
 			]);
 		}

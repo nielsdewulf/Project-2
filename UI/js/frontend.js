@@ -33,9 +33,10 @@ const showNewLobbies = data => {
 	document.querySelectorAll('.js-lobbychoice__item').forEach(el => {
 		el.addEventListener('click', function() {
 			console.log('Lobby clicked');
-			document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
-			document.querySelector('.js-main__avatar-multiplayer').classList.remove('c-hidden');
-			joinLobby(el.getAttribute('game-id'));
+			if (joinLobby(el.getAttribute('game-id'))) {
+				document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
+				document.querySelector('.js-main__avatar-multiplayer').classList.remove('c-hidden');
+			}
 		});
 	});
 };
@@ -112,7 +113,7 @@ const showResults = data => {
 		if (player.offlinePlayer) avatarName += ' (jij)';
 		let obj = `<div class="c-vertical-grid__box">
         <h2 class="c-horizontal-grid__place c-horizontal-grid__text c-horizontal-grid--center">${count}e</h2>
-        <img class="c-horizontal-grid__icon" src=${avatarIcon}>
+        <img class="c-horizontal-grid__icon" src="${avatarIcon}">
         <h2 class="c-horizontal-grid__name c-horizontal-grid__text c-horizontal-grid--center">${avatarName}</h2>
         <h2 class="c-horizontal-grid__score c-horizontal-grid__text c-horizontal-grid--center">${player.score}</h2>
         </div>`;
@@ -129,6 +130,38 @@ const showNewPlayer = data => {
 	 *      connected: Klaar voor te spelen
 	 * data.avatar
 	 */
+	let avatarIcon;
+	let avatarName;
+	switch (data.avatar) {
+		case 0:
+			avatarIcon = './img/png/JelleyAvatarIcon.png';
+			avatarName = 'Jelley';
+			break;
+		case 1:
+			avatarIcon = './img/png/StokeleyAvatarIcon.png';
+			avatarName = 'Stokeley';
+			break;
+		case 2:
+			avatarIcon = './img/png/SpikeyAvatarIcon.png';
+			avatarName = 'Spikey';
+			break;
+		case 3:
+			avatarIcon = './img/png/VlamAvatarIcon.png';
+			avatarName = 'Vlam';
+			break;
+	}
+	if (data.offlinePlayer) avatarName += ' (jij)';
+
+	let parent = document.querySelector('.js-multiplayer-lobby-grid');
+	parent.innerHTML += `<div class="c-vertical-grid__box-lobby">
+    <img src="${avatarIcon}" class="c-horizontal-grid__icon-lobby">
+    <h2
+        class="c-horizontal-grid__name-lobby c-horizontal-grid__text-lobby c-horizontal-grid--center-lobby">
+        ${avatarName}</h2>
+</div>`;
+};
+const clearPlayerList = () => {
+	document.querySelector('.js-multiplayer-lobby-grid').innerHTML = '';
 };
 
 let buttonListeners = function() {
@@ -147,7 +180,7 @@ let buttonListeners = function() {
 		document.querySelector('.js-main__avatar-singleplayer').classList.add('c-hidden');
 		document.querySelectorAll('.js-singleplayer-avatar').forEach(el => {
 			if (el.checked) {
-				initialiseNewGame(el.value, false);
+				initialiseNewGame(parseInt(el.value), false);
 				document.querySelector('.js-game').classList.remove('c-hidden');
 			}
 		});
@@ -170,18 +203,26 @@ let buttonListeners = function() {
 		document.querySelectorAll('.js-multiplayer-avatar').forEach(el => {
 			if (el.checked) {
 				console.log(el.value);
-				finaliseConnection(el.value);
+				finaliseConnection(parseInt(el.value));
 			}
 		});
 	});
 
+	/** New Lobby Button Event Listener*/
+
+	let lobbyAddButton = document.querySelector('.js-new-lobby');
+	lobbyAddButton.addEventListener('click', function() {
+		console.log('New Lobby button clicked');
+		createNewLobby();
+	});
 	/* Start Game Lobby Button Event Listener */
 	let lobbyStartGameButton = document.querySelector('.js-button__lobby-startgame');
 	lobbyStartGameButton.addEventListener('click', function() {
 		console.log('Start game button clicked');
-		document.querySelector('.js-main__lobby').classList.add('c-hidden');
-		loadGame();
-		document.querySelector('.js-game').classList.remove('c-hidden');
+		if (loadGame()) {
+			document.querySelector('.js-main__lobby').classList.add('c-hidden');
+			document.querySelector('.js-game').classList.remove('c-hidden');
+		}
 	});
 
 	/* Scoreboard Lobby Choice Button Event Listener */
