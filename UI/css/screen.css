@@ -123,6 +123,18 @@ Styling logo
 \*------------------------------------*/
 
 /*
+Components : Navigation
+---
+Class used to control and navigate the pages in the one page site
+*/
+
+.c-hidden{
+    display: none;
+}
+
+
+
+/*
 Components : Page
 ---
 Styling default page
