@@ -1,4 +1,25 @@
 /**
+ * Make sure MQTT JS is loaded before this
+ */
+var clientId = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
+let mainId = 'afloat/lobby/';
+let lobbyId = undefined;
+
+var mqttClient = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
+	protocolId: 'MQTT'
+});
+mqttClient.on('connect', function () {
+	mqttClient.subscribe(mainId, function (err) {
+		if (!err) {
+			console.warn('Connected');
+		} else {
+			console.log(err);
+		}
+	});
+});
+
+
+/**
  * Make sure MQTT Manager is loaded before this
  */
 
@@ -14,15 +35,15 @@ let currentPlayer = {
 };
 let playerList = [];
 
-const showNewLobby = data => {
-	/**
-	 * data.gameId
-	 * data.PlayerCount
-	 * data.MenuId
-	 * data.Status
-	 */
-	console.log('New lobby with id: ' + data.gameId, data);
-};
+// const showNewLobby = data => {
+// 	/**
+// 	 * data.gameId
+// 	 * data.PlayerCount
+// 	 * data.MenuId
+// 	 * data.Status
+// 	 */
+// 	console.log('New lobby with id: ' + data.gameId, data);
+// };
 const createNewLobbyCallback = data => {
 	console.error(data);
 	let obj = {
@@ -34,7 +55,7 @@ const createNewLobbyCallback = data => {
 	mqttClient.publish(mainId, JSON.stringify(obj));
 	showNewLobby(obj.lobby);
 	lobbies.push(obj.lobby);
-	lobbies.sort(function(a, b) {
+	lobbies.sort(function (a, b) {
 		return a.menuId - b.menuId;
 	});
 	joinLobby(obj.lobby.gameId);
@@ -55,13 +76,14 @@ const createNewLobby = () => {
 };
 const getlobbiesCallback = data => {
 	lobbies = data;
-	lobbies.sort(function(a, b) {
+	lobbies.sort(function (a, b) {
 		return a.menuId - b.menuId;
 	});
-	lobbies.forEach(lobby => {
-		showNewLobby(lobby);
-		console.log(lobby.gameId, lobby.menuId);
-	});
+	showNewLobbies(data);
+	// lobbies.forEach(lobby => {
+
+	// 	console.log(lobby.gameId, lobby.menuId);
+	// });
 };
 const getlobbies = () => {
 	/**
@@ -116,7 +138,7 @@ const joinLobby = gameId => {
 		playerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, data => { }, 'PUT', JSON.stringify(message));
 };
 const leaveLobby = () => {
 	if (currentLobby.status === 2) return;
@@ -142,7 +164,7 @@ const leaveLobby = () => {
 		PlayerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => { }, 'PUT', JSON.stringify(message));
 	currentLobby = undefined;
 };
 const finaliseConnection = avatarId => {
@@ -176,7 +198,7 @@ const loadGame = () => {
 			status: 'startGameLobby'
 		})
 	);
-	initialiseNewGame(true);
+	initialiseNewGame(currentPlayer.avatar, true);
 	mqttClient.publish(
 		mainId,
 		JSON.stringify({
@@ -188,7 +210,7 @@ const loadGame = () => {
 	let message = {
 		status: 1
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => { }, 'PUT', JSON.stringify(message));
 
 	console.log('Started Game');
 };
@@ -196,7 +218,7 @@ const endGameLobby = () => {
 	let message = {
 		status: 2
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => { }, 'PUT', JSON.stringify(message));
 	leaveLobby();
 };
 const getLobbyById = id => {
@@ -216,15 +238,16 @@ var leaderboard = undefined;
 
 const getTopHighscoresCallback = data => {
 	leaderboard = data;
-	leaderboard.sort(function(a, b) {
+	leaderboard.sort(function (a, b) {
 		return b.score - a.score;
 	});
+	showLeaderboard(leaderboard);
 };
 const getTopHighscores = top => {
 	return handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
 };
 
-const init = () => {
+const initBackend = () => {
 	// window.addEventListener('beforeunload', () => {
 	// 	if (currentLobby !== undefined) {
 	// 		leaveLobby();
@@ -236,14 +259,14 @@ const init = () => {
 	// 	}
 	// });
 	getTopHighscores(5);
-	mqttClient.on('message', function(topic, message) {
+	mqttClient.on('message', function (topic, message) {
 		if (topic === mainId) {
 			let data = JSON.parse(message);
 			if (data.clientId === clientId) return;
 			if (data.status === 'newLobby') {
 				showNewLobby(data.lobby);
 				lobbies.push(data.lobby);
-				lobbies.sort(function(a, b) {
+				lobbies.sort(function (a, b) {
 					return a.menuId - b.menuId;
 				});
 			}
@@ -252,16 +275,20 @@ const init = () => {
 				console.log('Lobby update', data.lobby);
 				let lobby = getLobbyById(data.lobby.gameId);
 				lobby.playerCount = data.lobby.playerCount;
+				showNewLobbies(lobbies);
 			}
 			if (data.status === 'lobbyStarted') {
 				// showNewLobby(data.lobby);
 				console.log('Lobby update', data.lobby);
 				let lobby = getLobbyById(data.lobby.gameId);
 				lobby.status = data.lobby.status;
+				lobbies.pop(lobby);
+				showNewLobbies(lobbies);
+
 			}
 		}
 	});
-	mqttClient.on('message', function(topic, message) {
+	mqttClient.on('message', function (topic, message) {
 		if (lobbyId !== undefined && topic === `afloat/lobby/${lobbyId}`) {
 			let data = JSON.parse(message);
 			if (data.clientId === clientId) return;
@@ -314,24 +341,24 @@ const init = () => {
 	// joinLobby('663580E9-46C8-4637-BB78-05688B9604E4');
 };
 
-document.addEventListener('DOMContentLoaded', function() {
-	init();
+document.addEventListener('DOMContentLoaded', function () {
+	initBackend();
 });
 
-const handleData = function(url, callback = data => {}, method = 'GET', body = null) {
+const handleData = function (url, callback = data => { }, method = 'GET', body = null) {
 	fetch(url, {
 		method: method,
 		body: body,
 		headers: { 'content-type': 'application/json' }
 	})
-		.then(function(response) {
+		.then(function (response) {
 			if (!response.ok) {
 				throw Error(`Problem with fetch(). Status Code: ${response.status}`);
 			} else {
 				return response.text();
 			}
 		})
-		.then(function(textObject) {
+		.then(function (textObject) {
 			if (textObject != '') callback(JSON.parse(textObject));
 		});
 };

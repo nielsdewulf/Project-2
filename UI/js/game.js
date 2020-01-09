@@ -306,7 +306,7 @@ function create() {
 	 */
 	this.input.on(
 		'pointerup',
-		function(pointer) {
+		function (pointer) {
 			if (!isFullscreen) {
 				this.scale.stopFullscreen();
 				screen.orientation.lock('landscape-primary');
@@ -335,7 +335,7 @@ function create() {
 								gyroscope = true;
 								window.addEventListener(
 									'deviceorientation',
-									function(e) {
+									function (e) {
 										processGyro(e.alpha, e.beta, e.gamma);
 									},
 									true
@@ -346,7 +346,7 @@ function create() {
 				} else {
 					// non iOS 13+
 				}
-			} catch {}
+			} catch { }
 
 			if (player.body.touching.down) {
 				player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
@@ -411,7 +411,7 @@ function create() {
 		if (window.DeviceOrientationEvent) {
 			window.addEventListener(
 				'deviceorientation',
-				function(e) {
+				function (e) {
 					processGyro(e.alpha, e.beta, e.gamma);
 				},
 				true
@@ -429,7 +429,7 @@ function create() {
 						gyroscope = true;
 						window.addEventListener(
 							'deviceorientation',
-							function(e) {
+							function (e) {
 								processGyro(e.alpha, e.beta, e.gamma);
 							},
 							true
@@ -442,7 +442,7 @@ function create() {
 			if (window.DeviceOrientationEvent) {
 				window.addEventListener(
 					'deviceorientation',
-					function(e) {
+					function (e) {
 						processGyro(e.alpha, e.beta, e.gamma);
 					},
 					true
@@ -678,7 +678,7 @@ function update() {
 					// console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
 					let x =
 						Math.random() *
-							(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
+						(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
 						((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
 
 					ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
@@ -847,7 +847,7 @@ function initMqtt(gameObj) {
 	// 	//51.105.206.206
 	// 	protocolId: 'MQTT'
 	// });
-	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function(err) {
+	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function (err) {
 		if (!err) {
 			// console.log(`afloat/lobby/${lobbyId}/game`);
 			connectedCloud = true;
@@ -876,7 +876,7 @@ function initMqtt(gameObj) {
 		}
 	});
 	if (!setupMqttGameListener) {
-		mqttClient.on('message', function(topic, message) {
+		mqttClient.on('message', function (topic, message) {
 			if (topic == `afloat/lobby/${lobbyId}/game`) {
 				let data = JSON.parse(message);
 				// console.log(data);
@@ -1366,7 +1366,7 @@ function die() {
 	// console.warn('YOU ARE DEAD');
 	if (!alive) return;
 	alive = false;
-	document.querySelector('canvas').classList.add('died');
+	document.querySelector('canvas').classList.add('c-died');
 	player.setActive(false);
 	player.setVisible(false);
 	if (multiplayer) {
@@ -1390,19 +1390,17 @@ const endGame = () => {
 		if (multiplayer) {
 			var scores = [
 				{
-					currentPlayer: {
-						clientId: clientId,
-						avatar: avatars.indexOf(avatar),
-						score: score
-					}
+					avatar: avatars.indexOf(avatar),
+					score: score
+
 				},
 				{
-					otherPlayer: {
-						avatar: avatars.indexOf(avatar),
-						score: otherPlayerData.score
-					}
+					avatar: avatars.indexOf(avatar),
+					score: otherPlayerData.score
+
 				}
 			];
+			showResults(scores);
 			otherPlayerData = {
 				avatar: avatars[0],
 				score: 0,
@@ -1423,7 +1421,18 @@ const endGame = () => {
 			connectedCloud = false;
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
+		} else {
+
+			showResults([
+				{
+					avatar: avatars.indexOf(avatar),
+					score: score
+
+				}
+			]);
 		}
+		document.querySelector('.js-game').classList.add('c-hidden');
+		document.querySelector('.js-main__results').classList.remove('c-hidden');
 		// location.reload();
 		currentScene.scene.stop();
 		started = false;
@@ -1469,9 +1478,9 @@ const startGame = () => {
 		}
 	}, 1000);
 };
-const initialiseNewGame = (multiplayerBool = false) => {
+const initialiseNewGame = (avatarid, multiplayerBool = false) => {
 	multiplayer = multiplayerBool;
-	avatar = avatars[currentPlayer.avatar];
+	avatar = avatars[avatarid];
 
 	game.scene.start('game');
 
@@ -1582,23 +1591,23 @@ const initFramework = () => {
 		avatar = avatars[0];
 	}
 
-	// window.addEventListener('beforeunload', () => {
-	// 	if (multiplayer && connectedCloud) {
-	// 		disconnectMultiplayer();
-	// 	} else {
-	// 		endGame();
-	// 	}
-	// });
-	// window.addEventListener('blur', () => {
-	// 	if (currentScene != undefined) {
-	// 		if (multiplayer && connectedCloud) {
-	// 			disconnectMultiplayer();
-	// 			endGame();
-	// 		} else {
-	// 			endGame();
-	// 		}
-	// 	}
-	// });
+	window.addEventListener('beforeunload', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+		} else {
+			endGame();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (currentScene != undefined) {
+			if (multiplayer && connectedCloud) {
+				disconnectMultiplayer();
+				endGame();
+			} else {
+				endGame();
+			}
+		}
+	});
 
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
@@ -1610,10 +1619,10 @@ const initFramework = () => {
 			try {
 				document.documentElement.requestFullscreen();
 				screen.orientation.lock('landscape');
-			} catch {}
+			} catch { }
 			try {
 				ScreenOrientation.lock('landscape');
-			} catch {}
+			} catch { }
 			noSleep.enable();
 			isFullscreen = true;
 			setTimeout(() => {
