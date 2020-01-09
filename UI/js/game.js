@@ -1446,7 +1446,7 @@ const endGame = () => {
 		health = 3;
 
 		scoreObject.innerHTML = 0;
-		document.querySelector('canvas').classList.remove('died');
+		document.querySelector('canvas').classList.remove('c-died');
 	}, 1000);
 };
 const disconnectMultiplayer = () => {
