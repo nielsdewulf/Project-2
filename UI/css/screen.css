@@ -316,12 +316,16 @@ Vertical Grid Styling
     align-items: center;
 }
 
+
 .c-horizontal-grid__place{
     justify-self: center;
 }
 
 .c-horizontal-grid__icon{
     justify-self: center;
+    height:75%; 
+    align-self: center;
+    
 }
 
 .c-horizontal-grid__name{
@@ -411,7 +415,7 @@ Container for Lobby page
 
     overflow-x: auto;
     scroll-snap-type: x proximity;
-    justify-content: center;
+    
 }
 
 .c-lobbychoice__item{
@@ -475,8 +479,11 @@ Container for Lobby page
 
     display: flex;
     align-items: center;
+    align-self:center;
     justify-content: center;
 }
+
+
 
 @media(min-width:1024px){
     .c-button-add__lobby {
@@ -491,6 +498,7 @@ Container for Lobby page
     
         display: flex;
         align-items: center;
+        align-self:center;
         justify-content: center;
     } 
 }
@@ -508,6 +516,7 @@ Container for Lobby page
     
         display: flex;
         align-items: center;
+        align-self:center;
         justify-content: center;
     } 
 }
