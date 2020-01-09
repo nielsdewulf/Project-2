@@ -207,6 +207,14 @@ let buttonListeners = function() {
 			}
 		});
 	});
+	/* Start Page Scoreboard Button Event Listener */
+    
+	let scoreboardButtonStartpage = document.querySelector('.js-button__scoreboard-startpage');
+    scoreboardButtonStartpage.addEventListener('click', function () {
+        console.log('Singleplayer button clicked');
+        document.querySelector('.js-main__start').classList.add('c-hidden');
+        document.querySelector('.js-main__scoreboard').classList.remove('c-hidden');
+    })
 
 	/** New Lobby Button Event Listener*/
 
@@ -241,6 +249,14 @@ let buttonListeners = function() {
 		document.querySelector('.js-main__start').classList.remove('c-hidden');
 	});
 
+	/* Startpage Lobby Button Event Listener */
+	let startpageButtonLobby = document.querySelector('.js-button__lobby-startpage');
+	startpageButtonLobby.addEventListener('click', function() {
+		console.log('Startpage Button Clicked');
+		document.querySelector('.js-main__lobby').classList.add('c-hidden');
+		document.querySelector('.js-main__start').classList.remove('c-hidden');
+	});
+
 	/* Scoreboard Resultaten Button Event Listener */
 	let scoreboardResultsButton = document.querySelector('.js-button__scoreboard-results');
 	scoreboardResultsButton.addEventListener('click', function() {
@@ -263,6 +279,8 @@ let buttonListeners = function() {
 		console.log('Results Button Clicked');
 		document.querySelector('.js-main__score-popup').classList.add('c-hidden');
 	});
+
+	
 };
 
 const initFrontend = () => {};
