@@ -378,8 +378,8 @@ Vertical Grid Styling
 
 .c-horizontal-grid__icon-lobby{
     justify-self: center;
-    background-color: black;
-    margin-left: 5%;
+    height:75%; 
+    align-self: center;
 }
 
 
