@@ -15,7 +15,7 @@ var noSleep = new NoSleep();
 
 var client;
 var isFullscreen = false;
-var scoreObject, highscoreObject, healthObjects;
+var scoreObject, highscoreObject, healthObjects, countdownWrapperObject;
 var multiplayer = false;
 var host = true;
 var connectedCloud = false;
@@ -131,7 +131,7 @@ function create() {
 
 	this.scale.setGameSize(width, height);
 	this.scale.resize(width, height);
-	console.log(width, height);
+	// console.log(width, height);
 	this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
 
 	this.scale.refresh();
@@ -470,7 +470,7 @@ function update() {
 
 	//   });
 	if (invincible && new Date().getTime() - gracePeriodFlickerTime > 250) {
-		console.error('Invincible');
+		// console.error('Invincible');
 		if (gracePeriodAlpha) {
 			player.alpha = 0.5;
 			gracePeriodAlpha = false;
@@ -847,7 +847,7 @@ function initMqtt(gameObj) {
 
 	client.on('message', function(topic, message) {
 		let data = JSON.parse(message);
-		console.log(data);
+		// console.log(data);
 		if (data.clientId === clientId) return;
 
 		if (data.status != undefined && data.status === 'connectionRequest') {
@@ -870,6 +870,16 @@ function initMqtt(gameObj) {
 
 			otherPlayer.body.setCollideWorldBounds = true;
 			gameObj.physics.add.collider(otherPlayer, platforms);
+			if (host) {
+				client.publish(
+					`afloat/lobby/${lobbyId}/game`,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'start'
+					})
+				);
+				startGame();
+			}
 		}
 		if (data.status != undefined && data.status === 'connected') {
 			host = false;
@@ -963,13 +973,13 @@ function initMqtt(gameObj) {
 			host = true;
 		}
 		if (data.status != undefined && data.status === 'start') {
-			started = true;
+			startGame();
 		}
 		if (data.status != undefined && data.status === 'respawn') {
 			otherPlayer.setPosition(width / 2, height - height * 0.5);
 		}
 		if (data.status != undefined && data.status === 'died') {
-			console.log('Other player died');
+			// console.log('Other player died');
 			otherPlayer.setActive(false).setVisible(false);
 			otherPlayerData.alive = false;
 			otherPlayerData.score = data.score;
@@ -1383,6 +1393,7 @@ const endGame = () => {
 		});
 		score = 0;
 		alive = true;
+		health = 3;
 		scoreObject.innerHTML = 0;
 		document.querySelector('canvas').classList.remove('died');
 	}, 1000);
@@ -1396,14 +1407,33 @@ const disconnectMultiplayer = () => {
 		})
 	);
 };
+const startGame = () => {
+	let countdown = 5;
+	let countdownInterval;
+	countdownInterval = setInterval(() => {
+		if (countdown == 0) {
+			countdownWrapperObject.innerHTML = '';
 
+			clearInterval(countdownInterval);
+			started = true;
+			// console.log('Starting');
+		} else {
+			countdownWrapperObject.innerHTML = `<h1 class="c-game-overlay__countdown js-countdown">${countdown}</h1>`;
+			setTimeout(() => {
+				let countdownObject = document.querySelector('.js-countdown');
+				countdownObject.classList.add('c-game-overlay__countdown--big');
+			}, 100);
+
+			countdown--;
+		}
+	}, 1000);
+};
 const initialiseNewGame = (multiplayerBool = false) => {
 	multiplayer = multiplayerBool;
 	game.scene.start('game');
+
 	if (!multiplayer) {
-		setTimeout(() => {
-			started = true;
-		}, 5000);
+		startGame();
 	}
 	// setTimeout(() => {
 	// 	game.scene.stop('game');
@@ -1444,7 +1474,7 @@ const resize = () => {
 	// console.log(grv)
 
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
-	console.log('Resize');
+	// console.log('Resize');
 	// location.reload();
 
 	// currentScene.scale.parent.width = Math.round(window.innerWidth);
@@ -1509,27 +1539,28 @@ const init = () => {
 		avatar = avatars[0];
 	}
 
-	// window.addEventListener('beforeunload', () => {
-	// 	if (multiplayer && connectedCloud) {
-	// 		disconnectMultiplayer();
-	// 	} else {
-	// 		endGame();
-	// 	}
-	// });
-	// window.addEventListener('blur', () => {
-	// 	if (currentScene != undefined) {
-	// 		if (multiplayer && connectedCloud) {
-	// 			disconnectMultiplayer();
-	// 			endGame();
-	// 		} else {
-	// 			endGame();
-	// 		}
-	// 	}
-	// });
+	window.addEventListener('beforeunload', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+		} else {
+			endGame();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (currentScene != undefined) {
+			if (multiplayer && connectedCloud) {
+				disconnectMultiplayer();
+				endGame();
+			} else {
+				endGame();
+			}
+		}
+	});
 
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
 	healthObjects = document.querySelectorAll('.js-health-heart');
+	countdownWrapperObject = document.querySelector('.js-countdown-wrapper');
 
 	document.documentElement.addEventListener('click', () => {
 		if (!isFullscreen) {
