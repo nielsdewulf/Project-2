@@ -90,25 +90,25 @@ const showResults = data => {
     let count = 1;
     let avatarIcon;
     let avatarName;
-    data.forEach(player =>
+    data.forEach(player => {
         switch (player.avatar) {
-        case 0:
-            avatarIcon = "./img/png/JelleyAvatarIcon.png";
-            avatarName = 'Jelley';
-            break;
-        case 1:
-            avatarIcon = "./img/png/StokeleyAvatarIcon.png";
-            avatarName = 'Stokeley';
-            break;
-        case 2:
-            avatarIcon = "./img/png/SpikeyAvatarIcon.png";
-            avatarName = 'Spikey';
-            break;
-        case 3:
-            avatarIcon = "./img/png/VlamAvatarIcon.png";
-            avatarName = 'Vlam';
-            break;
-    }
+            case 0:
+                avatarIcon = "./img/png/JelleyAvatarIcon.png";
+                avatarName = 'Jelley';
+                break;
+            case 1:
+                avatarIcon = "./img/png/StokeleyAvatarIcon.png";
+                avatarName = 'Stokeley';
+                break;
+            case 2:
+                avatarIcon = "./img/png/SpikeyAvatarIcon.png";
+                avatarName = 'Spikey';
+                break;
+            case 3:
+                avatarIcon = "./img/png/VlamAvatarIcon.png";
+                avatarName = 'Vlam';
+                break;
+        }
         let obj = `<div class="c-vertical-grid__box">
         <h2 class="c-horizontal-grid__place c-horizontal-grid__text c-horizontal-grid--center">${count}e</h2>
         <img class="c-horizontal-grid__icon" src=${avatarIcon}>
