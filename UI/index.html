@@ -12,7 +12,12 @@
     <link rel="stylesheet" href="css/screen.css">
     <link rel="stylesheet" href="css/normalize.css">
 
-    <script src="./js/navigation.js"></script>
+    <script src="js/mqtt.min.js" type="text/javascript"></script>
+    <script src="js/phaser.min.js"></script>
+    <script src="js/nosleep.min.js"></script>
+    <script src="js/backend.js"></script>
+    <script src="js/frontend.js"></script>
+    <script src="js/game.js"></script>
 </head>
 
 <body>
@@ -68,7 +73,7 @@
             <div class="c-app__lobby">
                 <span class="c-app__title">Lobby</span>
                 <div class="c-lobby">
-                    <div class="c-lobbychoice">
+                    <div class="c-lobbychoice js-lobby-parent">
                         <div class="c-lobbychoice__item js-lobbychoice__item">
                             <div class="c-lobbychoice__content">
                                 <h2 class="c-lobbychoice__title">Noordpool #1</h2>
@@ -89,7 +94,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="c-button-add__lobby">+</div>
+                    <div class="c-button-add__lobby js-new-lobby">+</div>
                 </div>
                 <button class="c-button js-button__scoreboard-lobbychoice">
                     <span class="c-button__title">Scorebord</span>
@@ -112,29 +117,29 @@
                 <div class="c-avatar">
                     <div class="c-avatarchoice">
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="avatarradio" type="radio"
-                                id="avatar0" checked>
+                            <input class="o-hide-accessible c-avatarchoice__radio js-singleplayer-avatar" value="0"
+                                name="avatarradio" type="radio" id="avatar0" checked>
                             <label class="c-avatarchoice__label" for="avatar0">
                                 <div class="c-avatarchoice__image c-avatar0-icon"></div>
                             </label>
                         </div>
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="avatarradio" type="radio"
-                                id="avatar1">
+                            <input class="o-hide-accessible c-avatarchoice__radio js-singleplayer-avatar" value="1"
+                                name="avatarradio" type="radio" id="avatar1">
                             <label class="c-avatarchoice__label" for="avatar1">
                                 <div class="c-avatarchoice__image c-avatar1-icon"></div>
                             </label>
                         </div>
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="avatarradio" type="radio"
-                                id="avatar2">
+                            <input class="o-hide-accessible c-avatarchoice__radio js-singleplayer-avatar" value="2"
+                                name="avatarradio" type="radio" id="avatar2">
                             <label class="c-avatarchoice__label" for="avatar2">
                                 <div class="c-avatarchoice__image c-avatar2-icon"></div>
                             </label>
                         </div>
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="avatarradio" type="radio"
-                                id="avatar3">
+                            <input class="o-hide-accessible c-avatarchoice__radio js-singleplayer-avatar" value="3"
+                                name="avatarradio" type="radio" id="avatar3">
                             <label class="c-avatarchoice__label" for="avatar3">
                                 <div class="c-avatarchoice__image c-avatar3-icon"></div>
                             </label>
@@ -162,29 +167,29 @@
                 <div class="c-avatar">
                     <div class="c-avatarchoice">
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="multiavatarradio" type="radio"
-                                id="multiavatar0" checked>
+                            <input class="o-hide-accessible c-avatarchoice__radio js-multiplayer-avatar" value="0"
+                                name="multiavatarradio" type="radio" id="multiavatar0" checked>
                             <label class="c-avatarchoice__label" for="multiavatar0">
                                 <div class="c-avatarchoice__image c-avatar0-icon"></div>
                             </label>
                         </div>
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="multiavatarradio" type="radio"
-                                id="multiavatar1">
+                            <input class="o-hide-accessible c-avatarchoice__radio js-multiplayer-avatar" value="1"
+                                name="multiavatarradio" type="radio" id="multiavatar1">
                             <label class="c-avatarchoice__label" for="multiavatar1">
                                 <div class="c-avatarchoice__image c-avatar1-icon"></div>
                             </label>
                         </div>
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="multiavatarradio" type="radio"
-                                id="multiavatar2">
+                            <input class="o-hide-accessible c-avatarchoice__radio js-multiplayer-avatar" value="2"
+                                name="multiavatarradio" type="radio" id="multiavatar2">
                             <label class="c-avatarchoice__label" for="multiavatar2">
                                 <div class="c-avatarchoice__image c-avatar2-icon"></div>
                             </label>
                         </div>
                         <div class="c-avatarchoice__option">
-                            <input class="o-hide-accessible c-avatarchoice__radio" name="multiavatarradio" type="radio"
-                                id="multiavatar3">
+                            <input class="o-hide-accessible c-avatarchoice__radio js-multiplayer-avatar" value="3"
+                                name="multiavatarradio" type="radio" id="multiavatar3">
                             <label class="c-avatarchoice__label" for="multiavatar3">
                                 <div class="c-avatarchoice__image c-avatar3-icon"></div>
                             </label>
@@ -207,19 +212,9 @@
             <div class="c-app__lobby">
                 <span class="c-app__title">Noordpool #1</span>
                 <div class="c-lobby">
-                    <div class="c-vertical-grid-lobby">
-                        <div class="c-vertical-grid__box-lobby">
-                            <img class="c-horizontal-grid__icon-lobby">
-                            <h2
-                                class="c-horizontal-grid__name-lobby c-horizontal-grid__text-lobby c-horizontal-grid--center-lobby">
-                                Speler #1</h2>
-                        </div>
-                        <div class="c-vertical-grid__box-lobby">
-                            <img class="c-horizontal-grid__icon-lobby">
-                            <h2
-                                class="c-horizontal-grid__name-lobby c-horizontal-grid__text-lobby c-horizontal-grid--center-lobby">
-                                Speler #1</h2>
-                        </div>
+                    <div class="c-vertical-grid-lobby js-multiplayer-lobby-grid">
+                        
+                        
                     </div>
                 </div>
                 <button class="c-button js-button__lobby-startgame">
@@ -238,7 +233,7 @@
             <div class="c-app__lobby">
                 <span class="c-app__title">Resultaten Noordpool #1</span>
                 <div class="c-lobby">
-                    <div class="c-vertical-grid">
+                    <div class="c-vertical-grid js-results-parent">
                         <div class="c-vertical-grid__box">
                             <h2 class="c-horizontal-grid__place c-horizontal-grid__text c-horizontal-grid--center">1e
                             </h2>
@@ -282,7 +277,7 @@
             <div class="c-app__lobby">
                 <span class="c-app__title">Scorebord</span>
                 <div class="c-lobby">
-                    <div class="c-vertical-grid">
+                    <div class="c-vertical-grid js-scoreboard-parent">
                         <div class="c-vertical-grid__box">
                             <h2 class="c-horizontal-grid__place c-horizontal-grid__text c-horizontal-grid--center">1e
                             </h2>
@@ -362,7 +357,56 @@
             </div>
         </div>
     </div>
+    <!--__________________________________Game_________________________________________-->
 
+    <div class="c-page c-hidden js-game">
+        <div class="c-game-overlay">
+            <div class="c-game-overlay__row">
+                <div class="c-game-overlay__wrapper u-width-1-of-3-vw">
+                    <div class="c-game-overlay__health">
+                        <h3>Levens</h3>
+                        <div class="c-game-overlay__content">
+                            <svg class="c-game-overlay__heart js-health-heart" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 22.94 21.19">
+                                <title>Heart</title>
+                                <path class="a"
+                                    d="M1,7.11c0,3.55,2.67,8.27,10.47,13.08,7.8-4.81,10.47-9.53,10.47-13.08,0-6.95-8.42-7.88-10.47-3.26C9.43-.74,1,.12,1,7.11Z" />
+                            </svg>
+                            <svg class="c-game-overlay__heart js-health-heart" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 22.94 21.19">
+                                <title>Heart</title>
+                                <path class="a"
+                                    d="M1,7.11c0,3.55,2.67,8.27,10.47,13.08,7.8-4.81,10.47-9.53,10.47-13.08,0-6.95-8.42-7.88-10.47-3.26C9.43-.74,1,.12,1,7.11Z" />
+                            </svg>
+                            <svg class="c-game-overlay__heart js-health-heart" xmlns=" http://www.w3.org/2000/svg"
+                                viewBox="0 0 22.94 21.19">
+                                <title>Heart</title>
+                                <path class="a"
+                                    d="M1,7.11c0,3.55,2.67,8.27,10.47,13.08,7.8-4.81,10.47-9.53,10.47-13.08,0-6.95-8.42-7.88-10.47-3.26C9.43-.74,1,.12,1,7.11Z" />
+                            </svg>
+                        </div>
+                    </div>
+
+
+                </div>
+                <div class="c-game-overlay__score u-width-1-of-3-vw">
+                    <h3>Score</h2>
+                        <h1 class="js-current-score">0</h1>
+                </div>
+                <div class="c-game-overlay__wrapper u-flex-justify-end u-width-1-of-3-vw">
+                    <div class="c-game-overlay__highscore">
+                        <h3>Doel</h3>
+                        <h2 class="js-highscore">850</h2>
+                    </div>
+                </div>
+
+            </div>
+            <div class="c-game-overlay__center js-countdown-wrapper">
+            </div>
+
+        </div>
+        <div id="c-game-area" class="c-game-area"></div>
+    </div>
 </body>
 
 </html>

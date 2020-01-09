@@ -1366,7 +1366,7 @@ function die() {
 	// console.warn('YOU ARE DEAD');
 	if (!alive) return;
 	alive = false;
-	document.querySelector('canvas').classList.add('died');
+	document.querySelector('canvas').classList.add('c-died');
 	player.setActive(false);
 	player.setVisible(false);
 	if (multiplayer) {
@@ -1390,19 +1390,20 @@ const endGame = () => {
 		if (multiplayer) {
 			var scores = [
 				{
-					currentPlayer: {
-						clientId: clientId,
-						avatar: avatars.indexOf(avatar),
-						score: score
-					}
+					avatar: avatars.indexOf(avatar),
+					score: score,
+					offlinePlayer: true
 				},
 				{
-					otherPlayer: {
-						avatar: avatars.indexOf(avatar),
-						score: otherPlayerData.score
-					}
+					avatar: avatars.indexOf(otherPlayerData.avatar),
+					score: otherPlayerData.score,
+					offlinePlayer: false
 				}
 			];
+			scores.sort(function(a, b) {
+				return b.score - a.score;
+			});
+			showResults(scores);
 			otherPlayerData = {
 				avatar: avatars[0],
 				score: 0,
@@ -1423,7 +1424,17 @@ const endGame = () => {
 			connectedCloud = false;
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
+		} else {
+			showResults([
+				{
+					avatar: avatars.indexOf(avatar),
+					score: score,
+					offlinePlayer: true
+				}
+			]);
 		}
+		document.querySelector('.js-game').classList.add('c-hidden');
+		document.querySelector('.js-main__results').classList.remove('c-hidden');
 		// location.reload();
 		currentScene.scene.stop();
 		started = false;
@@ -1469,9 +1480,9 @@ const startGame = () => {
 		}
 	}, 1000);
 };
-const initialiseNewGame = (multiplayerBool = false) => {
+const initialiseNewGame = (avatarid, multiplayerBool = false) => {
 	multiplayer = multiplayerBool;
-	avatar = avatars[currentPlayer.avatar];
+	avatar = avatars[avatarid];
 
 	game.scene.start('game');
 
@@ -1518,7 +1529,9 @@ const resize = () => {
 
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
 	// console.log('Resize');
-	// location.reload();
+	disconnectMultiplayer();
+	leaveLobby();
+	location.reload();
 
 	// currentScene.scale.parent.width = Math.round(window.innerWidth);
 	// currentScene.scale.parent.height = Math.round(window.innerHeight);
@@ -1582,23 +1595,23 @@ const initFramework = () => {
 		avatar = avatars[0];
 	}
 
-	// window.addEventListener('beforeunload', () => {
-	// 	if (multiplayer && connectedCloud) {
-	// 		disconnectMultiplayer();
-	// 	} else {
-	// 		endGame();
-	// 	}
-	// });
-	// window.addEventListener('blur', () => {
-	// 	if (currentScene != undefined) {
-	// 		if (multiplayer && connectedCloud) {
-	// 			disconnectMultiplayer();
-	// 			endGame();
-	// 		} else {
-	// 			endGame();
-	// 		}
-	// 	}
-	// });
+	window.addEventListener('beforeunload', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+		} else {
+			endGame();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (currentScene != undefined) {
+			if (multiplayer && connectedCloud) {
+				disconnectMultiplayer();
+				endGame();
+			} else {
+				endGame();
+			}
+		}
+	});
 
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
