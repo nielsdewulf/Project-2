@@ -261,16 +261,16 @@ const getTopHighscores = top => {
 };
 
 const initBackend = () => {
-	// window.addEventListener('beforeunload', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
-	// window.addEventListener('blur', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
+	window.addEventListener('beforeunload', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
 	getTopHighscores(5);
 	mqttClient.on('message', function(topic, message) {
 		if (topic === mainId) {
