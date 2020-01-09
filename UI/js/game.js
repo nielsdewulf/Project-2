@@ -1634,6 +1634,15 @@ const initFramework = () => {
 			try {
 				ScreenOrientation.lock('landscape');
 			} catch {}
+
+			if (typeof DeviceMotionEvent.requestPermission === 'function') {
+				DeviceMotionEvent.requestPermission()
+					.then(response => {
+						if (response == 'granted') {
+						}
+					})
+					.catch(console.error);
+			}
 			noSleep.enable();
 			isFullscreen = true;
 			setTimeout(() => {
