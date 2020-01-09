@@ -198,6 +198,17 @@ Styling default page
     border-radius: 10px;
 }
 
+.c-app__popup {
+    width:73vw;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-left: auto;
+    margin-right: auto;
+}
+
 
 
 /*
@@ -279,7 +290,7 @@ Vertical Grid Styling
 .c-horizontal-grid__text{
     font-family: 'Roboto';
     font-size: 1.875vw;
-    line-height: 36px;
+    line-height: 3.33vh;
     color: white;
 
     margin: 0;
@@ -306,6 +317,55 @@ Vertical Grid Styling
     justify-self: center;
 }
 
+/* Vertical grid styling lobbypage*/
+
+.c-vertical-grid-lobby{
+    display: grid;
+    grid-template-rows: repeat(2, 7vh);
+    grid-row-gap: 3vh;
+}
+
+.c-vertical-grid__box-lobby{
+    height: 7.87vh;
+    max-width: 100%;
+
+    border-radius: 10px;
+
+    background-color: #5B5BFF;
+
+    display: grid;
+    grid-template-columns: 9.375vw  1fr;
+}
+
+.c-horizontal-grid__text-lobby{
+    font-family: 'Roboto';
+    font-size: 1.875vw;
+    line-height: 3.33vh;
+    color: white;
+
+    margin: 0;
+}
+
+.c-horizontal-grid--center-lobby{
+    display: flex;
+    align-items: center;
+}
+
+.c-horizontal-grid__name-lobby{
+    margin-left: 2%;
+    height:7.87vh;
+}
+
+.c-horizontal-grid__icon-lobby{
+    justify-self: center;
+    background-color: black;
+    margin-left: 5%;
+}
+
+
+
+
+
 
 /*
 Components: Lobby
@@ -320,17 +380,23 @@ Container for Lobby page
    
     margin-top: 2%;
     margin-bottom:2%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
  }
 
  /* Horizontal Scroll Styling */
+ 
 .c-lobbychoice{
-    width: 100%;
+    width: 70%;
     height: 48.8vh;
 
     display: flex;
 
     overflow-x: auto;
     scroll-snap-type: x proximity;
+    justify-content: center;
 }
 
 .c-lobbychoice__item{
@@ -340,7 +406,7 @@ Container for Lobby page
     box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
 
     min-width: 16.77vw;
-
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -358,7 +424,7 @@ Container for Lobby page
     text-align: center;
 
     margin: 0;
-    margin-bottom: 48px;
+    margin-bottom: 4.44vh;
 }
 
 .c-lobbychoice__players-title{
@@ -369,7 +435,7 @@ Container for Lobby page
     text-align: center;
 
     margin: 0;
-    margin-bottom: 8px;
+    margin-bottom: 0.74vh;
 }
 
 .c-lobbychoice__players-count{
@@ -380,6 +446,55 @@ Container for Lobby page
     text-align: center;
 
     margin: 0;
+}
+
+.c-button-add__lobby {
+    width:40px;
+    height:40px;
+    background-color: #FFD54A;
+    
+    border-radius: 50%;
+
+    font-size: 5vw;
+    color:white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media(min-width:1024px){
+    .c-button-add__lobby {
+        width:80px;
+        height:80px;
+        background-color: #FFD54A;
+        
+        border-radius: 50%;
+    
+        font-size: 6vw;
+        color:white;
+    
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    } 
+}
+
+@media(min-width:1200px){
+    .c-button-add__lobby {
+        width:112px;
+        height:112px;
+        background-color: #FFD54A;
+        
+        border-radius: 50%;
+    
+        font-size: 7.5vw;
+        color:white;
+    
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    } 
 }
 
  /*
@@ -403,8 +518,9 @@ Container for avatar choice
 /* Avatar Choice Element */
 .c-avatarchoice{
     display: flex;
-    
-    
+    width:100%;
+    align-self: center;
+    justify-content: space-between;
 }
 
 .o-hide-accessible{
@@ -420,14 +536,10 @@ Container for avatar choice
     box-sizing: border-box;
 }
 
-.c-avatarchoice__option {
-    margin-left: 10px;
-    width:30%;
-}
 
 .c-avatarchoice__label{
-    height: 23.7vh;
-    width: 13.3vw;
+    height: 100px;
+    width: 100px;
 
     margin: 0;
 }
@@ -440,10 +552,9 @@ Container for avatar choice
 }
    
 
-
 .c-avatarchoice__image{
-    height: 23.7vh;
-    width: 13.3vw;
+    height: 100px;
+    width: 100px;
 }
 
 .c-avatar0-icon{
@@ -464,4 +575,116 @@ Container for avatar choice
 .c-avatar3-icon{
     background-image: url('../img/png/VlamAvatarIcon.png');
     background-size: cover;
+}
+
+@media (min-width: 1024px) {
+    .c-avatarchoice__label{
+        height: 160px;
+        width: 160px;
+    
+        margin: 0;
+    }
+
+    .c-avatarchoice__image{
+        height: 160px;
+        width: 160px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .c-avatarchoice__label{
+        height: 240px;
+        width: 240px;
+    
+        margin: 0;
+    }
+
+    .c-avatarchoice__image{
+        height: 240px;
+        width: 240px;
+    }
+}
+
+
+/* Scoreboard Popup Styling */
+.c-scoreboard-popup{
+    height: 100vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.c-scoreboard-popup__box{
+    width: 100%;
+    background-color: white;
+    height: 70.37vh;
+
+    border-radius: 10px;
+    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.c-scoreboard-popup__image{
+    width: 58.33vw;
+    height: 33.15vh;
+
+    margin-top: -7.41vh;
+}
+
+.c-scoreboard-popup__content{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.c-scoreboard-popup__description{
+    font-family: 'Roboto';
+    font-size: 1.67vw;
+    color: #707070;
+}
+
+.c-scoreboard-popup__question{
+    font-family: 'Roboto';
+    font-size: 1.875vw;
+    color: #707070;
+}
+
+.c-scoreboard-popup__name-input{
+    width: 41.67vw;
+    height: 7.41vh;
+
+    background-color: #E2E2E2;
+
+    border: none;
+    border-radius: 10px;
+
+    margin-bottom: 4.63vh;
+}
+
+
+.c-scoreboard-popup__button{
+    width: 25.5vw;
+    height: 10.19vh;
+
+    border: 0;
+    border-radius: 10px;
+
+    background-color: #E70000;
+    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
+}
+
+.c-scoreboard-popup__button:focus{
+    box-shadow: none;
+}
+
+.c-scoreboard-popup__button-title{
+    font-family: 'Roboto';
+    font-size: 2.30vw;
+    font-weight: 600;
+    
+    color: white;
 }
