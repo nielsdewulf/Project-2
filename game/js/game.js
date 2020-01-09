@@ -8,12 +8,14 @@ var boundingWidth, boundingHeight;
 
 var screenangle = window.orientation;
 
+var game;
+
 var gyroscope = false;
 var noSleep = new NoSleep();
 
 var client;
 var isFullscreen = false;
-var scoreObject, highscoreObject, healthObjects;
+var scoreObject, highscoreObject, healthObjects, countdownWrapperObject;
 var multiplayer = false;
 var host = true;
 var connectedCloud = false;
@@ -129,7 +131,7 @@ function create() {
 
 	this.scale.setGameSize(width, height);
 	this.scale.resize(width, height);
-	console.log(width, height);
+	// console.log(width, height);
 	this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
 
 	this.scale.refresh();
@@ -359,7 +361,7 @@ function create() {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isJumping: true,
@@ -393,7 +395,9 @@ function create() {
 	/**
 	 * Initialise MQTT
 	 */
-	initMqtt(this);
+	if (multiplayer) {
+		initMqtt(this);
+	}
 	/**
 	 * Gyroscope
 	 */
@@ -466,7 +470,7 @@ function update() {
 
 	//   });
 	if (invincible && new Date().getTime() - gracePeriodFlickerTime > 250) {
-		console.error('Invincible');
+		// console.error('Invincible');
 		if (gracePeriodAlpha) {
 			player.alpha = 0.5;
 			gracePeriodAlpha = false;
@@ -506,7 +510,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						lobbyId,
+						`afloat/lobby/${lobbyId}/game`,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: true,
@@ -538,7 +542,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						lobbyId,
+						`afloat/lobby/${lobbyId}/game`,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: true,
@@ -570,7 +574,7 @@ function update() {
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						lobbyId,
+						`afloat/lobby/${lobbyId}/game`,
 						JSON.stringify({
 							clientId: clientId,
 							isRunning: false,
@@ -608,7 +612,7 @@ function update() {
 				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					client.publish(
-						lobbyId,
+						`afloat/lobby/${lobbyId}/game`,
 						JSON.stringify({
 							clientId: clientId,
 							isJumping: true,
@@ -678,16 +682,18 @@ function update() {
 					if (alive) addScore();
 
 					let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							status: 'newEnemy',
-							type: 'icicle',
-							x: xb,
-							y: yb
-						})
-					);
+					if (connectedCloud) {
+						client.publish(
+							`afloat/lobby/${lobbyId}/game`,
+							JSON.stringify({
+								clientId: clientId,
+								status: 'newEnemy',
+								type: 'icicle',
+								x: xb,
+								y: yb
+							})
+						);
+					}
 				} else {
 					/**
 					 * Spawn penguin
@@ -726,17 +732,19 @@ function update() {
 					list.push(penguin);
 					if (alive) addScore();
 					let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
-					client.publish(
-						lobbyId,
-						JSON.stringify({
-							clientId: clientId,
-							status: 'newEnemy',
-							type: 'penguin',
-							flip: flip,
-							x: xb,
-							y: yb
-						})
-					);
+					if (connectedCloud) {
+						client.publish(
+							`afloat/lobby/${lobbyId}/game`,
+							JSON.stringify({
+								clientId: clientId,
+								status: 'newEnemy',
+								type: 'penguin',
+								flip: flip,
+								x: xb,
+								y: yb
+							})
+						);
+					}
 				}
 			}
 			lastTimeSpawn = new Date().getTime();
@@ -745,7 +753,7 @@ function update() {
 	//   enemiesText.setText(score);
 	// scoreText.setText(score);
 
-	if (multiplayer && otherPlayerData.alive) {
+	if (multiplayer && otherPlayerData.alive && otherPlayer !== undefined) {
 		try {
 			if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
 				otherPlayer.body.velocity.x = boundingWidth * -0.3;
@@ -818,12 +826,13 @@ function initMqtt(gameObj) {
 		protocolId: 'MQTT'
 	});
 	client.on('connect', function() {
-		client.subscribe(lobbyId, function(err) {
+		client.subscribe(`afloat/lobby/${lobbyId}/game`, function(err) {
 			if (!err) {
+				// console.log(`afloat/lobby/${lobbyId}/game`);
 				connectedCloud = true;
 				console.warn('Connected');
 				client.publish(
-					lobbyId,
+					`afloat/lobby/${lobbyId}/game`,
 					JSON.stringify({
 						clientId: clientId,
 						status: 'connected',
@@ -843,25 +852,33 @@ function initMqtt(gameObj) {
 
 		if (data.status != undefined && data.status === 'connectionRequest') {
 			console.warn(`Connection request from: ${data.clientId}`);
-			if (!multiplayer) {
-				multiplayer = true;
-				otherPlayerData.avatar = avatars[data.avatar];
-				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
+			// multiplayer = true;
+			otherPlayerData.avatar = avatars[data.avatar];
+			console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
 
-				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-				// player.displayWidth = ;
-				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-				otherPlayer.setGravityY(gravity);
+			otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
+			// player.displayWidth = ;
+			otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+			otherPlayer.setGravityY(gravity);
 
-				// gameObj.physics.add.existing(otherPlayer);
-				otherPlayer.setDepth(10);
-				otherPlayer.alpha = 0.2;
+			// gameObj.physics.add.existing(otherPlayer);
+			otherPlayer.setDepth(10);
+			otherPlayer.alpha = 0.2;
 
-				// otherPlayer.body.bounce.x = 0.1;
-				// otherPlayer.body.bounce.y = 0.1;
+			// otherPlayer.body.bounce.x = 0.1;
+			// otherPlayer.body.bounce.y = 0.1;
 
-				otherPlayer.body.setCollideWorldBounds = true;
-				gameObj.physics.add.collider(otherPlayer, platforms);
+			otherPlayer.body.setCollideWorldBounds = true;
+			gameObj.physics.add.collider(otherPlayer, platforms);
+			if (host) {
+				client.publish(
+					`afloat/lobby/${lobbyId}/game`,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'start'
+					})
+				);
+				startGame();
 			}
 		}
 		if (data.status != undefined && data.status === 'connected') {
@@ -869,33 +886,31 @@ function initMqtt(gameObj) {
 			console.warn(`User Connected: ${data.clientId}`);
 
 			client.publish(
-				lobbyId,
+				`afloat/lobby/${lobbyId}/game`,
 				JSON.stringify({
 					clientId: clientId,
 					status: 'connectionRequest',
 					avatar: avatars.indexOf(avatar)
 				})
 			);
-			if (!multiplayer) {
-				multiplayer = true;
-				otherPlayerData.avatar = avatars[data.avatar];
-				console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
+			// multiplayer = true;
+			otherPlayerData.avatar = avatars[data.avatar];
+			console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
 
-				otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-				// player.displayWidth = ;
-				otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-				otherPlayer.setGravityY(gravity);
+			otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
+			// player.displayWidth = ;
+			otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+			otherPlayer.setGravityY(gravity);
 
-				// gameObj.physics.add.existing(otherPlayer);
-				otherPlayer.setDepth(10);
-				otherPlayer.alpha = 0.2;
+			// gameObj.physics.add.existing(otherPlayer);
+			otherPlayer.setDepth(10);
+			otherPlayer.alpha = 0.2;
 
-				// otherPlayer.body.bounce.x = 0.1;
-				// otherPlayer.body.bounce.y = 0.1;
+			// otherPlayer.body.bounce.x = 0.1;
+			// otherPlayer.body.bounce.y = 0.1;
 
-				otherPlayer.body.setCollideWorldBounds = true;
-				gameObj.physics.add.collider(otherPlayer, platforms);
-			}
+			otherPlayer.body.setCollideWorldBounds = true;
+			gameObj.physics.add.collider(otherPlayer, platforms);
 		}
 		if (data.status != undefined && data.status === 'newEnemy') {
 			if (data.type === 'icicle') {
@@ -958,13 +973,13 @@ function initMqtt(gameObj) {
 			host = true;
 		}
 		if (data.status != undefined && data.status === 'start') {
-			started = true;
+			startGame();
 		}
 		if (data.status != undefined && data.status === 'respawn') {
 			otherPlayer.setPosition(width / 2, height - height * 0.5);
 		}
 		if (data.status != undefined && data.status === 'died') {
-			console.log('Other player died');
+			// console.log('Other player died');
 			otherPlayer.setActive(false).setVisible(false);
 			otherPlayerData.alive = false;
 			otherPlayerData.score = data.score;
@@ -1006,7 +1021,7 @@ function processGyro(alpha, beta, gamma) {
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: true,
@@ -1038,7 +1053,7 @@ function processGyro(alpha, beta, gamma) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: true,
@@ -1069,7 +1084,7 @@ function processGyro(alpha, beta, gamma) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: false,
@@ -1102,7 +1117,7 @@ function processGyro(alpha, beta, gamma) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: true,
@@ -1133,7 +1148,7 @@ function processGyro(alpha, beta, gamma) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: true,
@@ -1164,7 +1179,7 @@ function processGyro(alpha, beta, gamma) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: false,
@@ -1197,7 +1212,7 @@ function processGyro(alpha, beta, gamma) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: true,
@@ -1227,7 +1242,7 @@ function processGyro(alpha, beta, gamma) {
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: true,
@@ -1257,7 +1272,7 @@ function processGyro(alpha, beta, gamma) {
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 						client.publish(
-							lobbyId,
+							`afloat/lobby/${lobbyId}/game`,
 							JSON.stringify({
 								clientId: clientId,
 								isRunning: false,
@@ -1280,18 +1295,18 @@ function hit() {
 	if (invincible || !alive) return;
 	health--;
 	if (health === 0) {
-		console.error('DIE');
+		// console.error('DIE');
 		healthObjects[0].classList.add('c-game-overlay__heart--dead');
 		die();
 	} else {
-		console.error('NO DIE');
+		// console.error('NO DIE');
 		healthObjects[health].classList.add('c-game-overlay__heart--dead');
 		if (player.body.y > height) {
 			player.setPosition(width / 2, height - height * 0.5);
 			invincible = true;
 			if (multiplayer) {
 				client.publish(
-					lobbyId,
+					`afloat/lobby/${lobbyId}/game`,
 					JSON.stringify({
 						clientId: clientId,
 						status: 'respawn'
@@ -1313,7 +1328,7 @@ function hit() {
 	}
 }
 function die() {
-	console.warn('YOU ARE DEAD');
+	// console.warn('YOU ARE DEAD');
 	if (!alive) return;
 	alive = false;
 	document.querySelector('canvas').classList.add('died');
@@ -1321,7 +1336,7 @@ function die() {
 	player.setVisible(false);
 	if (multiplayer) {
 		client.publish(
-			lobbyId,
+			`afloat/lobby/${lobbyId}/game`,
 			JSON.stringify({
 				clientId: clientId,
 				status: 'died',
@@ -1371,25 +1386,58 @@ const endGame = () => {
 			};
 		}
 		// location.reload();
-		currentScene.scene.restart();
+		currentScene.scene.stop();
 		started = false;
 		healthObjects.forEach(el => {
 			el.classList.remove('c-game-overlay__heart--dead');
 		});
 		score = 0;
 		alive = true;
+		health = 3;
 		scoreObject.innerHTML = 0;
 		document.querySelector('canvas').classList.remove('died');
 	}, 1000);
 };
 const disconnectMultiplayer = () => {
 	client.publish(
-		lobbyId,
+		`afloat/lobby/${lobbyId}/game`,
 		JSON.stringify({
 			clientId: clientId,
 			status: 'disconnect'
 		})
 	);
+};
+const startGame = () => {
+	let countdown = 5;
+	let countdownInterval;
+	countdownInterval = setInterval(() => {
+		if (countdown == 0) {
+			countdownWrapperObject.innerHTML = '';
+
+			clearInterval(countdownInterval);
+			started = true;
+			// console.log('Starting');
+		} else {
+			countdownWrapperObject.innerHTML = `<h1 class="c-game-overlay__countdown js-countdown">${countdown}</h1>`;
+			setTimeout(() => {
+				let countdownObject = document.querySelector('.js-countdown');
+				countdownObject.classList.add('c-game-overlay__countdown--big');
+			}, 100);
+
+			countdown--;
+		}
+	}, 1000);
+};
+const initialiseNewGame = (multiplayerBool = false) => {
+	multiplayer = multiplayerBool;
+	game.scene.start('game');
+
+	if (!multiplayer) {
+		startGame();
+	}
+	// setTimeout(() => {
+	// 	game.scene.stop('game');
+	// }, 1000);
 };
 
 const getNormalizedPositions = (xb, yb) => {
@@ -1426,7 +1474,7 @@ const resize = () => {
 	// console.log(grv)
 
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
-	console.log('Resize');
+	// console.log('Resize');
 	// location.reload();
 
 	// currentScene.scale.parent.width = Math.round(window.innerWidth);
@@ -1450,7 +1498,7 @@ const initGame = () => {
 		width: width,
 		height: height,
 		scale: {
-			parent: 'body',
+			parent: 'c-game-area',
 			mode: Phaser.Scale.FIT,
 			width: width,
 			height: height
@@ -1463,14 +1511,23 @@ const initGame = () => {
 				// },
 				debug: false
 			}
-		},
-		scene: {
+		}
+		// scene: {
+		// 	preload: preload,
+		// 	create: create,
+		// 	update: update
+		// }
+	};
+	game = new Phaser.Game(config);
+	currentScene = game.scene.add(
+		'game',
+		{
 			preload: preload,
 			create: create,
 			update: update
-		}
-	};
-	var game = new Phaser.Game(config);
+		},
+		false
+	);
 };
 
 const init = () => {
@@ -1482,21 +1539,28 @@ const init = () => {
 		avatar = avatars[0];
 	}
 
-	// window.addEventListener('beforeunload', () => {
-	// 	if (multiplayer && connectedCloud) {
-	// 		disconnectMultiplayer();
-	// 	}
-	// });
-	// window.addEventListener('blur', () => {
-	// 	if (multiplayer && connectedCloud) {
-	// 		disconnectMultiplayer();
-	// 		endGame();
-	// 	}
-	// });
+	window.addEventListener('beforeunload', () => {
+		if (multiplayer && connectedCloud) {
+			disconnectMultiplayer();
+		} else {
+			endGame();
+		}
+	});
+	window.addEventListener('blur', () => {
+		if (currentScene != undefined) {
+			if (multiplayer && connectedCloud) {
+				disconnectMultiplayer();
+				endGame();
+			} else {
+				endGame();
+			}
+		}
+	});
 
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
 	healthObjects = document.querySelectorAll('.js-health-heart');
+	countdownWrapperObject = document.querySelector('.js-countdown-wrapper');
 
 	document.documentElement.addEventListener('click', () => {
 		if (!isFullscreen) {
