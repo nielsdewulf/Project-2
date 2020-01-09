@@ -380,18 +380,23 @@ Container for Lobby page
    
     margin-top: 2%;
     margin-bottom:2%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
  }
 
  /* Horizontal Scroll Styling */
  
 .c-lobbychoice{
-    width: 100%;
+    width: 70%;
     height: 48.8vh;
 
     display: flex;
 
     overflow-x: auto;
     scroll-snap-type: x proximity;
+    justify-content: center;
 }
 
 .c-lobbychoice__item{
@@ -401,7 +406,7 @@ Container for Lobby page
     box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
 
     min-width: 16.77vw;
-
+    
     display: flex;
     justify-content: center;
     align-items: center;
@@ -441,6 +446,55 @@ Container for Lobby page
     text-align: center;
 
     margin: 0;
+}
+
+.c-button-add__lobby {
+    width:40px;
+    height:40px;
+    background-color: #FFD54A;
+    
+    border-radius: 50%;
+
+    font-size: 5vw;
+    color:white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media(min-width:1024px){
+    .c-button-add__lobby {
+        width:80px;
+        height:80px;
+        background-color: #FFD54A;
+        
+        border-radius: 50%;
+    
+        font-size: 6vw;
+        color:white;
+    
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    } 
+}
+
+@media(min-width:1200px){
+    .c-button-add__lobby {
+        width:112px;
+        height:112px;
+        background-color: #FFD54A;
+        
+        border-radius: 50%;
+    
+        font-size: 7.5vw;
+        color:white;
+    
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    } 
 }
 
  /*
