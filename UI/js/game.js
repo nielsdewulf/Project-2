@@ -1433,6 +1433,9 @@ const endGame = () => {
 				}
 			]);
 		}
+		document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
+			el.innerHTML = currentLobby.menuId;
+		});
 		document.querySelector('.js-game').classList.add('c-hidden');
 		document.querySelector('.js-main__results').classList.remove('c-hidden');
 		// location.reload();
@@ -1485,7 +1488,7 @@ const initialiseNewGame = (avatarid, multiplayerBool = false) => {
 	avatar = avatars[avatarid];
 
 	game.scene.start('game');
-
+	
 	if (!multiplayer) {
 		startGame();
 	}

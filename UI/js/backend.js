@@ -133,7 +133,9 @@ const joinLobby = gameId => {
 			player: currentPlayer
 		})
 	);
-
+	document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
+		el.innerHTML = currentLobby.menuId;
+	});
 	document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
 	document.querySelector('.js-main__avatar-multiplayer').classList.remove('c-hidden');
 
