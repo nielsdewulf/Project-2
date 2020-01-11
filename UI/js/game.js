@@ -186,6 +186,11 @@ var penguinsRIGHT = [];
 var enemies = [];
 
 /**
+ * Heart powerups
+ */
+var healthPowerups = [];
+
+/**
  * If client is the host it saves when the last time was when it spawned something
  */
 var lastTimeSpawn = new Date().getTime();
@@ -233,6 +238,8 @@ function preload() {
 
 	this.load.image('penguin', 'assets/PenguinAfloat.png');
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
+
+	this.load.image('heart', 'assets/heart.png');
 }
 
 /**
@@ -379,6 +386,9 @@ function create() {
 
 	//Player should be hit when it collides with an enemy
 	this.physics.add.overlap(player, enemies, hit, null, this);
+
+	//Player should get an extra heart when it collides with a health powerup
+	this.physics.add.overlap(healthPowerups, player, useHealthPowerup, null, this);
 
 	/**
 	 * Spawn second player if multiplayer is true
@@ -752,13 +762,14 @@ function update() {
 		/**
 		 * Randomize when an object is being spawned
 		 */
-		let random = Math.random() * (3000 - 1000) + 3000;
+		let random = Math.random() * (4500 - 2500) + 2500;
 		if (new Date().getTime() - lastTimeSpawn > random) {
 			/**
 			 * 80% chance for icicle
 			 * 20% chance for penguin
 			 */
-			if (Math.random() <= 0.8) {
+			let spawnChance = Math.random();
+			if (spawnChance <= 0.7) {
 				/**
 				 * Spawn icicle
 				 */
@@ -799,7 +810,7 @@ function update() {
 						})
 					);
 				}
-			} else {
+			} else if (spawnChance <= 0.92) {
 				/**
 				 * Spawn penguin
 				 */
@@ -857,6 +868,49 @@ function update() {
 							status: 'newEnemy',
 							type: 'penguin',
 							flip: flip,
+							x: xb,
+							y: yb
+						})
+					);
+				}
+			} else {
+				/**
+				 * Spawn healthPowerup
+				 */
+
+				//Randomize spawn location
+				let x =
+					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
+					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
+
+				//Add sprite to the canvas
+				let health = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'heart');
+				health.scaleY = health.scaleX = boundingWidth / 22000;
+
+				//Set gravity
+				health.setGravityY(gravity);
+
+				//HealthPowerup should always be on top of player
+				health.setDepth(1000);
+				health.setOrigin(0.5, 0);
+				health.name = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
+
+				//HealthPowerup should stand on the platform, not fall through
+				this.physics.add.collider(health, platforms);
+
+				//Add the HealthPowerup to the powerup list
+				healthPowerups.push(health);
+
+				//Make x,y positions relative so other players with different resolution or aspect ratio get the correct position
+				let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
+				if (connectedCloud) {
+					mqttClient.publish(
+						`afloat/lobby/${lobbyId}/game`,
+						JSON.stringify({
+							clientId: clientId,
+							status: 'newPowerup',
+							type: 'health',
+							id: health.name,
 							x: xb,
 							y: yb
 						})
@@ -1052,6 +1106,40 @@ function initMqtt(gameObj) {
 				}
 
 				/**
+				 * Status newPowerup has spawned. This means this client is not the host
+				 * and we should spawn the objects by his command
+				 */
+				if (data.status != undefined && data.status === 'newPowerup') {
+					//Randomize spawn location
+					let [x, y] = getRealPositions(data.x, data.y);
+
+					//Add sprite to the canvas
+					let health = gameObj.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'heart');
+					health.scaleY = health.scaleX = boundingWidth / 22000;
+
+					//Set gravity
+					health.setGravityY(gravity);
+
+					//HealthPowerup should always be on top of player
+					health.setDepth(1000);
+					health.setOrigin(0.5, 0);
+					health.name = data.id;
+
+					//HealthPowerup should stand on the platform, not fall through
+					gameObj.physics.add.collider(health, platforms);
+
+					//Add the HealthPowerup to the powerup list
+					healthPowerups.push(health);
+				}
+
+				if (data.status != undefined && data.status === 'usePowerup') {
+					healthPowerups.forEach(el => {
+						if (el.name === data.id) {
+							el.destroy();
+						}
+					});
+				}
+				/**
 				 * Status when a new enemy has spawned. This means this client is not the host
 				 * and we should spawn the objects by his command
 				 */
@@ -1191,7 +1279,7 @@ function initMqtt(gameObj) {
 
 /**
  * Handles gyroscope changes
- * @param {double} alpha
+ * @param {Double} alpha
  * @param {Double} beta
  * @param {Double} gamma
  */
@@ -1476,6 +1564,24 @@ function processGyro(alpha, beta, gamma) {
 	}
 }
 
+function useHealthPowerup(obj) {
+	obj.destroy();
+	if (multiplayer) {
+		mqttClient.publish(
+			`afloat/lobby/${lobbyId}/game`,
+			JSON.stringify({
+				clientId: clientId,
+				status: 'usePowerup',
+				id: obj.name
+			})
+		);
+	}
+	if (health == 3) return;
+
+	health++;
+	healthObjects[0].classList.remove('c-game-overlay__heart--dead');
+}
+
 /**
  * When a player is hit this function fires
  */
@@ -1656,6 +1762,9 @@ const endGame = () => {
 				el.innerHTML = '1';
 			});
 		}
+
+		//Remove resize listener
+		window.removeEventListener('resize', resize);
 
 		//Hide game layer
 		document.querySelector('.js-game').classList.add('c-hidden');
