@@ -762,7 +762,7 @@ function update() {
 		/**
 		 * Randomize when an object is being spawned
 		 */
-		let random = Math.random() * (4500 - 2500) + 2500;
+		let random = Math.random() * (3500 - 1500) + 1500;
 		if (new Date().getTime() - lastTimeSpawn > random) {
 			/**
 			 * 80% chance for icicle
@@ -810,7 +810,7 @@ function update() {
 						})
 					);
 				}
-			} else if (spawnChance <= 0.92) {
+			} else if (spawnChance <= 0.95) {
 				/**
 				 * Spawn penguin
 				 */
@@ -1579,7 +1579,7 @@ function useHealthPowerup(obj) {
 	if (health == 3) return;
 
 	health++;
-	healthObjects[0].classList.remove('c-game-overlay__heart--dead');
+	healthObjects[health].classList.remove('c-game-overlay__heart--dead');
 }
 
 /**
