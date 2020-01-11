@@ -13,7 +13,6 @@ const showNewLobbies = data => {
 	 * data.MenuId
 	 * data.Status
 	 */
-	console.log(data);
 	let parent = document.querySelector('.js-lobby-parent');
 	let result = '';
 	data.forEach(el => {
@@ -180,7 +179,8 @@ let buttonListeners = function() {
 		document.querySelector('.js-main__avatar-singleplayer').classList.add('c-hidden');
 		document.querySelectorAll('.js-singleplayer-avatar').forEach(el => {
 			if (el.checked) {
-				initialiseNewGame(parseInt(el.value), false);
+				currentPlayer.avatar = parseInt(el.value);
+				initialiseNewGame(currentPlayer);
 				document.querySelector('.js-game').classList.remove('c-hidden');
 			}
 		});

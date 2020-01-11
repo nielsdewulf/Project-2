@@ -76,7 +76,8 @@ var gravity;
 /**
  * Avatar list
  */
-var avatars = [{
+var avatars = [
+	{
 		key: 'player1',
 		crop: true
 	},
@@ -315,51 +316,63 @@ function create() {
 	avatars.forEach((el, i) => {
 		this.anims.create({
 			key: 'left' + i,
-			frames: [{
-				key: el.key,
-				frame: 0
-			}],
+			frames: [
+				{
+					key: el.key,
+					frame: 0
+				}
+			],
 			frameRate: 10
 		});
 		this.anims.create({
 			key: 'leftJump' + i,
-			frames: [{
-				key: el.key,
-				frame: 3
-			}],
+			frames: [
+				{
+					key: el.key,
+					frame: 3
+				}
+			],
 			frameRate: 10
 		});
 		this.anims.create({
 			key: 'turn' + i,
-			frames: [{
-				key: el.key,
-				frame: 1
-			}],
+			frames: [
+				{
+					key: el.key,
+					frame: 1
+				}
+			],
 			frameRate: 20
 		});
 		this.anims.create({
 			key: 'turnJump' + i,
-			frames: [{
-				key: el.key,
-				frame: 4
-			}],
+			frames: [
+				{
+					key: el.key,
+					frame: 4
+				}
+			],
 			frameRate: 5
 		});
 
 		this.anims.create({
 			key: 'right' + i,
-			frames: [{
-				key: el.key,
-				frame: 2
-			}],
+			frames: [
+				{
+					key: el.key,
+					frame: 2
+				}
+			],
 			frameRate: 10
 		});
 		this.anims.create({
 			key: 'rightJump' + i,
-			frames: [{
-				key: el.key,
-				frame: 5
-			}],
+			frames: [
+				{
+					key: el.key,
+					frame: 5
+				}
+			],
 			frameRate: 10
 		});
 	});
@@ -368,11 +381,31 @@ function create() {
 	this.physics.add.overlap(player, enemies, hit, null, this);
 
 	/**
+	 * Spawn second player if multiplayer is true
+	 */
+	if (multiplayer) {
+		//Adding player to the canvas
+		otherPlayer = this.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
+		otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
+		otherPlayer.setGravityY(gravity);
+
+		otherPlayer.setDepth(10);
+
+		//Set other player transparency
+		otherPlayer.alpha = 0.5;
+
+		otherPlayer.body.setCollideWorldBounds = true;
+
+		//Player should stand on the platform
+		this.physics.add.collider(otherPlayer, platforms);
+	}
+
+	/**
 	 * Click event -> Jump
 	 */
 	this.input.on(
 		'pointerup',
-		function (pointer) {
+		function(pointer) {
 			if (player.body.touching.down) {
 				player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
 
@@ -419,14 +452,14 @@ function create() {
 		if (window.DeviceOrientationEvent) {
 			window.addEventListener(
 				'deviceorientation',
-				function (e) {
+				function(e) {
 					processGyro(e.alpha, e.beta, e.gamma);
 				},
 				true
 			);
 			gyroscope = true;
-		} else {}
-
+		} else {
+		}
 	} else {
 		if (!gyroscope && typeof DeviceMotionEvent.requestPermission === 'function') {
 			DeviceMotionEvent.requestPermission()
@@ -435,7 +468,7 @@ function create() {
 						gyroscope = true;
 						window.addEventListener(
 							'deviceorientation',
-							function (e) {
+							function(e) {
 								processGyro(e.alpha, e.beta, e.gamma);
 							},
 							true
@@ -448,13 +481,14 @@ function create() {
 			if (window.DeviceOrientationEvent) {
 				window.addEventListener(
 					'deviceorientation',
-					function (e) {
+					function(e) {
 						processGyro(e.alpha, e.beta, e.gamma);
 					},
 					true
 				);
 				gyroscope = true;
-			} else {}
+			} else {
+			}
 		}
 	}
 }
@@ -466,9 +500,8 @@ function update() {
 	 * Flickers player when he's invincible
 	 */
 	if (invincible && new Date().getTime() - gracePeriodFlickerTime > 250) {
-		=
 		if (gracePeriodAlpha) {
-			player.alpha = 0.5;
+			player.alpha = 0.1;
 			gracePeriodAlpha = false;
 			gracePeriodFlickerTime = new Date().getTime();
 		} else {
@@ -732,8 +765,7 @@ function update() {
 
 				//Randomize spawn location
 				let x =
-					Math.random() *
-					(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
+					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
 					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
 
 				//Add sprite to the canvas
@@ -746,7 +778,7 @@ function update() {
 				//Icicle should always be on top of player
 				ice.setDepth(1000);
 				ice.setOrigin(0.5, 0);
-				
+
 				//Add the Icicle to the enemies list
 				enemies.push(ice);
 
@@ -789,7 +821,7 @@ function update() {
 				let penguin = this.physics.add.sprite(x, height - height * 0.2, 'penguin');
 
 				//Scaling
-				penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
+				penguin.scaleY = penguin.scaleX = boundingWidth / 16500;
 
 				//Penguin should be flipped when going to the left
 				penguin.flipX = flip;
@@ -840,7 +872,6 @@ function update() {
 	 * When multiplayer -> update player position
 	 */
 	if (multiplayer && otherPlayerData.alive && otherPlayer !== undefined) {
-
 		/**
 		 * If running to the left
 		 */
@@ -854,9 +885,9 @@ function update() {
 				otherPlayer.height = 286.752;
 			}
 
-		/**
-		 * If running to the right
-		 */
+			/**
+			 * If running to the right
+			 */
 		} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
 			//Set velocity
 			otherPlayer.body.velocity.x = boundingWidth * 0.3;
@@ -867,9 +898,9 @@ function update() {
 				otherPlayer.height = 286.752;
 			}
 
-		/**
-		 * If standing still
-		 */
+			/**
+			 * If standing still
+			 */
 		} else {
 			//Set velocity
 			otherPlayer.body.velocity.x = 0;
@@ -879,7 +910,6 @@ function update() {
 				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
 				otherPlayer.height = 286.752;
 			}
-
 		}
 		/**
 		 * If other player is jumping
@@ -928,11 +958,11 @@ function addScore() {
 
 /**
  * Initialise MQTT
- * @param {GameObj} gameObj 
+ * @param {GameObj} gameObj
  */
 function initMqtt(gameObj) {
 	//Subscribe to the correct lobby
-	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function (err) {
+	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function(err) {
 		if (!err) {
 			connectedCloud = true;
 			console.warn('Subscribed to ' + `afloat/lobby/${lobbyId}/game`);
@@ -970,8 +1000,7 @@ function initMqtt(gameObj) {
 	 * Setup event listener when someone sends a message
 	 */
 	if (!setupMqttGameListener) {
-		mqttClient.on('message', function (topic, message) {
-
+		mqttClient.on('message', function(topic, message) {
 			/**
 			 * If message matches the correct topic
 			 */
@@ -988,27 +1017,6 @@ function initMqtt(gameObj) {
 				 */
 				if (data.status != undefined && data.status === 'connectionRequest') {
 					console.warn(`Connection request from: ${data.clientId}`);
-
-					//Set the correct avatar
-					otherPlayerData.avatar = avatars[data.avatar];
-
-					console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
-
-					//Adding player to the canvas
-					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-					otherPlayer.setGravityY(gravity);
-
-					otherPlayer.setDepth(10);
-
-					//Set other player transparency
-					otherPlayer.alpha = 0.5;
-
-					otherPlayer.body.setCollideWorldBounds = true;
-
-					//Player should stand on the platform
-					gameObj.physics.add.collider(otherPlayer, platforms);
-
 					/**
 					 * If player has joined the game should start
 					 */
@@ -1041,32 +1049,10 @@ function initMqtt(gameObj) {
 							avatar: avatars.indexOf(avatar)
 						})
 					);
-
-					//Set correct avatar for the other player
-					otherPlayerData.avatar = avatars[data.avatar];
-
-					console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
-
-					//Add other player to the canvas
-					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-
-					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
-					otherPlayer.setGravityY(gravity);
-
-					otherPlayer.setDepth(10);
-
-					//Set other player transparency
-					otherPlayer.alpha = 0.5;
-
-
-					otherPlayer.body.setCollideWorldBounds = true;
-
-					//Player should stand on the platform
-					gameObj.physics.add.collider(otherPlayer, platforms);
 				}
 
 				/**
-				 * Status when a new enemy has spawned. This means this client is not the host 
+				 * Status when a new enemy has spawned. This means this client is not the host
 				 * and we should spawn the objects by his command
 				 */
 				if (data.status != undefined && data.status === 'newEnemy') {
@@ -1081,10 +1067,10 @@ function initMqtt(gameObj) {
 						ice = gameObj.physics.add.sprite(x, y, 'icicle');
 						ice.scaleY = ice.scaleX = boundingWidth / 6000;
 						ice.setGravityY(gravity * icicleConfig.gravity);
-						
+
 						ice.setDepth(1000);
 						ice.setOrigin(0.5, 0);
-						
+
 						ice.body.onWorldBounds = true;
 
 						//Add enemy to list of enemies
@@ -1093,9 +1079,9 @@ function initMqtt(gameObj) {
 						//Add score if still alive
 						if (alive) addScore();
 
-					/**
-					 * If enemy is a penguin
-					 */
+						/**
+						 * If enemy is a penguin
+						 */
 					} else if (data.type === 'penguin') {
 						//Convert relative positions to absolute
 						let [x, y] = getRealPositions(data.x, data.y);
@@ -1112,7 +1098,7 @@ function initMqtt(gameObj) {
 						//Add penguin to the canvas
 						let penguin = gameObj.physics.add.sprite(x, y, 'penguin');
 
-						penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
+						penguin.scaleY = penguin.scaleX = boundingWidth / 16500;
 
 						//If penguin should be flipped: direction left -> flipped
 						penguin.flipX = data.flip;
@@ -1187,12 +1173,14 @@ function initMqtt(gameObj) {
 					/**
 					 * Update positions for accuracy
 					 */
-					if (data.x != undefined || data.y != undefined) {
-						let [x, y] = getRealPositions(data.x, data.y);
-						otherPlayerData.x = x;
-						otherPlayerData.y = y;
-						otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
-					}
+					try {
+						if (data.x != undefined || data.y != undefined) {
+							let [x, y] = getRealPositions(data.x, data.y);
+							otherPlayerData.x = x;
+							otherPlayerData.y = y;
+							otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
+						}
+					} catch {}
 				}
 			}
 		});
@@ -1203,9 +1191,9 @@ function initMqtt(gameObj) {
 
 /**
  * Handles gyroscope changes
- * @param {double} alpha 
- * @param {Double} beta 
- * @param {Double} gamma 
+ * @param {double} alpha
+ * @param {Double} beta
+ * @param {Double} gamma
  */
 function processGyro(alpha, beta, gamma) {
 	//We should only process it if the player is still alive
@@ -1256,9 +1244,9 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			/**
-			 * Go right
-			 */
+				/**
+				 * Go right
+				 */
 			} else if (beta < -3) {
 				//Set velocity
 				player.body.velocity.x = boundingWidth * 0.3;
@@ -1298,9 +1286,9 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			/**
-			 * Standing still
-			 */
+				/**
+				 * Standing still
+				 */
 			} else {
 				//Set velocity
 				player.body.velocity.x = 0;
@@ -1312,7 +1300,7 @@ function processGyro(alpha, beta, gamma) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
-				
+
 				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
@@ -1342,9 +1330,9 @@ function processGyro(alpha, beta, gamma) {
 					}
 				}
 			}
-		/**
-		 * If orientation is landscape
-		 */
+			/**
+			 * If orientation is landscape
+			 */
 		} else if (window.orientation === 90) {
 			/**
 			 * Go right
@@ -1388,9 +1376,9 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			/**
-			 * Go left
-			 */
+				/**
+				 * Go left
+				 */
 			} else if (beta < -3) {
 				//Set velocity
 				player.body.velocity.x = boundingWidth * -0.3;
@@ -1430,9 +1418,9 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			/**
-			 * Standing still
-			 */
+				/**
+				 * Standing still
+				 */
 			} else {
 				//Set velocity
 				player.body.velocity.x = 0;
@@ -1473,9 +1461,9 @@ function processGyro(alpha, beta, gamma) {
 					}
 				}
 			}
-		/**
-		 * If orientation is portrait
-		 */
+			/**
+			 * If orientation is portrait
+			 */
 		} else {
 			if (gamma > 3) {
 				//Go right
@@ -1505,9 +1493,9 @@ function hit() {
 		healthObjects[0].classList.add('c-game-overlay__heart--dead');
 		die();
 
-	/**
-	 * If player is not about to die
-	 */
+		/**
+		 * If player is not about to die
+		 */
 	} else {
 		//Remove heart
 		healthObjects[health].classList.add('c-game-overlay__heart--dead');
@@ -1537,10 +1525,10 @@ function hit() {
 				(invincible = false), (gracePeriodAlpha = false);
 				player.alpha = 1;
 			}, 2250);
-		
-		/**
-		 * If player got hit by an object
-		 */
+
+			/**
+			 * If player got hit by an object
+			 */
 		} else {
 			//Set invincible
 			invincible = true;
@@ -1549,7 +1537,7 @@ function hit() {
 			setTimeout(() => {
 				(invincible = false), (gracePeriodAlpha = false);
 				player.alpha = 1;
-			}, 1000);
+			}, 1500);
 		}
 	}
 }
@@ -1587,9 +1575,9 @@ function die() {
 		if (!otherPlayerData.alive) {
 			endGame();
 		}
-	/**
-	 * If singleplayer End Game
-	 */
+		/**
+		 * If singleplayer End Game
+		 */
 	} else {
 		endGame();
 	}
@@ -1605,9 +1593,9 @@ const endGame = () => {
 		 * If multiplayer
 		 */
 		if (multiplayer) {
-			
 			//Send scores of both players
-			var scores = [{
+			var scores = [
+				{
 					avatar: avatars.indexOf(avatar),
 					score: score,
 					offlinePlayer: true
@@ -1619,7 +1607,7 @@ const endGame = () => {
 				}
 			];
 			//Sort the scores
-			scores.sort(function (a, b) {
+			scores.sort(function(a, b) {
 				return b.score - a.score;
 			});
 
@@ -1649,22 +1637,19 @@ const endGame = () => {
 			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
-			
-			//Show correct lobby number
-			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
-				el.innerHTML = currentLobby.menuId;
-			});
-		
-		/**
-		 * If singleplayer
-		 */
+
+			/**
+			 * If singleplayer
+			 */
 		} else {
 			//Show results of player
-			showResults([{
-				avatar: avatars.indexOf(avatar),
-				score: score,
-				offlinePlayer: true
-			}]);
+			showResults([
+				{
+					avatar: avatars.indexOf(avatar),
+					score: score,
+					offlinePlayer: true
+				}
+			]);
 
 			//Set lobby number to 1
 			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
@@ -1725,7 +1710,7 @@ const startGame = () => {
 
 	//Set countdown
 	let countdown = 5;
-	
+
 	let countdownInterval;
 
 	//Setup countdown interval
@@ -1738,12 +1723,12 @@ const startGame = () => {
 
 			clearInterval(countdownInterval);
 			started = true;
-		/**
-		 * If not 0 -> count down
-		 */
+			/**
+			 * If not 0 -> count down
+			 */
 		} else {
 			countdownWrapperObject.innerHTML = `<h1 class="c-game-overlay__countdown js-countdown">${countdown}</h1>`;
-			
+
 			/**
 			 * Add zoom effect
 			 */
@@ -1759,15 +1744,17 @@ const startGame = () => {
 
 /**
  * Initialises a new game (~THIS DOES NOT START IT~)
- * @param {int} avatarid 
- * @param {boolean} multiplayerBool 
+ * @param {int} avatarid
+ * @param {boolean} multiplayerBool
  */
-const initialiseNewGame = (avatarid, multiplayerBool = false) => {
+const initialiseNewGame = (currentPlayer, otherPlayer = undefined, multiplayerBool = false) => {
 	//Set multiplayer variable
+	if (host) console.warn('Starting game as host');
+	else console.warn('Starting game as slave');
 	multiplayer = multiplayerBool;
 
 	//Set correct avatar
-	avatar = avatars[avatarid];
+	avatar = avatars[currentPlayer.avatar];
 
 	//Start the game scene
 	game.scene.start('game');
@@ -1778,13 +1765,16 @@ const initialiseNewGame = (avatarid, multiplayerBool = false) => {
 	 */
 	if (!multiplayer) {
 		startGame();
+	} else {
+		//Set the correct avatar
+		otherPlayerData.avatar = avatars[otherPlayer.avatar];
 	}
 };
 
 /**
  * Return relative (normalized) x,y coords
- * @param {double} xb 
- * @param {double} yb 
+ * @param {double} xb
+ * @param {double} yb
  */
 const getNormalizedPositions = (xb, yb) => {
 	let x = ((xb - (width - boundingWidth * 0.85) / 2) / boundingWidth) * 100;
@@ -1794,8 +1784,8 @@ const getNormalizedPositions = (xb, yb) => {
 
 /**
  * Return absolute x,y coords
- * @param {double} xb 
- * @param {double} yb 
+ * @param {double} xb
+ * @param {double} yb
  */
 const getRealPositions = (xb, yb) => {
 	let x = (xb / 100) * boundingWidth + (width - boundingWidth * 0.85) / 2;
@@ -1815,7 +1805,7 @@ const calcWidthHeight = () => {
 
 /**
  * Return Gamebounds based on 16:9 aspect ratio
- * @param {double} height 
+ * @param {double} height
  */
 const calcGameBounds = height => {
 	return [height * 1.77, height];
@@ -1872,7 +1862,8 @@ const initGame = () => {
 
 	//Add game scene
 	currentScene = game.scene.add(
-		'game', {
+		'game',
+		{
 			preload: preload,
 			create: create,
 			update: update
@@ -1889,10 +1880,15 @@ const initFramework = () => {
 	 * Event when page gets closed
 	 */
 	window.addEventListener('beforeunload', () => {
-		if (multiplayer && connectedCloud) {
-			disconnectMultiplayer();
-		} else {
-			endGame();
+		if (isLoadingGame || started) {
+			if (currentScene != undefined) {
+				if (multiplayer && connectedCloud) {
+					disconnectMultiplayer();
+					endGame();
+				} else {
+					endGame();
+				}
+			}
 		}
 	});
 
@@ -1900,12 +1896,14 @@ const initFramework = () => {
 	 * Event when user switches to another tab
 	 */
 	window.addEventListener('blur', () => {
-		if (currentScene != undefined) {
-			if (multiplayer && connectedCloud) {
-				disconnectMultiplayer();
-				endGame();
-			} else {
-				endGame();
+		if (isLoadingGame || started) {
+			if (currentScene != undefined) {
+				if (multiplayer && connectedCloud) {
+					disconnectMultiplayer();
+					endGame();
+				} else {
+					endGame();
+				}
 			}
 		}
 	});
@@ -1941,7 +1939,8 @@ const initFramework = () => {
 			if (typeof DeviceMotionEvent.requestPermission === 'function') {
 				DeviceMotionEvent.requestPermission()
 					.then(response => {
-						if (response == 'granted') {}
+						if (response == 'granted') {
+						}
 					})
 					.catch(console.error);
 			}
@@ -1950,7 +1949,7 @@ const initFramework = () => {
 			 * Disable screen sleeping
 			 */
 			noSleep.enable();
-			
+
 			// Set fullscreen to true
 			isFullscreen = true;
 

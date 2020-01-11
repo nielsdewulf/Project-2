@@ -91,6 +91,7 @@ const getLobbiesCallback = data => {
 	lobbies.sort(function(a, b) {
 		return a.menuId - b.menuId;
 	});
+	pingPlayers();
 	showNewLobbies(data);
 };
 
@@ -105,7 +106,7 @@ const getLobbies = () => {
 	 * data.Status
 	 */
 
-	handleData('https://project2mct.azurewebsites.net/api/game/?status=0', getlobbiesCallback);
+	handleData('https://project2mct.azurewebsites.net/api/game/?status=0', getLobbiesCallback);
 };
 
 /**
@@ -141,7 +142,8 @@ const joinLobby = gameId => {
 	isLoadingGame = false;
 
 	//Update playerCount
-	currentLobby.playerCount++;
+	if (currentLobby.playerCount !== 2) currentLobby.playerCount++;
+
 	mqttClient.publish(
 		mainId,
 		JSON.stringify({
@@ -199,8 +201,7 @@ const leaveLobby = () => {
 			status: 'disconnect'
 		})
 	);
-
-	currentLobby.playerCount--;
+	if (currentLobby.playerCount !== 0) currentLobby.playerCount--;
 	mqttClient.publish(
 		mainId,
 		JSON.stringify({
@@ -275,7 +276,12 @@ const loadGame = () => {
 	);
 
 	//Initialise a new game
-	initialiseNewGame(currentPlayer.avatar, true);
+	let otherPlayer;
+	playerList.forEach(p => {
+		if (!p.offlinePlayer) otherPlayer = p;
+	});
+	initialiseNewGame(currentPlayer, otherPlayer, true);
+
 	mqttClient.publish(
 		mainId,
 		JSON.stringify({
@@ -310,7 +316,7 @@ const endGameLobby = () => {
 	let message = {
 		status: 2
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/game/${lobbyId}`, data => {}, 'PUT', JSON.stringify(message));
 	leaveLobby();
 };
 
@@ -326,6 +332,64 @@ const getLobbyById = id => {
 		}
 	});
 	return result;
+};
+
+/**
+ * PingPlayers to correct the playerCount of lobbies
+ */
+const pingPlayers = () => {
+	try {
+		//Reset playersResponded from playerCalls before back to 0 
+		lobbies.forEach(el => {
+			if (el.status !== 2) {
+				el.playersResponded = 0;
+			}
+		});
+		
+		//Publish a playerCall
+		mqttClient.publish(
+			mainId,
+			JSON.stringify({
+				clientId: clientId,
+				status: 'playerCall'
+			})
+		);
+		//Add yourself to the list
+		if (currentLobby !== undefined) {
+			let lobby = getLobbyById(currentLobby.gameId);
+			lobby.playersResponded++;
+		}
+		
+		/**
+		 * Timeout: after a second it'll check who responded
+		 * 1second should be sufficient for the load the MQTT server could get.
+		 */
+		setTimeout(() => {
+			lobbies.forEach(el => {
+				if (el.status !== 2 && el.playersResponded !== undefined) {
+					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
+					el.playerCount = el.playersResponded;
+					if (el.playerCount !== el.playersResponded) {
+						mqttClient.publish(
+							mainId,
+							JSON.stringify({
+								clientId: clientId,
+								status: 'playerUpdate',
+								lobby: el
+							})
+						);
+
+						let message = {
+							PlayerCount: el.playerCount
+						};
+
+						handleData(`https://project2mct.azurewebsites.net/api/game/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+					}
+				}
+			});
+			showNewLobbies(lobbies);
+		}, 1000);
+	} catch {}
 };
 
 /**
@@ -357,23 +421,29 @@ const getTopHighscores = top => {
  * Initialise the backend
  */
 const initBackend = () => {
-	//When user quits the page
-	window.addEventListener('beforeunload', () => {
-		if (currentLobby !== undefined) {
-			leaveLobby();
-		}
-	});
+	// //When user quits the page
+	// window.addEventListener('beforeunload', () => {
+	// 	if (currentLobby !== undefined) {
+	// 		leaveLobby();
+	// 	}
+	// });
 
-	//When user switches tabs
-	window.addEventListener('blur', () => {
-		if (currentLobby !== undefined) {
-			leaveLobby();
-		}
-	});
+	// //When user switches tabs
+	// window.addEventListener('blur', () => {
+	// 	if (currentLobby !== undefined) {
+	// 		leaveLobby();
+	// 	}
+	// });
 
 	//Get the top highscores on page load
 	getTopHighscores(5);
 
+	/**
+	 * Interval for playerCount checking
+	 */
+	setInterval(() => {
+		pingPlayers();
+	}, 4000);
 	/**
 	 * Register Lobby listener
 	 */
@@ -420,6 +490,33 @@ const initBackend = () => {
 				lobbies.pop(lobby);
 				showNewLobbies(lobbies);
 			}
+			/**
+			 * when a player issues a playerCall
+			 */
+			if (data.status === 'playerCall') {
+				if (currentLobby !== undefined)
+					mqttClient.publish(
+						topic,
+						JSON.stringify({
+							clientId: clientId,
+							receiver: data.clientId,
+							status: 'playerCallPong',
+							lobby: currentLobby
+						})
+					);
+			}
+			/**
+			 * When a player responds to your playerCall
+			 */
+			if (data.status === 'playerCallPong') {
+				if (data.receiver === clientId) {
+					let lobby = getLobbyById(data.lobby.gameId);
+
+					try {
+						lobby.playersResponded++;
+					} catch {}
+				}
+			}
 		}
 	});
 
@@ -457,7 +554,11 @@ const initBackend = () => {
 				//Set his offlinePlayer variable to false
 				data.player.offlinePlayer = false;
 				playerList.push(data.player);
+				if (data.player.avatar !== undefined) {
+					showNewPlayer(data.player);
+				}
 			}
+
 			/**
 			 * When you join an existing lobby you'll get a message
 			 * by other users telling you they are also in the lobby
@@ -487,10 +588,10 @@ const initBackend = () => {
 					if (el.clientId === data.clientId) {
 						el.avatar = data.avatar;
 						el.status = 'connected';
+						showNewPlayer(el);
 					}
 				});
 				//Show new player in playerlist
-				showNewPlayer(data.player);
 			}
 			/**
 			 * When the other user clicks the start button
@@ -499,7 +600,11 @@ const initBackend = () => {
 				console.log('Started Game');
 
 				document.querySelector('.js-main__lobby').classList.add('c-hidden');
-				initialiseNewGame(currentPlayer.avatar, true);
+				let otherPlayer;
+				playerList.forEach(p => {
+					if (!p.offlinePlayer) otherPlayer = p;
+				});
+				initialiseNewGame(currentPlayer, otherPlayer, true);
 				document.querySelector('.js-game').classList.remove('c-hidden');
 			}
 
