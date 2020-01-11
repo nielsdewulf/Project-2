@@ -13,7 +13,6 @@ const showNewLobbies = data => {
 	 * data.MenuId
 	 * data.Status
 	 */
-	console.log(data);
 	let parent = document.querySelector('.js-lobby-parent');
 	let result = '';
 	data.forEach(el => {

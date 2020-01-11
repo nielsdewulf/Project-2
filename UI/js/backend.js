@@ -334,13 +334,19 @@ const getLobbyById = id => {
 	return result;
 };
 
+/**
+ * PingPlayers to correct the playerCount of lobbies
+ */
 const pingPlayers = () => {
 	try {
+		//Reset playersResponded from playerCalls before back to 0 
 		lobbies.forEach(el => {
 			if (el.status !== 2) {
 				el.playersResponded = 0;
 			}
 		});
+		
+		//Publish a playerCall
 		mqttClient.publish(
 			mainId,
 			JSON.stringify({
@@ -348,10 +354,16 @@ const pingPlayers = () => {
 				status: 'playerCall'
 			})
 		);
+		//Add yourself to the list
 		if (currentLobby !== undefined) {
 			let lobby = getLobbyById(currentLobby.gameId);
 			lobby.playersResponded++;
 		}
+		
+		/**
+		 * Timeout: after a second it'll check who responded
+		 * 1second should be sufficient for the load the MQTT server could get.
+		 */
 		setTimeout(() => {
 			lobbies.forEach(el => {
 				if (el.status !== 2 && el.playersResponded !== undefined) {
@@ -478,7 +490,9 @@ const initBackend = () => {
 				lobbies.pop(lobby);
 				showNewLobbies(lobbies);
 			}
-
+			/**
+			 * when a player issues a playerCall
+			 */
 			if (data.status === 'playerCall') {
 				if (currentLobby !== undefined)
 					mqttClient.publish(
@@ -491,11 +505,17 @@ const initBackend = () => {
 						})
 					);
 			}
+			/**
+			 * When a player responds to your playerCall
+			 */
 			if (data.status === 'playerCallPong') {
-				let lobby = getLobbyById(data.lobby.gameId);
-				try {
-					lobby.playersResponded++;
-				} catch {}
+				if (data.receiver === clientId) {
+					let lobby = getLobbyById(data.lobby.gameId);
+
+					try {
+						lobby.playersResponded++;
+					} catch {}
+				}
 			}
 		}
 	});

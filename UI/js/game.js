@@ -380,6 +380,9 @@ function create() {
 	//Player should be hit when it collides with an enemy
 	this.physics.add.overlap(player, enemies, hit, null, this);
 
+	/**
+	 * Spawn second player if multiplayer is true
+	 */
 	if (multiplayer) {
 		//Adding player to the canvas
 		otherPlayer = this.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
