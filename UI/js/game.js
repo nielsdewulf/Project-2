@@ -1039,7 +1039,7 @@ function initMqtt(gameObj) {
 function processGyro(alpha, beta, gamma) {
 	if (alive) {
 		if (window.orientation === -90) {
-			if (beta > 6) {
+			if (beta > 3) {
 				player.body.velocity.x = boundingWidth * -0.3;
 				player.anims.play('left' + avatars.indexOf(avatar));
 				if (avatar.crop) {
@@ -1070,7 +1070,7 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			} else if (beta < -6) {
+			} else if (beta < -3) {
 				player.body.velocity.x = boundingWidth * 0.3;
 				player.anims.play('right' + avatars.indexOf(avatar));
 				if (avatar.crop) {
@@ -1135,7 +1135,7 @@ function processGyro(alpha, beta, gamma) {
 				}
 			}
 		} else if (window.orientation === 90) {
-			if (beta > 6) {
+			if (beta > 3) {
 				player.body.velocity.x = boundingWidth * 0.3;
 				player.anims.play('right' + avatars.indexOf(avatar));
 				if (avatar.crop) {
@@ -1166,7 +1166,7 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			} else if (beta < -6) {
+			} else if (beta < -3) {
 				player.body.velocity.x = boundingWidth * -0.3;
 				player.anims.play('left' + avatars.indexOf(avatar));
 				if (avatar.crop) {
@@ -1230,7 +1230,7 @@ function processGyro(alpha, beta, gamma) {
 				}
 			}
 		} else {
-			if (gamma > 6) {
+			if (gamma > 3) {
 				player.body.velocity.x = boundingWidth * 0.3;
 				player.anims.play('right' + avatars.indexOf(avatar));
 				if (avatar.crop) {
@@ -1261,7 +1261,7 @@ function processGyro(alpha, beta, gamma) {
 						beforePlayerData = newPlayerData;
 					}
 				}
-			} else if (gamma < -6) {
+			} else if (gamma < -3) {
 				player.body.velocity.x = boundingWidth * -0.3;
 				player.anims.play('left' + avatars.indexOf(avatar));
 				if (avatar.crop) {
