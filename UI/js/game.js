@@ -1,46 +1,146 @@
-// var clientId = ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c => (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16));
-
-// var lobbyId = 'abcdefg';
-
+/**
+ * Screen width and height
+ */
 var width, height;
 
+/**
+ * Width based on height multiplied by 16:9 ratio, height = screen height
+ */
 var boundingWidth, boundingHeight;
 
+/**
+ * Orientation = eg 90deg or (-)180deg
+ */
 var screenangle = window.orientation;
 
+/**
+ * Game object. Is undefined if not loaded properly
+ */
 var game;
 
+/**
+ * If gyroscope setup does not work we should display error. Gyroscope goes to true if it works
+ */
 var gyroscope = false;
+
+/**
+ * No screen sleep object.
+ */
 var noSleep = new NoSleep();
 
+/**
+ * variable if game is in fullscreen
+ */
 var isFullscreen = false;
+
+/**
+ * DOM objects
+ */
 var scoreObject, highscoreObject, healthObjects, countdownWrapperObject;
+
+/**
+ * Multiplayer toggle
+ */
 var multiplayer = false;
+
+/**
+ * If host this code toggles if he can spawn objects or not
+ */
 var host = true;
+
+/**
+ * If connected to the MQTT room
+ */
 var connectedCloud = false;
+
+/**
+ * Check if the on message event listener has been registered already
+ */
 var setupMqttGameListener = false;
+
+/**
+ * Check if game has started
+ */
 var started = false;
+
+/**
+ * Platform where objects can stand on
+ */
 var platforms;
+
+/**
+ * Variable which defines gravity
+ */
 var gravity;
 
-var avatars = [
-	{ key: 'player1', crop: true },
-	{ key: 'player2', crop: false },
-	{ key: 'player3', crop: false },
-	{ key: 'player4', crop: false }
+/**
+ * Avatar list
+ */
+var avatars = [{
+		key: 'player1',
+		crop: true
+	},
+	{
+		key: 'player2',
+		crop: false
+	},
+	{
+		key: 'player3',
+		crop: false
+	},
+	{
+		key: 'player4',
+		crop: false
+	}
 ];
 
+/**
+ * Current player object
+ */
 var player;
+
+/**
+ * Player object that defines if current player is alive or not
+ */
+var alive = true;
+
+/**
+ * Health object. can range from 0->3
+ */
 var health = 3;
+
+/**
+ * Holds the current player score
+ */
+let score = 0;
+
+/**
+ * Defines if current player should be invincible
+ */
 var invincible = false;
+
+/**
+ * Defines what avatar the current player has chosen
+ */
 var avatar = avatars[1];
+
+/**
+ * Object for multiplayer that checks if it's not sending double redundant data
+ */
 var beforePlayerData = {
 	clientId: clientId,
 	isRunning: false,
 	direction: 0
 };
 
+/**
+ * Object for multiplayer that holds the other player object
+ */
 var otherPlayer;
+
+/**
+ * Object for multiplayer that holds the other player game information
+ */
 var otherPlayerData = {
 	avatar: avatars[0],
 	score: 0,
@@ -52,43 +152,66 @@ var otherPlayerData = {
 	y: 0
 };
 
+/**
+ * Icicle config data for tweaking purposes
+ */
 var icicleConfig = {
-	gravity: 0.1, //20% of height
+	gravity: 0.1, //10% of height
 	minSpawnOffset: 1.15,
 	maxSpawnOffset: 0.85
 };
+
+/**
+ * Penguin config data for tweaking purposes
+ */
 var penguinConfig = {
-	speed: 0.2
+	speed: 0.3
 };
-var alive = true;
+
+/**
+ * Holds the current scene
+ */
 var currentScene;
 
+/**
+ * Holds all penguin objects
+ */
 var penguinsLEFT = [];
 var penguinsRIGHT = [];
 
+/**
+ * Holds all enemies
+ */
 var enemies = [];
+
+/**
+ * If client is the host it saves when the last time was when it spawned something
+ */
 var lastTimeSpawn = new Date().getTime();
 
-// let scoreText;
-// let enemiesText;
-let score = 0;
-
+/**
+ * When the player is invincible this should tell how long it's been since it switched opacity
+ */
 let gracePeriodFlickerTime = new Date().getTime();
+
+/**
+ * When the player is invincible this should tell to what opacity it should be switched to
+ */
 let gracePeriodAlpha = false;
+
 /**
  * Game life cycles
  */
 
+/**
+ * Loads all images
+ */
 function preload() {
 	this.load.image('bg', 'assets/bg.png');
 	this.load.image('platform', 'assets/PlatformAfloatCenter.png');
 	this.load.image('platform-edge-left', 'assets/PlatformAfloatLeft.png');
 	this.load.image('platform-edge-right', 'assets/PlatformAfloatRight.png');
 	this.load.image('platform-full', 'assets/PlatformAfloatFullHigher.png');
-
-	// this.load.image('platform', 'assets/.png');
-
-	// this.load.image('player1', 'assets/player.png');
 
 	this.load.spritesheet('player1', 'assets/AvatarAfloatOne.png', {
 		frameWidth: 355.5,
@@ -111,7 +234,14 @@ function preload() {
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
 }
 
+/**
+ * Creates the whole game at start
+ */
 function create() {
+	/**
+	 * Setting up variables
+	 */
+
 	currentScene = this;
 
 	enemies = [];
@@ -130,9 +260,7 @@ function create() {
 
 	this.scale.setGameSize(width, height);
 	this.scale.resize(width, height);
-	// console.log(width, height);
 	this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
-
 	this.scale.refresh();
 
 	/**
@@ -140,214 +268,111 @@ function create() {
 	 */
 	let bg = this.add.image(width / 2, height - height / 2, 'bg');
 	bg.scaleX = bg.scaleY = width > height * 1.77 ? width / 7500 : height / 3500;
-	// let bg = this.add.tileSprite(width / 2, height - height / 2, width, height, 'bg');
-	// // bg.displayWidth = width < height ? width : height;
-
-	// bg.tileScaleX = bg.tileScaleY = width > height * 1.77 ? width / 7500 : height / 7500;
-
-	// bg.alpha = 0.5;
 
 	/**
-	 * World events
-	 */
-	//   this.physics.world.on('worldbounds', addScore);
-	//   this.physics.world.setBoundsCollision(true, true, false, true);
-
-	/**
-	 * Platform
+	 * Platform group
 	 */
 	platforms = this.physics.add.staticGroup();
-
-	// platform = this.add.rectangle((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192, 0xff0000);
-	// // platforms.add(platform);
-	// platform.setOrigin(0, 0);
-	// platform.setDepth(1000);
-	// var container = this.add.container(width / 2, height - height * 0.05);
-
-	/**
-	 * Left platform edge
-	 */
-
-	// let sprite = this.add.tileSprite((width - boundingWidth * 0.55) / 2+1, height - height * 0.1, (boundingWidth / 1344) * 30, (boundingWidth / 1344) * 96, 'platform-edge-left');
-	// // sprite.displayWidth = (boundingWidth / 1344) * 192;
-	// sprite.tileScaleX = sprite.tileScaleY = boundingWidth / 4400;
-	// // ts.tileScaleY = boundingWidth / 1354;
-	// sprite.setOrigin(1, 0);
-	// // spritexd.displayHeight = boundingHeight * 0.1;
-
-	// // spritexd.scaleY = spritexd.scaleX = boundingWidth / 1344;
-	// platforms.add(sprite);
-
-	/**
-	 * Right platform edge
-	 */
-	// let spritexd = this.add.tileSprite((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55 - 0.5, height - height * 0.1, (boundingWidth / 1344) * 30, (boundingWidth / 1344) * 192, 'platform-edge-right');
-	// // sprite.displayWidth = (boundingWidth / 1344) * 192;
-	// spritexd.tileScaleX = spritexd.tileScaleY = boundingWidth / 4400;
-	// // ts.tileScaleY = boundingWidth / 1354;
-	// spritexd.setOrigin(0, 0);
-	// // spritexd.displayHeight = boundingHeight * 0.1;
-
-	// // spritexd.scaleY = spritexd.scaleX = boundingWidth / 1344;
-	// platforms.add(spritexd);
-
-	// var shape = this.make.graphics();
-
-	// shape.fillStyle(0xffffff);
-
-	// shape.beginPath();
-
-	// shape.fillRect((width - boundingWidth * 0.55) / 2 + boundingWidth * 0.55, height - height * 0.1, (boundingWidth / 1344) * 192, (boundingWidth / 1344) * 192);
-	// // shape.setOrigin(0, 0);
-	// var mask = shape.createGeometryMask();
-
-	// spritexd.setMask(mask);
 
 	/**
 	 * Middle platform
 	 */
+	//tileSprite(x,y,width,height,imagekey)
 	ts = this.add.tileSprite(width / 2, height - height * 0.1, boundingWidth * 0.85, (boundingWidth / 1344) * 96, 'platform-full');
 	ts.tilePositionX = 0;
 	ts.tilePositionY = 0;
 	ts.setOrigin(0.5, 0);
 
+	//scaling
 	ts.tileScaleX = boundingWidth / 3540;
 	ts.tileScaleY = boundingWidth / 3540;
+
+	//add platform to platform group
 	platforms.add(ts);
 
 	/**
 	 * Player
 	 */
+	//add.sprite(x,y,imagekey)
 	player = this.physics.add.sprite(width / 2, height - height * 0.5, avatar.key);
-	// player.displayWidth = ;
+	//scaling
 	player.scaleY = player.scaleX = boundingWidth / 3000;
 
-	// this.physics.add.existing(player);
+	//similar to z index in css
 	player.setDepth(100);
 
 	player.setGravityY(gravity);
 
-	// player.body.bounce.x = 0.1;
-	// player.body.bounce.y = 0.1;
-
 	player.body.setCollideWorldBounds = true;
+
+	//Player should stand on platform and not fall through
 	this.physics.add.collider(player, platforms);
 
+	//setup WASD buttons for debugging
 	cursors = this.input.keyboard.createCursorKeys();
+
+	//setup player animations for all avatars
 	avatars.forEach((el, i) => {
 		this.anims.create({
 			key: 'left' + i,
-			frames: [{ key: el.key, frame: 0 }],
+			frames: [{
+				key: el.key,
+				frame: 0
+			}],
 			frameRate: 10
 		});
 		this.anims.create({
 			key: 'leftJump' + i,
-			frames: [{ key: el.key, frame: 3 }],
+			frames: [{
+				key: el.key,
+				frame: 3
+			}],
 			frameRate: 10
 		});
 		this.anims.create({
 			key: 'turn' + i,
-			frames: [{ key: el.key, frame: 1 }],
+			frames: [{
+				key: el.key,
+				frame: 1
+			}],
 			frameRate: 20
 		});
 		this.anims.create({
 			key: 'turnJump' + i,
-			frames: [{ key: el.key, frame: 4 }],
+			frames: [{
+				key: el.key,
+				frame: 4
+			}],
 			frameRate: 5
 		});
 
 		this.anims.create({
 			key: 'right' + i,
-			frames: [{ key: el.key, frame: 2 }],
+			frames: [{
+				key: el.key,
+				frame: 2
+			}],
 			frameRate: 10
 		});
 		this.anims.create({
 			key: 'rightJump' + i,
-			frames: [{ key: el.key, frame: 5 }],
+			frames: [{
+				key: el.key,
+				frame: 5
+			}],
 			frameRate: 10
 		});
 	});
 
-	// /**
-	//  * Sliding object
-	//  */
-
-	// let penguin = this.physics.add.sprite((width - boundingWidth * 0.85) / 2, height - height * 0.2, 'player1');
-	// penguin.scaleY = penguin.scaleX = boundingWidth / 3000;
-
-	// this.physics.add.existing(penguin);
-	// penguin.setDepth(10);
-	// penguin.body.bounce.x = 0.2;
-	// penguin.body.bounce.y = 0.2;
-	// penguin.body.setCollideWorldBounds = true;
-	// this.physics.add.collider(penguin, platforms);
-	// enemies.push(penguin);
-	// penguinsRIGHT.push(penguin);
-	// /**
-	//  * Falling object
-	//  */
-	// let x = Math.random() * ((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85 - (width - boundingWidth * 0.85) / 2) + (width - boundingWidth * 0.85) / 2;
-	// console.warn('REEEEEE: ' + x);
-	// ice = this.physics.add.sprite(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset, 0, 'player1');
-	// ice.scaleY = ice.scaleX = boundingWidth / 3000;
-
-	// this.physics.add.existing(ice);
-	// ice.setDepth(10);
-	// ice.body.bounce.x = 0.2;
-	// ice.body.bounce.y = 0.2;
-	// // ice.body.setCollideWorldBounds = true;
-	// // this.physics.add.collider(ice, platforms);
-	// enemies.push(ice);
-
+	//Player should be hit when it collides with an enemy
 	this.physics.add.overlap(player, enemies, hit, null, this);
 
 	/**
-	 * Click event
+	 * Click event -> Jump
 	 */
 	this.input.on(
 		'pointerup',
-		function(pointer) {
-			if (!isFullscreen) {
-				this.scale.stopFullscreen();
-				screen.orientation.lock('landscape-primary');
-				document.documentElement.requestFullscreen();
-
-				noSleep.enable();
-				isFullscreen = true;
-			}
-			// if (this.scale.isFullscreen) {
-			// 	this.scale.stopFullscreen();
-			// 	noSleep.disable();
-			// 	// On stop fulll screen
-			// } else {
-			// 	this.scale.startFullscreen();
-			// 	noSleep.enable();
-			// 	// On start fulll screen
-			// }
-
-			//   var iOS =
-			//     /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-			try {
-				if (!gyroscope && typeof DeviceMotionEvent.requestPermission === 'function') {
-					DeviceMotionEvent.requestPermission()
-						.then(response => {
-							if (response == 'granted') {
-								gyroscope = true;
-								window.addEventListener(
-									'deviceorientation',
-									function(e) {
-										processGyro(e.alpha, e.beta, e.gamma);
-									},
-									true
-								);
-							}
-						})
-						.catch(console.error);
-				} else {
-					// non iOS 13+
-				}
-			} catch {}
-
+		function (pointer) {
 			if (player.body.touching.down) {
 				player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
 
@@ -357,6 +382,7 @@ function create() {
 						isJumping: true
 					};
 					if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						mqttClient.publish(
@@ -378,49 +404,29 @@ function create() {
 	);
 
 	/**
-	 * Score
-	 */
-	// scoreText = this.add.text(width / 2, 0, 'Test', {
-	// 	font: '65px Arial',
-	// 	fill: '#ffffff',
-	// 	align: 'center'
-	// });
-	//   enemiesText = this.add.text(width / 4, 0, 'Test', {
-	//     font: '65px Arial',
-	//     fill: '#ffffff',
-	//     align: 'center'
-	//   });
-
-	/**
-	 * Initialise MQTT
+	 * If multiplayer -> initialise MQTT
 	 */
 	if (multiplayer) {
 		initMqtt(this);
 	}
+
 	/**
-	 * Gyroscope
+	 * Setup gyroscope
 	 */
 
-	// let text = this.add.text(0, 0, 'Test', {
-	// 	font: '65px Arial',
-	// 	fill: '#ff0044',
-	// 	align: 'center'
-	// });
 	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	if (!iOS) {
 		if (window.DeviceOrientationEvent) {
 			window.addEventListener(
 				'deviceorientation',
-				function(e) {
+				function (e) {
 					processGyro(e.alpha, e.beta, e.gamma);
 				},
 				true
 			);
 			gyroscope = true;
-		} else {
-		}
+		} else {}
 
-		// initGyroscope();
 	} else {
 		if (!gyroscope && typeof DeviceMotionEvent.requestPermission === 'function') {
 			DeviceMotionEvent.requestPermission()
@@ -429,7 +435,7 @@ function create() {
 						gyroscope = true;
 						window.addEventListener(
 							'deviceorientation',
-							function(e) {
+							function (e) {
 								processGyro(e.alpha, e.beta, e.gamma);
 							},
 							true
@@ -442,34 +448,25 @@ function create() {
 			if (window.DeviceOrientationEvent) {
 				window.addEventListener(
 					'deviceorientation',
-					function(e) {
+					function (e) {
 						processGyro(e.alpha, e.beta, e.gamma);
 					},
 					true
 				);
 				gyroscope = true;
-			} else {
-			}
+			} else {}
 		}
 	}
 }
-
+/**
+ * Game loop. Calls itself multiple times a second.
+ */
 function update() {
-	//   enemies.forEach((el, i) => {
-	//       if (el.body.y > height) {
-	//         console.log('enemy passed');
-	//         enemies.pop(el);
-	//         if (!enemies.includes(el)) {
-	//           if (penguinsRIGHT.includes(el)) penguinsRIGHT.pop(el);
-	//           if (penguinsLEFT.includes(el)) penguinsLEFT.pop(el);
-	//           el.destroy();
-	//         }
-	//         score++;
-	//       }
-
-	//   });
+	/**
+	 * Flickers player when he's invincible
+	 */
 	if (invincible && new Date().getTime() - gracePeriodFlickerTime > 250) {
-		// console.error('Invincible');
+		=
 		if (gracePeriodAlpha) {
 			player.alpha = 0.5;
 			gracePeriodAlpha = false;
@@ -480,6 +477,10 @@ function update() {
 			gracePeriodFlickerTime = new Date().getTime();
 		}
 	}
+
+	/**
+	 * Moves all penguins
+	 */
 	if (started) {
 		penguinsLEFT.forEach((el, i) => {
 			el.body.velocity.x = boundingWidth * penguinConfig.speed * -1;
@@ -488,25 +489,36 @@ function update() {
 			el.body.velocity.x = boundingWidth * penguinConfig.speed;
 		});
 	}
+
 	/**
-	 * START DEBUG
+	 * Debug code which enables cursors for testing
 	 */
-	//!gyroscope
 	if (!gyroscope && alive) {
+		/**
+		 * When pressing left button
+		 */
 		if (cursors.left.isDown && !cursors.right.isDown) {
+			//set velocity
 			player.body.velocity.x = boundingWidth * -0.3;
+
+			//play the correct animation
 			player.anims.play('left' + avatars.indexOf(avatar));
+			//crop if avatar needs it
 			if (avatar.crop) {
 				player.height = 286.752;
 				player.setCrop(0, 72.248, player.width, 286.752);
 			}
+
+			//if multiplayer send player data to other users
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
 					isRunning: true,
 					direction: -1
 				};
+				//check if player data is not a duplicate
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+					//Make x,y positions relative for other resolutions and aspect ratios
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					mqttClient.publish(
 						`afloat/lobby/${lobbyId}/game`,
@@ -524,21 +536,31 @@ function update() {
 				}
 			}
 
-			// player.anims.play('left', true);
+			/**
+			 * When pressing right button
+			 */
 		} else if (cursors.right.isDown) {
+			//set velocity
 			player.body.velocity.x = boundingWidth * 0.3;
+
+			//play the correct animation
 			player.anims.play('right' + avatars.indexOf(avatar));
+			//crop if avatar needs it
 			if (avatar.crop) {
 				player.height = 286.752;
 				player.setCrop(0, 72.248, player.width, 286.752);
 			}
+
+			//if multiplayer send player data to other users
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
 					isRunning: true,
 					direction: 1
 				};
+				//check if player data is not a duplicate
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+					//Make x,y positions relative for other resolutions and aspect ratios
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					mqttClient.publish(
 						`afloat/lobby/${lobbyId}/game`,
@@ -558,19 +580,27 @@ function update() {
 
 			// player.anims.play('right', true);
 		} else {
+			//set velocity
 			player.body.velocity.x = 0;
+
+			//play the correct animation
 			player.anims.play('turn' + avatars.indexOf(avatar));
+			//crop if avatar needs it
 			if (avatar.crop) {
 				player.height = 286.752;
 				player.setCrop(0, 72.248, player.width, 286.752);
 			}
+
+			//if multiplayer send player data to other users
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
 					isRunning: false,
 					direction: 0
 				};
+				//check if player data is not a duplicate
 				if (beforePlayerData.isRunning !== newPlayerData.isRunning) {
+					//Make x,y positions relative for other resolutions and aspect ratios
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					mqttClient.publish(
 						`afloat/lobby/${lobbyId}/game`,
@@ -589,10 +619,16 @@ function update() {
 			}
 			// player.anims.play('turn');
 		}
+
+		/**
+		 * When player is not touching the floor
+		 */
 		if (!player.body.touching.down) {
+			//Disable crop for normal state
 			player.isCropped = false;
 			player.height = 359;
 
+			//Play correct animation
 			if (player.body.velocity.x === 0) {
 				player.anims.play('turnJump' + avatars.indexOf(avatar));
 			} else {
@@ -600,15 +636,23 @@ function update() {
 				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
 			}
 		}
+
+		/**
+		 * When the up button is being pressed -> jump
+		 */
 		if (cursors.up.isDown && player.body.touching.down) {
+			//Set velocity
 			player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
 
+			//if multiplayer send player data to other users
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
 					isJumping: true
 				};
+				//check if player data is not a duplicate
 				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
+					//Make x,y positions relative for other resolutions and aspect ratios
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 					mqttClient.publish(
 						`afloat/lobby/${lobbyId}/game`,
@@ -620,16 +664,20 @@ function update() {
 							y: y
 						})
 					);
-					// console.log('send jump');
 					beforePlayerData = newPlayerData;
 				}
 			}
 		}
 	} else {
+		/**
+		 * When player is not touching the floor
+		 */
 		if (!player.body.touching.down) {
+			//Disable crop for normal state
 			player.isCropped = false;
 			player.height = 359;
 
+			//Play correct animation
 			if (player.body.velocity.x === 0) {
 				player.anims.play('turnJump' + avatars.indexOf(avatar));
 			} else {
@@ -637,12 +685,15 @@ function update() {
 				if (player.body.velocity.x < 0) player.anims.play('leftJump' + avatars.indexOf(avatar));
 			}
 		} else {
+			//Player is touching the floor -> send update if multiplayer
 			if (connectedCloud) {
 				let newPlayerData = {
 					clientId: clientId,
 					isJumping: false
 				};
+				//Check if not duplicate
 				if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
+					//Make x,y positions relative for other resolutions and aspect ratios
 					let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 					mqttClient.publish(
@@ -662,149 +713,179 @@ function update() {
 	}
 
 	/**
-	 * END DEBUG
+	 * If client is host and game has started -> spawn new objects
 	 */
-
 	if ((host || !multiplayer) && started) {
+		/**
+		 * Randomize when an object is being spawned
+		 */
 		let random = Math.random() * (3000 - 1000) + 3000;
 		if (new Date().getTime() - lastTimeSpawn > random) {
-			// console.log(new Date().getTime() - lastTimeSpawn, random);
-			if (Math.random() > 0.2) {
-				// console.warn('RESPAWNING');
-				if (Math.random() <= 0.8) {
-					/**
-					 * Spawn icicle
-					 */
-					// console.error(width - (boundingWidth * 0.55) / 2, width - boundingWidth * 0.85 + boundingWidth);
-					let x =
-						Math.random() *
-							(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
-						((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
+			/**
+			 * 80% chance for icicle
+			 * 20% chance for penguin
+			 */
+			if (Math.random() <= 0.8) {
+				/**
+				 * Spawn icicle
+				 */
 
-					ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
-					ice.scaleY = ice.scaleX = boundingWidth / 6000;
-					ice.setGravityY(gravity * icicleConfig.gravity);
+				//Randomize spawn location
+				let x =
+					Math.random() *
+					(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
+					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
 
-					// ice.setGravityY(0.5);
-					// ice.body.gravity.y = 2;
-					// ice.body.setAllowGravity(false);
-					// this.physics.add.existing(ice);
-					ice.setDepth(1000);
-					ice.setOrigin(0.5, 0);
-					ice.body.bounce.x = 0.2;
-					ice.body.bounce.y = 0.2;
-					// ice.body.velocity.y = 500;
+				//Add sprite to the canvas
+				ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
+				ice.scaleY = ice.scaleX = boundingWidth / 6000;
 
-					// ice.body.setCollideWorldBounds(true);
-					ice.body.onWorldBounds = true;
+				//Set custom gravity (Icicle speed)
+				ice.setGravityY(gravity * icicleConfig.gravity);
 
-					// this.physics.add.collider(ice, platforms);
-					enemies.push(ice);
-					if (alive) addScore();
+				//Icicle should always be on top of player
+				ice.setDepth(1000);
+				ice.setOrigin(0.5, 0);
+				
+				//Add the Icicle to the enemies list
+				enemies.push(ice);
 
-					let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
-					if (connectedCloud) {
-						mqttClient.publish(
-							`afloat/lobby/${lobbyId}/game`,
-							JSON.stringify({
-								clientId: clientId,
-								status: 'newEnemy',
-								type: 'icicle',
-								x: xb,
-								y: yb
-							})
-						);
-					}
+				//If alive addScore
+				if (alive) addScore();
+
+				//Make x,y positions relative so other players with different resolution or aspect ratio get the correct position
+				let [xb, yb] = getNormalizedPositions(x, -1 * (boundingHeight * 0.4));
+				if (connectedCloud) {
+					mqttClient.publish(
+						`afloat/lobby/${lobbyId}/game`,
+						JSON.stringify({
+							clientId: clientId,
+							status: 'newEnemy',
+							type: 'icicle',
+							x: xb,
+							y: yb
+						})
+					);
+				}
+			} else {
+				/**
+				 * Spawn penguin
+				 */
+				let x;
+				let list;
+				let flip = true;
+
+				//Randomize left/right
+				if (Math.random() <= 0.5) {
+					x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
+					list = penguinsLEFT;
+					flip = false;
 				} else {
-					/**
-					 * Spawn penguin
-					 */
-					let x;
-					let list;
-					let flip = true;
+					x = (width - boundingWidth * 0.85) / 2;
+					list = penguinsRIGHT;
+				}
 
-					//Randomize left/right
-					if (Math.random() <= 0.5) {
-						x = (width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85;
-						list = penguinsLEFT;
-						flip = false;
-					} else {
-						x = (width - boundingWidth * 0.85) / 2;
-						list = penguinsRIGHT;
-					}
+				//Add penguin to the canvas
+				let penguin = this.physics.add.sprite(x, height - height * 0.2, 'penguin');
 
-					let penguin = this.physics.add.sprite(x, height - height * 0.2, 'penguin');
+				//Scaling
+				penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
 
-					penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
-					penguin.flipX = flip;
-					penguin.setOrigin(0.5, 0);
-					penguin.setGravityY(gravity);
+				//Penguin should be flipped when going to the left
+				penguin.flipX = flip;
+				penguin.setOrigin(0.5, 0);
 
-					this.physics.add.existing(penguin);
-					penguin.setDepth(1000);
-					penguin.body.bounce.x = 0.5;
-					penguin.body.bounce.y = 0.5;
+				//Set gravity
+				penguin.setGravityY(gravity);
 
-					// penguin.body.setCollideWorldBounds(true);
-					penguin.body.onWorldBounds = true;
+				penguin.setDepth(1000);
 
-					this.physics.add.collider(penguin, platforms);
-					enemies.push(penguin);
-					list.push(penguin);
-					if (alive) addScore();
-					let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
-					if (connectedCloud) {
-						mqttClient.publish(
-							`afloat/lobby/${lobbyId}/game`,
-							JSON.stringify({
-								clientId: clientId,
-								status: 'newEnemy',
-								type: 'penguin',
-								flip: flip,
-								x: xb,
-								y: yb
-							})
-						);
-					}
+				penguin.body.bounce.x = 0.5;
+				penguin.body.bounce.y = 0.5;
+
+				//Penguins should be able to stand on the platform not fall through it
+				this.physics.add.collider(penguin, platforms);
+
+				//Add penguin to enemy list
+				enemies.push(penguin);
+
+				//Add penguin to the list if it should go right or left
+				list.push(penguin);
+
+				//Add score if still alive
+				if (alive) addScore();
+
+				//Make x,y positions relative so other players with different resolution or aspect ratio get the correct position
+				let [xb, yb] = getNormalizedPositions(x, height - height * 0.2);
+				if (connectedCloud) {
+					mqttClient.publish(
+						`afloat/lobby/${lobbyId}/game`,
+						JSON.stringify({
+							clientId: clientId,
+							status: 'newEnemy',
+							type: 'penguin',
+							flip: flip,
+							x: xb,
+							y: yb
+						})
+					);
 				}
 			}
+			//Update when an enemy has spawned
 			lastTimeSpawn = new Date().getTime();
 		}
 	}
-	//   enemiesText.setText(score);
-	// scoreText.setText(score);
 
+	/**
+	 * When multiplayer -> update player position
+	 */
 	if (multiplayer && otherPlayerData.alive && otherPlayer !== undefined) {
-		// && otherPlayer !== undefined
 
+		/**
+		 * If running to the left
+		 */
 		if (otherPlayerData.isRunning && otherPlayerData.direction == -1) {
+			//Set velocity
 			otherPlayer.body.velocity.x = boundingWidth * -0.3;
+			//Play animation
 			otherPlayer.anims.play('left' + avatars.indexOf(otherPlayerData.avatar));
 			if (otherPlayerData.avatar.crop) {
 				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
 				otherPlayer.height = 286.752;
 			}
-			// console.log('Running left');
+
+		/**
+		 * If running to the right
+		 */
 		} else if (otherPlayerData.isRunning && otherPlayerData.direction == 1) {
+			//Set velocity
 			otherPlayer.body.velocity.x = boundingWidth * 0.3;
+			//Play animation
 			otherPlayer.anims.play('right' + avatars.indexOf(otherPlayerData.avatar));
 			if (otherPlayerData.avatar.crop) {
 				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
 				otherPlayer.height = 286.752;
 			}
 
-			// console.log('Running right');
+		/**
+		 * If standing still
+		 */
 		} else {
+			//Set velocity
 			otherPlayer.body.velocity.x = 0;
+			//Play animation
 			otherPlayer.anims.play('turn' + avatars.indexOf(otherPlayerData.avatar));
 			if (otherPlayerData.avatar.crop) {
 				otherPlayer.setCrop(0, 72.248, player.width, 286.752);
 				otherPlayer.height = 286.752;
 			}
 
-			// console.log('Standstill');
 		}
+		/**
+		 * If other player is jumping
+		 */
 		if (!otherPlayer.body.touching.down) {
+			//Play animation
 			if (otherPlayer.body.velocity.x === 0) otherPlayer.anims.play('turnJump' + avatars.indexOf(otherPlayerData.avatar));
 			if (otherPlayer.body.velocity.x > 0) otherPlayer.anims.play('rightJump' + avatars.indexOf(otherPlayerData.avatar));
 			if (otherPlayer.body.velocity.x < 0) otherPlayer.anims.play('leftJump' + avatars.indexOf(otherPlayerData.avatar));
@@ -813,16 +894,21 @@ function update() {
 				otherPlayer.height = 359;
 			}
 		}
+		/**
+		 * If the other player is about to jump
+		 */
 		if (otherPlayerData.isJumping && otherPlayer.body.touching.down) {
-			otherPlayer.body.velocity.y = (boundingHeight / 2) * 1.5 * -1; //((player.height + boundingHeight) / 2) * 1.2 * -1
-			otherPlayerData.isJumping = false;
+			//Set velocity
+			otherPlayer.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
 
-			// console.log('Jumping');
+			//Set jumping to false so the player won't jump twice
+			otherPlayerData.isJumping = false;
 		}
-		// } catch (ex) {
-		// 	console.error(ex);
-		// }
 	}
+
+	/**
+	 * If player fell of the platform -> hit
+	 */
 	if (player.body.y > height) {
 		hit();
 	}
@@ -831,77 +917,101 @@ function update() {
 /**
  * Game Utility functions
  */
+
+/**
+ * Add score
+ */
 function addScore() {
 	score++;
 	scoreObject.innerHTML = score;
 }
 
+/**
+ * Initialise MQTT
+ * @param {GameObj} gameObj 
+ */
 function initMqtt(gameObj) {
-	// if (connectedCloud) {
-	// 	// mqttClient.end(true);
-	// 	// mqttClient.close();
-	// }
-
-	// client = mqtt.connect(`wss://mct-mqtt.westeurope.cloudapp.azure.com`, {
-	// 	//wss://mqtt.funergydev.com:9001
-	// 	//51.105.206.206
-	// 	protocolId: 'MQTT'
-	// });
-	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function(err) {
+	//Subscribe to the correct lobby
+	mqttClient.subscribe(`afloat/lobby/${lobbyId}/game`, function (err) {
 		if (!err) {
-			// console.log(`afloat/lobby/${lobbyId}/game`);
 			connectedCloud = true;
 			console.warn('Subscribed to ' + `afloat/lobby/${lobbyId}/game`);
-			// let random = Math.random() * (200 - 100) + 100;
-			mqttClient.publish(
-				`afloat/lobby/${lobbyId}/game`,
-				JSON.stringify({
-					clientId: clientId,
-					status: 'connected',
-					avatar: avatars.indexOf(avatar)
-				})
-			);
-			// setTimeout(() => {
-			// 	mqttClient.publish(
-			// 		`afloat/lobby/${lobbyId}/game`,
-			// 		JSON.stringify({
-			// 			clientId: clientId,
-			// 			status: 'connected',
-			// 			avatar: avatars.indexOf(avatar)
-			// 		})
-			// 	);
-			// }, random);
+
+			/**
+			 * Send a connected message to the other player
+			 */
+			// mqttClient.publish(
+			// 	`afloat/lobby/${lobbyId}/game`,
+			// 	JSON.stringify({
+			// 		clientId: clientId,
+			// 		status: 'connected',
+			// 		avatar: avatars.indexOf(avatar)
+			// 	})
+			// );
+
+			let random = Math.random() * 200;
+
+			setTimeout(() => {
+				mqttClient.publish(
+					`afloat/lobby/${lobbyId}/game`,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'connected',
+						avatar: avatars.indexOf(avatar)
+					})
+				);
+			}, random);
 		} else {
 			console.log(err);
 		}
 	});
+
+	/**
+	 * Setup event listener when someone sends a message
+	 */
 	if (!setupMqttGameListener) {
-		mqttClient.on('message', function(topic, message) {
+		mqttClient.on('message', function (topic, message) {
+
+			/**
+			 * If message matches the correct topic
+			 */
 			if (topic == `afloat/lobby/${lobbyId}/game`) {
 				let data = JSON.parse(message);
-				// console.log(data);
+
+				/**
+				 * Skip all messages from itself
+				 */
 				if (data.clientId === clientId) return;
 
+				/**
+				 * If the player joins last he will get a connection request from the player that received the 'connected' message
+				 */
 				if (data.status != undefined && data.status === 'connectionRequest') {
 					console.warn(`Connection request from: ${data.clientId}`);
-					// multiplayer = true;
+
+					//Set the correct avatar
 					otherPlayerData.avatar = avatars[data.avatar];
+
 					console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
 
+					//Adding player to the canvas
 					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-					// player.displayWidth = ;
 					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 					otherPlayer.setGravityY(gravity);
 
-					// gameObj.physics.add.existing(otherPlayer);
 					otherPlayer.setDepth(10);
-					otherPlayer.alpha = 0.2;
 
-					// otherPlayer.body.bounce.x = 0.1;
-					// otherPlayer.body.bounce.y = 0.1;
+					//Set other player transparency
+					otherPlayer.alpha = 0.5;
 
 					otherPlayer.body.setCollideWorldBounds = true;
+
+					//Player should stand on the platform
 					gameObj.physics.add.collider(otherPlayer, platforms);
+
+					/**
+					 * If player has joined the game should start
+					 */
 					if (host) {
 						mqttClient.publish(
 							`afloat/lobby/${lobbyId}/game`,
@@ -913,10 +1023,16 @@ function initMqtt(gameObj) {
 						startGame();
 					}
 				}
+
+				/**
+				 * If player receives a 'connected' message it means he joined first of the two
+				 */
 				if (data.status != undefined && data.status === 'connected') {
-					host = false;
 					console.warn(`User Connected: ${data.clientId}`);
 
+					/**
+					 * Tell the other player he's are here already
+					 */
 					mqttClient.publish(
 						`afloat/lobby/${lobbyId}/game`,
 						JSON.stringify({
@@ -925,48 +1041,63 @@ function initMqtt(gameObj) {
 							avatar: avatars.indexOf(avatar)
 						})
 					);
-					// multiplayer = true;
+
+					//Set correct avatar for the other player
 					otherPlayerData.avatar = avatars[data.avatar];
+
 					console.warn(`Spawning player: ${data.clientId} / With skin ${otherPlayerData.avatar.key}`);
 
+					//Add other player to the canvas
 					otherPlayer = gameObj.physics.add.sprite(width / 2, height - height * 0.5, otherPlayerData.avatar.key);
-					// player.displayWidth = ;
+
 					otherPlayer.scaleY = otherPlayer.scaleX = boundingWidth / 3000;
 					otherPlayer.setGravityY(gravity);
 
-					// gameObj.physics.add.existing(otherPlayer);
 					otherPlayer.setDepth(10);
-					otherPlayer.alpha = 0.2;
 
-					// otherPlayer.body.bounce.x = 0.1;
-					// otherPlayer.body.bounce.y = 0.1;
+					//Set other player transparency
+					otherPlayer.alpha = 0.5;
+
 
 					otherPlayer.body.setCollideWorldBounds = true;
+
+					//Player should stand on the platform
 					gameObj.physics.add.collider(otherPlayer, platforms);
 				}
+
+				/**
+				 * Status when a new enemy has spawned. This means this client is not the host 
+				 * and we should spawn the objects by his command
+				 */
 				if (data.status != undefined && data.status === 'newEnemy') {
+					/**
+					 * If enemy is an icicle
+					 */
 					if (data.type === 'icicle') {
+						//Convert relative positions to absolute
 						let [x, y] = getRealPositions(data.x, data.y);
 
+						//Add Icicle to the canvas
 						ice = gameObj.physics.add.sprite(x, y, 'icicle');
 						ice.scaleY = ice.scaleX = boundingWidth / 6000;
 						ice.setGravityY(gravity * icicleConfig.gravity);
-						// ice.setGravityY(2);
-						// ice.body.gravity.y = 2;
-						// gameObj.physics.add.existing(ice);
+						
 						ice.setDepth(1000);
 						ice.setOrigin(0.5, 0);
-						ice.body.bounce.x = 0.2;
-						ice.body.bounce.y = 0.2;
-						// ice.body.velocity.y = 500;
-
-						// ice.body.setCollideWorldBounds(true);
+						
 						ice.body.onWorldBounds = true;
 
-						// this.physics.add.collider(ice, platforms);
+						//Add enemy to list of enemies
 						enemies.push(ice);
+
+						//Add score if still alive
 						if (alive) addScore();
+
+					/**
+					 * If enemy is a penguin
+					 */
 					} else if (data.type === 'penguin') {
+						//Convert relative positions to absolute
 						let [x, y] = getRealPositions(data.x, data.y);
 
 						let list;
@@ -978,52 +1109,84 @@ function initMqtt(gameObj) {
 							list = penguinsRIGHT;
 						}
 
+						//Add penguin to the canvas
 						let penguin = gameObj.physics.add.sprite(x, y, 'penguin');
 
 						penguin.scaleY = penguin.scaleX = boundingWidth / 15000;
+
+						//If penguin should be flipped: direction left -> flipped
 						penguin.flipX = data.flip;
 						penguin.setOrigin(0.5, 0);
 						penguin.setGravityY(gravity);
 
-						gameObj.physics.add.existing(penguin);
 						penguin.setDepth(1000);
 						penguin.body.bounce.x = 0.5;
 						penguin.body.bounce.y = 0.5;
 
-						// penguin.body.setCollideWorldBounds(true);
 						penguin.body.onWorldBounds = true;
 
+						//Penguin should stand on the platform, not fall through
 						gameObj.physics.add.collider(penguin, platforms);
+						//Add penguin to the list of enemies
 						enemies.push(penguin);
+						//Add penguin to the list of penguins that should go right or left
 						list.push(penguin);
+
+						//Add score if player is still alive
 						if (alive) addScore();
 					}
 				}
+				/**
+				 * Other player disconnect status
+				 */
 				if (data.status != undefined && data.status === 'disconnect') {
+					//Hide other player
 					otherPlayer.setActive(false).setVisible(false);
 					multiplayer = false;
 					host = true;
 				}
+				/**
+				 * Start status: Starts the game
+				 */
 				if (data.status != undefined && data.status === 'start') {
 					startGame();
 				}
+				/**
+				 * Respawns the other player
+				 */
 				if (data.status != undefined && data.status === 'respawn') {
 					otherPlayer.setPosition(width / 2, height - height * 0.5);
 				}
+				/**
+				 * Status that says the other player has died
+				 */
 				if (data.status != undefined && data.status === 'died') {
-					// console.log('Other player died');
+					//Hide other player
 					otherPlayer.setActive(false).setVisible(false);
+					//Set alive to false
 					otherPlayerData.alive = false;
+					//Save his score for the results page
 					otherPlayerData.score = data.score;
+
+					//If both players are dead -> End the game
 					if (!alive) {
 						endGame();
 					}
 				}
+				/**
+				 * If the other player has moved
+				 */
 				if (data.status != undefined && data.status === 'movement') {
+					/**
+					 * Update movement statusses
+					 */
 					if (data.isRunning != undefined) otherPlayerData.isRunning = data.isRunning;
 					if (data.direction != undefined) otherPlayerData.direction = data.direction;
 					if (data.isJumping != undefined) otherPlayerData.isJumping = data.isJumping;
 
+					/**
+					 * Update positions for accuracy
+					 */
 					if (data.x != undefined || data.y != undefined) {
 						let [x, y] = getRealPositions(data.x, data.y);
 						otherPlayerData.x = x;
@@ -1033,27 +1196,49 @@ function initMqtt(gameObj) {
 				}
 			}
 		});
+		//Tell the game that it has already registered the mqtt event listener
 		setupMqttGameListener = true;
 	}
 }
+
+/**
+ * Handles gyroscope changes
+ * @param {double} alpha 
+ * @param {Double} beta 
+ * @param {Double} gamma 
+ */
 function processGyro(alpha, beta, gamma) {
+	//We should only process it if the player is still alive
 	if (alive) {
+		/**
+		 * If orientation is alternative landscape
+		 */
 		if (window.orientation === -90) {
+			/**
+			 * Player goes left
+			 */
 			if (beta > 3) {
+				//Set velocity
 				player.body.velocity.x = boundingWidth * -0.3;
+
+				//Play animation
 				player.anims.play('left' + avatars.indexOf(avatar));
+				//Set crop if avatar needs it
 				if (avatar.crop) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
 
+				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
 						clientId: clientId,
 						isRunning: true,
 						direction: -1
 					};
+					//Check for duplicate data
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 						mqttClient.publish(
 							`afloat/lobby/${lobbyId}/game`,
@@ -1067,24 +1252,34 @@ function processGyro(alpha, beta, gamma) {
 								y: y
 							})
 						);
+						//Set new data as old data
 						beforePlayerData = newPlayerData;
 					}
 				}
+			/**
+			 * Go right
+			 */
 			} else if (beta < -3) {
+				//Set velocity
 				player.body.velocity.x = boundingWidth * 0.3;
+
+				//Play animation
 				player.anims.play('right' + avatars.indexOf(avatar));
+				//Set crop if avatar needs it
 				if (avatar.crop) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
-
+				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
 						clientId: clientId,
 						isRunning: true,
 						direction: 1
 					};
+					//Check for duplicate data
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						mqttClient.publish(
@@ -1099,23 +1294,35 @@ function processGyro(alpha, beta, gamma) {
 								y: y
 							})
 						);
+						//Set new data as old data
 						beforePlayerData = newPlayerData;
 					}
 				}
+			/**
+			 * Standing still
+			 */
 			} else {
+				//Set velocity
 				player.body.velocity.x = 0;
+
+				//Play animation
 				player.anims.play('turn' + avatars.indexOf(avatar));
+				//Set crop if avatar needs it
 				if (avatar.crop) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
+				
+				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
 						clientId: clientId,
 						isRunning: false,
 						direction: 0
 					};
+					//Check for duplicate data
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						mqttClient.publish(
@@ -1130,25 +1337,39 @@ function processGyro(alpha, beta, gamma) {
 								y: y
 							})
 						);
+						//Set new data as old data
 						beforePlayerData = newPlayerData;
 					}
 				}
 			}
+		/**
+		 * If orientation is landscape
+		 */
 		} else if (window.orientation === 90) {
+			/**
+			 * Go right
+			 */
 			if (beta > 3) {
+				//Set velocity
 				player.body.velocity.x = boundingWidth * 0.3;
+				//Play animation
 				player.anims.play('right' + avatars.indexOf(avatar));
+				//Set crop if avatar needs it
 				if (avatar.crop) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
+
+				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
 						clientId: clientId,
 						isRunning: true,
 						direction: 1
 					};
+					//Check for duplicate data
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						mqttClient.publish(
@@ -1163,23 +1384,34 @@ function processGyro(alpha, beta, gamma) {
 								y: y
 							})
 						);
+						//Set new data as old data
 						beforePlayerData = newPlayerData;
 					}
 				}
+			/**
+			 * Go left
+			 */
 			} else if (beta < -3) {
+				//Set velocity
 				player.body.velocity.x = boundingWidth * -0.3;
+				//Play animation
 				player.anims.play('left' + avatars.indexOf(avatar));
+				//Set crop if avatar needs it
 				if (avatar.crop) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
+
+				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
 						clientId: clientId,
 						isRunning: true,
 						direction: -1
 					};
+					//Check for duplicate data
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						mqttClient.publish(
@@ -1194,23 +1426,34 @@ function processGyro(alpha, beta, gamma) {
 								y: y
 							})
 						);
+						//Set new data as old data
 						beforePlayerData = newPlayerData;
 					}
 				}
+			/**
+			 * Standing still
+			 */
 			} else {
+				//Set velocity
 				player.body.velocity.x = 0;
+				//Play animation
 				player.anims.play('turn' + avatars.indexOf(avatar));
+				//Set crop if avatar needs it
 				if (avatar.crop) {
 					player.setCrop(0, 72.248, player.width, 286.752);
 					player.height = 286.752;
 				}
+
+				//If multiplayer send player update
 				if (connectedCloud) {
 					let newPlayerData = {
 						clientId: clientId,
 						isRunning: false,
 						direction: 0
 					};
+					//Check for duplicate data
 					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
+						//Make x,y positions relative for other resolutions and aspect ratios
 						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
 
 						mqttClient.publish(
@@ -1225,120 +1468,61 @@ function processGyro(alpha, beta, gamma) {
 								y: y
 							})
 						);
+						//Set new data as old data
 						beforePlayerData = newPlayerData;
 					}
 				}
 			}
+		/**
+		 * If orientation is portrait
+		 */
 		} else {
 			if (gamma > 3) {
-				player.body.velocity.x = boundingWidth * 0.3;
-				player.anims.play('right' + avatars.indexOf(avatar));
-				if (avatar.crop) {
-					player.setCrop(0, 72.248, player.width, 286.752);
-					player.height = 286.752;
-				}
-				if (connectedCloud) {
-					let newPlayerData = {
-						clientId: clientId,
-						isRunning: true,
-						direction: 1
-					};
-					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-
-						mqttClient.publish(
-							`afloat/lobby/${lobbyId}/game`,
-							JSON.stringify({
-								clientId: clientId,
-								isRunning: true,
-								direction: 1,
-								status: 'movement',
-
-								x: x,
-								y: y
-							})
-						);
-						beforePlayerData = newPlayerData;
-					}
-				}
+				//Go right
 			} else if (gamma < -3) {
-				player.body.velocity.x = boundingWidth * -0.3;
-				player.anims.play('left' + avatars.indexOf(avatar));
-				if (avatar.crop) {
-					player.setCrop(0, 72.248, player.width, 286.752);
-					player.height = 286.752;
-				}
-				if (connectedCloud) {
-					let newPlayerData = {
-						clientId: clientId,
-						isRunning: true,
-						direction: -1
-					};
-					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-						mqttClient.publish(
-							`afloat/lobby/${lobbyId}/game`,
-							JSON.stringify({
-								clientId: clientId,
-								isRunning: true,
-								direction: -1,
-								status: 'movement',
-
-								x: x,
-								y: y
-							})
-						);
-						beforePlayerData = newPlayerData;
-					}
-				}
+				//Go left
 			} else {
-				player.body.velocity.x = 0;
-				player.anims.play('turn' + avatars.indexOf(avatar));
-				if (avatar.crop) {
-					player.setCrop(0, 72.248, player.width, 286.752);
-					player.height = 286.752;
-				}
-				if (connectedCloud) {
-					let newPlayerData = {
-						clientId: clientId,
-						isRunning: false,
-						direction: 0
-					};
-					if (beforePlayerData.isRunning !== newPlayerData.isRunning || beforePlayerData.direction !== newPlayerData.direction) {
-						let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
-						mqttClient.publish(
-							`afloat/lobby/${lobbyId}/game`,
-							JSON.stringify({
-								clientId: clientId,
-								isRunning: false,
-								direction: 0,
-								status: 'movement',
-
-								x: x,
-								y: y
-							})
-						);
-						beforePlayerData = newPlayerData;
-					}
-				}
+				//Standing still
 			}
 		}
 	}
 }
 
+/**
+ * When a player is hit this function fires
+ */
 function hit() {
+	//Do nothing if player is invincible
 	if (invincible || !alive) return;
+
 	health--;
+
+	/**
+	 * If player is about to die
+	 */
 	if (health === 0) {
-		// console.error('DIE');
+		//Remove the last heart
 		healthObjects[0].classList.add('c-game-overlay__heart--dead');
 		die();
+
+	/**
+	 * If player is not about to die
+	 */
 	} else {
-		// console.error('NO DIE');
+		//Remove heart
 		healthObjects[health].classList.add('c-game-overlay__heart--dead');
+
+		/**
+		 * If player fell of the platform
+		 */
 		if (player.body.y > height) {
+			//Place him on the platform
 			player.setPosition(width / 2, height - height * 0.5);
+
+			//Set invincible
 			invincible = true;
+
+			//If multiplayer send respawn status
 			if (multiplayer) {
 				mqttClient.publish(
 					`afloat/lobby/${lobbyId}/game`,
@@ -1348,13 +1532,20 @@ function hit() {
 					})
 				);
 			}
+			//Remove invicibility after 2.25 seconds
 			setTimeout(() => {
 				(invincible = false), (gracePeriodAlpha = false);
 				player.alpha = 1;
 			}, 2250);
+		
+		/**
+		 * If player got hit by an object
+		 */
 		} else {
+			//Set invincible
 			invincible = true;
 
+			//Remove invincibility after 1 second
 			setTimeout(() => {
 				(invincible = false), (gracePeriodAlpha = false);
 				player.alpha = 1;
@@ -1362,13 +1553,27 @@ function hit() {
 		}
 	}
 }
+
+/**
+ * If player is dead
+ */
 function die() {
-	// console.warn('YOU ARE DEAD');
+	//If hes already dead -> do nothing
 	if (!alive) return;
+
+	//Set alive to false
 	alive = false;
+
+	//Make screen black and white to signal death
 	document.querySelector('canvas').classList.add('c-died');
+
+	//Hide player
 	player.setActive(false);
 	player.setVisible(false);
+
+	/**
+	 * If multiplayer send status update
+	 */
 	if (multiplayer) {
 		mqttClient.publish(
 			`afloat/lobby/${lobbyId}/game`,
@@ -1378,18 +1583,31 @@ function die() {
 				score: score
 			})
 		);
+		//If both players are dead -> End Game
 		if (!otherPlayerData.alive) {
 			endGame();
 		}
+	/**
+	 * If singleplayer End Game
+	 */
 	} else {
 		endGame();
 	}
 }
+
+/**
+ * Ends the game
+ */
 const endGame = () => {
+	//Adds 1 second delay for ending the game not abruptly
 	setTimeout(() => {
+		/**
+		 * If multiplayer
+		 */
 		if (multiplayer) {
-			var scores = [
-				{
+			
+			//Send scores of both players
+			var scores = [{
 					avatar: avatars.indexOf(avatar),
 					score: score,
 					offlinePlayer: true
@@ -1400,10 +1618,15 @@ const endGame = () => {
 					offlinePlayer: false
 				}
 			];
-			scores.sort(function(a, b) {
+			//Sort the scores
+			scores.sort(function (a, b) {
 				return b.score - a.score;
 			});
+
+			//Show results page
 			showResults(scores);
+
+			//Reset all variables for next game
 			otherPlayerData = {
 				avatar: avatars[0],
 				score: 0,
@@ -1420,42 +1643,69 @@ const endGame = () => {
 				isRunning: false,
 				direction: 0
 			};
-			endGameLobby();
 			connectedCloud = false;
+
+			//Disconnect from lobby and Mqtt lobbies
+			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
+			
+			//Show correct lobby number
 			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
 				el.innerHTML = currentLobby.menuId;
 			});
+		
+		/**
+		 * If singleplayer
+		 */
 		} else {
-			showResults([
-				{
-					avatar: avatars.indexOf(avatar),
-					score: score,
-					offlinePlayer: true
-				}
-			]);
+			//Show results of player
+			showResults([{
+				avatar: avatars.indexOf(avatar),
+				score: score,
+				offlinePlayer: true
+			}]);
+
+			//Set lobby number to 1
 			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
 				el.innerHTML = '1';
 			});
 		}
 
+		//Hide game layer
 		document.querySelector('.js-game').classList.add('c-hidden');
+		//Show results page
 		document.querySelector('.js-main__results').classList.remove('c-hidden');
-		// location.reload();
+
+		//Stop game scene
 		currentScene.scene.stop();
+
+		//Set started to False
 		started = false;
+
+		//Reset hearts
 		healthObjects.forEach(el => {
 			el.classList.remove('c-game-overlay__heart--dead');
 		});
-		score = 0;
-		alive = true;
-		health = 3;
 
+		//Set score back to 0
+		score = 0;
+		//Set alive back to true
+		alive = true;
+		//Set health back to 3
+		health = 3;
+		host = true;
+		//Reset score object
 		scoreObject.innerHTML = 0;
+
+		//Remove black and white death filter
 		document.querySelector('canvas').classList.remove('c-died');
 	}, 1000);
 };
+
+/**
+ * To disconnect from a multiplayer game
+ */
 const disconnectMultiplayer = () => {
 	mqttClient.publish(
 		`afloat/lobby/${lobbyId}/game`,
@@ -1465,19 +1715,38 @@ const disconnectMultiplayer = () => {
 		})
 	);
 };
+
+/**
+ * Start the game
+ */
 const startGame = () => {
+	//Set correct highscore from the leaderboard
 	highscoreObject.innerHTML = leaderboard[0].score;
+
+	//Set countdown
 	let countdown = 5;
+	
 	let countdownInterval;
+
+	//Setup countdown interval
 	countdownInterval = setInterval(() => {
+		/**
+		 * If 0 -> Start the game
+		 */
 		if (countdown == 0) {
 			countdownWrapperObject.innerHTML = '';
 
 			clearInterval(countdownInterval);
 			started = true;
-			// console.log('Starting');
+		/**
+		 * If not 0 -> count down
+		 */
 		} else {
 			countdownWrapperObject.innerHTML = `<h1 class="c-game-overlay__countdown js-countdown">${countdown}</h1>`;
+			
+			/**
+			 * Add zoom effect
+			 */
 			setTimeout(() => {
 				let countdownObject = document.querySelector('.js-countdown');
 				countdownObject.classList.add('c-game-overlay__countdown--big');
@@ -1487,30 +1756,56 @@ const startGame = () => {
 		}
 	}, 1000);
 };
+
+/**
+ * Initialises a new game (~THIS DOES NOT START IT~)
+ * @param {int} avatarid 
+ * @param {boolean} multiplayerBool 
+ */
 const initialiseNewGame = (avatarid, multiplayerBool = false) => {
+	//Set multiplayer variable
 	multiplayer = multiplayerBool;
+
+	//Set correct avatar
 	avatar = avatars[avatarid];
 
+	//Start the game scene
 	game.scene.start('game');
 
+	/**
+	 * If singleplayer -> Start the game immediately
+	 * else -> wait for the other player to join
+	 */
 	if (!multiplayer) {
 		startGame();
 	}
-	// setTimeout(() => {
-	// 	game.scene.stop('game');
-	// }, 1000);
 };
 
+/**
+ * Return relative (normalized) x,y coords
+ * @param {double} xb 
+ * @param {double} yb 
+ */
 const getNormalizedPositions = (xb, yb) => {
 	let x = ((xb - (width - boundingWidth * 0.85) / 2) / boundingWidth) * 100;
 	let y = (yb / boundingHeight) * 100;
 	return [x, y];
 };
+
+/**
+ * Return absolute x,y coords
+ * @param {double} xb 
+ * @param {double} yb 
+ */
 const getRealPositions = (xb, yb) => {
 	let x = (xb / 100) * boundingWidth + (width - boundingWidth * 0.85) / 2;
 	let y = (yb / 100) * boundingHeight;
 	return [x, y];
 };
+
+/**
+ * Calculate width and height based on device pixel ratio
+ */
 const calcWidthHeight = () => {
 	const dpr = window.devicePixelRatio;
 	let width = window.innerWidth > window.innerHeight ? window.innerWidth * dpr : window.innerHeight * dpr;
@@ -1518,10 +1813,17 @@ const calcWidthHeight = () => {
 	return [width, height];
 };
 
+/**
+ * Return Gamebounds based on 16:9 aspect ratio
+ * @param {double} height 
+ */
 const calcGameBounds = height => {
 	return [height * 1.77, height];
 };
 
+/**
+ * On resize
+ */
 const resize = () => {
 	let newWidth,
 		newHeight = calcWidthHeight();
@@ -1529,27 +1831,20 @@ const resize = () => {
 	let newBoundingWidth,
 		newBoundingHeight = calcGameBounds(newHeight);
 
-	// if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
+	if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
 
 	[width, height] = [newWidth, newHeight];
-	// console.log(grv)
 
 	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
-	// console.log('Resize');
+
 	disconnectMultiplayer();
 	leaveLobby();
 	location.reload();
-
-	// currentScene.scale.parent.width = Math.round(window.innerWidth);
-	// currentScene.scale.parent.height = Math.round(window.innerHeight);
-
-	// currentScene.scale.canvas.width = width;
-	// currentScene.scale.canvas.height = height;
-	// currentScene.scale.canvas.style.width = Math.round(window.innerWidth) + 'px';
-	// currentScene.scale.canvas.style.height = Math.round(window.innerHeight) + 'px';
-
-	// currentScene.scene.restart();
 };
+
+/**
+ * Create game object
+ */
 const initGame = () => {
 	[width, height] = calcWidthHeight();
 
@@ -1569,22 +1864,15 @@ const initGame = () => {
 		physics: {
 			default: 'arcade',
 			arcade: {
-				// gravity: {
-				// 	y: height
-				// },
 				debug: false
 			}
 		}
-		// scene: {
-		// 	preload: preload,
-		// 	create: create,
-		// 	update: update
-		// }
 	};
 	game = new Phaser.Game(config);
+
+	//Add game scene
 	currentScene = game.scene.add(
-		'game',
-		{
+		'game', {
 			preload: preload,
 			create: create,
 			update: update
@@ -1593,15 +1881,13 @@ const initGame = () => {
 	);
 };
 
+/**
+ * Initialises the framework
+ */
 const initFramework = () => {
-	// screen.orientation.lock('landscape-primary');
-
-	var url = new URL(window.location);
-	avatar = avatars[parseInt(url.searchParams.get('avatar'))];
-	if (avatar == undefined) {
-		avatar = avatars[0];
-	}
-
+	/**
+	 * Event when page gets closed
+	 */
 	window.addEventListener('beforeunload', () => {
 		if (multiplayer && connectedCloud) {
 			disconnectMultiplayer();
@@ -1609,6 +1895,10 @@ const initFramework = () => {
 			endGame();
 		}
 	});
+
+	/**
+	 * Event when user switches to another tab
+	 */
 	window.addEventListener('blur', () => {
 		if (currentScene != undefined) {
 			if (multiplayer && connectedCloud) {
@@ -1620,31 +1910,53 @@ const initFramework = () => {
 		}
 	});
 
+	//Setup DOM objects
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
 	healthObjects = document.querySelectorAll('.js-health-heart');
 	countdownWrapperObject = document.querySelector('.js-countdown-wrapper');
 
+	/**
+	 * When user clicks go to fullscreen
+	 */
 	document.documentElement.addEventListener('click', () => {
 		if (!isFullscreen) {
+			/**
+			 * Setup fullscreen
+			 */
 			try {
 				document.documentElement.requestFullscreen();
 				screen.orientation.lock('landscape');
 			} catch {}
+			/**
+			 * Request landscape mode
+			 */
 			try {
 				ScreenOrientation.lock('landscape');
 			} catch {}
 
+			/**
+			 * Request gyroscope permission for iOS users
+			 */
 			if (typeof DeviceMotionEvent.requestPermission === 'function') {
 				DeviceMotionEvent.requestPermission()
 					.then(response => {
-						if (response == 'granted') {
-						}
+						if (response == 'granted') {}
 					})
 					.catch(console.error);
 			}
+
+			/**
+			 * Disable screen sleeping
+			 */
 			noSleep.enable();
+			
+			// Set fullscreen to true
 			isFullscreen = true;
+
+			/**
+			 * Initialise game object
+			 */
 			setTimeout(() => {
 				initGame();
 			}, 500);
