@@ -1807,7 +1807,6 @@ const endGame = () => {
 			//Disconnect from lobby and Mqtt lobbies
 			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
-			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 			/**
 			 * If singleplayer
@@ -1826,6 +1825,15 @@ const endGame = () => {
 			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
 				el.innerHTML = '1';
 			});
+		}
+
+		if (leaderboard !== undefined || leaderboard.length >= 5) {
+			if (score > leaderboard[4].score) {
+				//TODO: Show leaderboard popup
+			}
+		} else {
+			//No score in leaderboard
+			//TODO: Show leaderboard popup
 		}
 
 		//Remove resize listener
@@ -1880,7 +1888,15 @@ const disconnectMultiplayer = () => {
  */
 const startGame = () => {
 	//Set correct highscore from the leaderboard
-	highscoreObject.innerHTML = leaderboard[0].score;
+	if (leaderboard !== undefined) {
+		if (leaderboard.length !== 0) {
+			highscoreObject.innerHTML = leaderboard[0].score;
+		} else {
+			highscoreObject.innerHTML = 0;
+		}
+	} else {
+		highscoreObject.innerHTML = 0;
+	}
 
 	//Set countdown
 	let countdown = 5;

@@ -197,7 +197,7 @@ let buttonListeners = function() {
 
 	/* Singleplayer Startpage Button Event Listener */
 	let avatarsinglePlayerStartpageButton = document.querySelector('.js-button__avatar-startpage');
-		avatarsinglePlayerStartpageButton.addEventListener('click', function() {
+	avatarsinglePlayerStartpageButton.addEventListener('click', function() {
 		console.log('Startpage button clicked');
 		document.querySelector('.js-main__avatar-singleplayer').classList.add('c-hidden');
 		document.querySelector('.js-main__start').classList.remove('c-hidden');
@@ -280,6 +280,7 @@ let buttonListeners = function() {
 		console.log('Lobbychoice Button Clicked');
 		document.querySelector('.js-main__lobby').classList.add('c-hidden');
 		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+		leaveLobby();
 	});
 
 	/* Scoreboard Resultaten Button Event Listener */

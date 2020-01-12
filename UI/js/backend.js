@@ -131,14 +131,6 @@ const joinLobby = gameId => {
 	} else {
 		currentLobby = LobbyObj;
 	}
-	mqttClient.publish(
-		mainId,
-		JSON.stringify({
-			clientId: clientId,
-			status: 'canConnect',
-			lobby: currentLobby
-		})
-	);
 
 	//Reset playerList
 	playerList = [];
@@ -201,12 +193,18 @@ const leaveLobby = () => {
 	//If game has already ended -> do nothing
 	if (currentLobby.status === 2) return;
 
+	if (!isLoadingGame) {
+		document.querySelector('.js-main__lobby').classList.add('c-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+	}
+
 	console.log('leftLobby');
 	mqttClient.publish(
 		`afloat/lobby/${lobbyId}`,
 		JSON.stringify({
 			clientId: clientId,
-			status: 'disconnect'
+			status: 'disconnect',
+			player: currentPlayer
 		})
 	);
 	if (currentLobby.playerCount !== 0) currentLobby.playerCount--;
@@ -218,6 +216,8 @@ const leaveLobby = () => {
 			lobby: currentLobby
 		})
 	);
+	showNewLobbies(lobbies);
+	mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 	//Update playerCount in database
 	let message = {
@@ -644,8 +644,8 @@ const initBackend = () => {
 			 * When other user disconnects from the lobby
 			 */
 			if (data.status === 'disconnect') {
-				playerList = [];
-				playerList.push(currentPlayer);
+				playerList.pop(data.player);
+				showNewPlayer(playerList);
 			}
 		}
 	});
