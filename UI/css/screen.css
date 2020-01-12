@@ -129,10 +129,6 @@ Components : Navigation
 Class used to control and navigate the pages in the one page site
 */
 
-.c-hidden {
-    display: none;
-}
-
 .c-disabled {
     background-color: lightgrey;
 }
@@ -697,17 +693,17 @@ Container for avatar choice
 }
 
 /* Deathscreen Pop-up */
-.c-deathscreen{
+.c-deathscreen {
     z-index: 1000;
     position: absolute;
     width: 100%;
     top: 0;
-    
+
     display: flex;
     justify-content: center;
 }
 
-.c-deathscreen-popup{
+.c-deathscreen-popup {
     margin-top: 10px;
 
     display: flex;
@@ -719,10 +715,10 @@ Container for avatar choice
     height: 130px;
 
     border-radius: 20px;
-    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
+    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
 }
 
-.c-deathscreen-popup__text{
+.c-deathscreen-popup__text {
     color: #707070;
 
     text-align: center;
@@ -734,7 +730,7 @@ Container for avatar choice
     font-size: 32px;
 }
 
-.c-deathscreen-popup__score{
+.c-deathscreen-popup__score {
     color: #5B5BFF !important;
 }
 
@@ -857,4 +853,8 @@ canvas {
 
 .u-width-1-of-3-vw {
     width: calc(100%/3);
+}
+
+.u-hidden {
+    display: none !important;
 }

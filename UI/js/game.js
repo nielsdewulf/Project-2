@@ -1103,6 +1103,19 @@ function initMqtt(gameObj) {
 							avatar: avatars.indexOf(avatar)
 						})
 					);
+					/**
+					 * If player has joined the game should start
+					 */
+					if (host) {
+						mqttClient.publish(
+							`afloat/lobby/${lobbyId}/game`,
+							JSON.stringify({
+								clientId: clientId,
+								status: 'start'
+							})
+						);
+						startGame();
+					}
 				}
 
 				/**
@@ -1745,6 +1758,8 @@ function die() {
 		//If both players are dead -> End Game
 		if (!otherPlayerData.alive) {
 			endGame();
+		} else {
+			document.querySelector('.js-deathscreen-popup').classList.remove('u-hidden');
 		}
 		/**
 		 * If singleplayer End Game
@@ -1808,6 +1823,8 @@ const endGame = () => {
 			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 
+			document.querySelector('.js-deathscreen-popup').classList.add('u-hidden');
+
 			/**
 			 * If singleplayer
 			 */
@@ -1839,9 +1856,9 @@ const endGame = () => {
 		window.removeEventListener('resize', resize);
 
 		//Hide game layer
-		document.querySelector('.js-game').classList.add('c-hidden');
+		document.querySelector('.js-game').classList.add('u-hidden');
 		//Show results page
-		document.querySelector('.js-main__results').classList.remove('c-hidden');
+		document.querySelector('.js-main__results').classList.remove('u-hidden');
 
 		//Stop game scene
 		currentScene.scene.stop();
@@ -1854,7 +1871,6 @@ const endGame = () => {
 			el.classList.remove('c-game-overlay__heart--dead');
 		});
 
-		
 		//Set alive back to true
 		alive = true;
 		//Set health back to 3
