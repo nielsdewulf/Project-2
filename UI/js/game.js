@@ -1418,6 +1418,39 @@ function processGyro(alpha, beta, gamma) {
 					}
 				}
 			}
+
+			/**
+			 * Jumping
+			 */
+			if (gamma > 10 || gamma < -10) {
+				//Jump
+				if (player.body.touching.down) {
+					player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
+
+					if (connectedCloud) {
+						let newPlayerData = {
+							clientId: clientId,
+							isJumping: true
+						};
+						if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
+							//Make x,y positions relative for other resolutions and aspect ratios
+							let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+							mqttClient.publish(
+								`afloat/lobby/${lobbyId}/game`,
+								JSON.stringify({
+									clientId: clientId,
+									isJumping: true,
+									status: 'movement',
+									x: x,
+									y: y
+								})
+							);
+							beforePlayerData = newPlayerData;
+						}
+					}
+				}
+			}
 			/**
 			 * If orientation is landscape
 			 */
@@ -1549,6 +1582,36 @@ function processGyro(alpha, beta, gamma) {
 					}
 				}
 			}
+
+			if (gamma > 10 || gamma < -10) {
+				//Jump
+				if (player.body.touching.down) {
+					player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
+
+					if (connectedCloud) {
+						let newPlayerData = {
+							clientId: clientId,
+							isJumping: true
+						};
+						if (beforePlayerData.isJumping !== newPlayerData.isJumping) {
+							//Make x,y positions relative for other resolutions and aspect ratios
+							let [x, y] = getNormalizedPositions(player.body.x, player.body.y);
+
+							mqttClient.publish(
+								`afloat/lobby/${lobbyId}/game`,
+								JSON.stringify({
+									clientId: clientId,
+									isJumping: true,
+									status: 'movement',
+									x: x,
+									y: y
+								})
+							);
+							beforePlayerData = newPlayerData;
+						}
+					}
+				}
+			}
 			/**
 			 * If orientation is portrait
 			 */
@@ -1578,8 +1641,8 @@ function useHealthPowerup(obj) {
 	}
 	if (health == 3) return;
 
-	health++;
 	healthObjects[health].classList.remove('c-game-overlay__heart--dead');
+	health++;
 }
 
 /**
@@ -2043,18 +2106,6 @@ const initFramework = () => {
 			} catch {}
 
 			/**
-			 * Request gyroscope permission for iOS users
-			 */
-			if (typeof DeviceMotionEvent.requestPermission === 'function') {
-				DeviceMotionEvent.requestPermission()
-					.then(response => {
-						if (response == 'granted') {
-						}
-					})
-					.catch(console.error);
-			}
-
-			/**
 			 * Disable screen sleeping
 			 */
 			noSleep.enable();
@@ -2068,6 +2119,18 @@ const initFramework = () => {
 			setTimeout(() => {
 				initGame();
 			}, 500);
+
+			/**
+			 * Request gyroscope permission for iOS users
+			 */
+			if (typeof DeviceMotionEvent.requestPermission === 'function') {
+				DeviceMotionEvent.requestPermission()
+					.then(response => {
+						if (response == 'granted') {
+						}
+					})
+					.catch(console.error);
+			}
 		}
 	});
 };
