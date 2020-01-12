@@ -292,3 +292,44 @@
     
     color: white;
 }
+
+
+
+/* Deathscreen Pop-up */
+.c-deathscreen{
+    z-index: 1000;
+    position: absolute;
+    width: 100%;
+}
+
+.c-deathscreen-popup{
+    /* margin: auto; */
+    margin-top: 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background-color: white;
+    width: 1150px;
+    height: 130px;
+
+    border-radius: 20px;
+    box-shadow: 0px 5px 6px 0px rgba(0,0,0,0.16);
+}
+
+.c-deathscreen-popup__text{
+    color: #707070;
+
+    text-align: center;
+    margin: 0;
+    margin-bottom: 10px;
+
+    font-family: 'Roboto';
+    font-weight: 600;
+    font-size: 32px;
+}
+
+.c-deathscreen-popup__score{
+    color: #5B5BFF !important;
+}
