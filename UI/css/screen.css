@@ -416,6 +416,8 @@ Container for Lobby page
     overflow-x: auto;
     scroll-snap-type: x proximity;
     
+    padding-top:1vh;
+    padding-bottom: 1vh;
 }
 
 .c-lobbychoice__item{
