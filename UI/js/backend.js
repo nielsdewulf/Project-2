@@ -435,13 +435,14 @@ const saveHighscoreCallback = data => {
  * @param {int} score
  * @param {string} gameid
  */
-const saveHighscore = (name, score, gameid, avatar) => {
+const saveHighscore = (name, score, gameid = null, avatar) => {
 	let obj = {
-		name: name,
-		score: score,
-		gameId: gameid,
-		avatar: avatar
+		Name: name,
+		Score: score,
+		GameId: gameid,
+		Avatar: avatar
 	};
+	console.log(obj);
 	return handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
 };
 
