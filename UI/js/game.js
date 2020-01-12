@@ -1827,6 +1827,15 @@ const endGame = () => {
 			});
 		}
 
+		if (leaderboard !== undefined || leaderboard.length >= 5) {
+			if (score > leaderboard[4].score) {
+				//TODO: Show leaderboard popup
+			}
+		} else {
+			//No score in leaderboard
+			//TODO: Show leaderboard popup
+		}
+
 		//Remove resize listener
 		window.removeEventListener('resize', resize);
 
