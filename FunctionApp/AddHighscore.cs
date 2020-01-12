@@ -35,7 +35,14 @@ namespace afloat
                         command.CommandText = $@"insert into Leaderboard values(@id,@name,@gameid,@score,@avatar);";
                         command.Parameters.AddWithValue("@id", highscore.PlayerId);
                         command.Parameters.AddWithValue("@name", highscore.Name);
-                        command.Parameters.AddWithValue("@gameid", highscore.GameId);
+                        if (highscore.GameId != null)
+                        {
+                            command.Parameters.AddWithValue("@gameid", highscore.GameId);
+                        }
+                        else
+                        {
+                            command.Parameters.AddWithValue("@gameid", DBNull.Value);
+                        }
                         command.Parameters.AddWithValue("@score", highscore.Score);
                         command.Parameters.AddWithValue("@avatar", highscore.Avatar);
 
@@ -48,7 +55,7 @@ namespace afloat
             catch (Exception ex)
             {
 
-                log.LogError("Error at AddGame: "+ex.ToString());
+                log.LogError("Error at AddGame: " + ex.ToString());
                 return new StatusCodeResult(500);
             }
         }
