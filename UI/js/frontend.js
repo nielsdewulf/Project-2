@@ -129,35 +129,44 @@ const showNewPlayer = data => {
 	 *      connected: Klaar voor te spelen
 	 * data.avatar
 	 */
-	let avatarIcon;
-	let avatarName;
-	switch (data.avatar) {
-		case 0:
-			avatarIcon = './img/png/JelleyAvatarIcon.png';
-			avatarName = 'Jelley';
-			break;
-		case 1:
-			avatarIcon = './img/png/StokeleyAvatarIcon.png';
-			avatarName = 'Stokeley';
-			break;
-		case 2:
-			avatarIcon = './img/png/SpikeyAvatarIcon.png';
-			avatarName = 'Spikey';
-			break;
-		case 3:
-			avatarIcon = './img/png/VlamAvatarIcon.png';
-			avatarName = 'Vlam';
-			break;
-	}
-	if (data.offlinePlayer) avatarName += ' (jij)';
+	let result = '';
 
-	let parent = document.querySelector('.js-multiplayer-lobby-grid');
-	parent.innerHTML += `<div class="c-vertical-grid__box-lobby">
+	console.log(data);
+	for (let player of data) {
+		let avatarIcon;
+		let avatarName;
+		if (player.avatar !== undefined) {
+			switch (player.avatar) {
+				case 0:
+					avatarIcon = './img/png/JelleyAvatarIcon.png';
+					avatarName = 'Jelley';
+					break;
+				case 1:
+					avatarIcon = './img/png/StokeleyAvatarIcon.png';
+					avatarName = 'Stokeley';
+					break;
+				case 2:
+					avatarIcon = './img/png/SpikeyAvatarIcon.png';
+					avatarName = 'Spikey';
+					break;
+				case 3:
+					avatarIcon = './img/png/VlamAvatarIcon.png';
+					avatarName = 'Vlam';
+					break;
+			}
+			if (player.offlinePlayer) avatarName += ' (jij)';
+
+			result += `<div class="c-vertical-grid__box-lobby">
     <img src="${avatarIcon}" class="c-horizontal-grid__icon-lobby">
     <h2
         class="c-horizontal-grid__name-lobby c-horizontal-grid__text-lobby c-horizontal-grid--center-lobby">
         ${avatarName}</h2>
 </div>`;
+		}
+	}
+	let parent = document.querySelector('.js-multiplayer-lobby-grid');
+	console.log(result);
+	parent.innerHTML = result;
 };
 const clearPlayerList = () => {
 	document.querySelector('.js-multiplayer-lobby-grid').innerHTML = '';

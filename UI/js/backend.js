@@ -131,6 +131,14 @@ const joinLobby = gameId => {
 	} else {
 		currentLobby = LobbyObj;
 	}
+	mqttClient.publish(
+		mainId,
+		JSON.stringify({
+			clientId: clientId,
+			status: 'canConnect',
+			lobby: currentLobby
+		})
+	);
 
 	//Reset playerList
 	playerList = [];
@@ -237,7 +245,7 @@ const finaliseConnection = avatarId => {
 	);
 
 	//Show player in list
-	showNewPlayer(currentPlayer);
+	showNewPlayer(playerList);
 };
 
 /**
@@ -339,13 +347,13 @@ const getLobbyById = id => {
  */
 const pingPlayers = () => {
 	try {
-		//Reset playersResponded from playerCalls before back to 0 
+		//Reset playersResponded from playerCalls before back to 0
 		lobbies.forEach(el => {
 			if (el.status !== 2) {
 				el.playersResponded = 0;
 			}
 		});
-		
+
 		//Publish a playerCall
 		mqttClient.publish(
 			mainId,
@@ -359,7 +367,7 @@ const pingPlayers = () => {
 			let lobby = getLobbyById(currentLobby.gameId);
 			lobby.playersResponded++;
 		}
-		
+
 		/**
 		 * Timeout: after a second it'll check who responded
 		 * 1second should be sufficient for the load the MQTT server could get.
@@ -532,30 +540,34 @@ const initBackend = () => {
 			//Skips messages by itself
 			if (data.clientId === clientId) return;
 
+			if (data.status === 'canConnect') {
+			}
+
 			/**
 			 * When a player is joins the lobby.
 			 */
 			if (data.status === 'connected') {
 				//If playerList exceeds 1 -> Reset
-				if (playerList.length > 1) {
-					playerList = [];
-					playerList.push(currentPlayer);
-				}
-				mqttClient.publish(
-					topic,
-					JSON.stringify({
-						clientId: clientId,
-						status: 'connectionRequest',
-						player: currentPlayer
-					})
-				);
-				console.log('Connection request from ' + data.clientId);
+				if (host && playerList.length > 1) {
+					// playerList = [];
+					// playerList.push(currentPlayer);
+				} else {
+					mqttClient.publish(
+						topic,
+						JSON.stringify({
+							clientId: clientId,
+							status: 'connectionRequest',
+							player: currentPlayer
+						})
+					);
+					console.log('Connection request from ' + data.clientId);
 
-				//Set his offlinePlayer variable to false
-				data.player.offlinePlayer = false;
-				playerList.push(data.player);
-				if (data.player.avatar !== undefined) {
-					showNewPlayer(data.player);
+					//Set his offlinePlayer variable to false
+					data.player.offlinePlayer = false;
+					playerList.push(data.player);
+					if (data.player.avatar !== undefined) {
+						showNewPlayer(playerList);
+					}
 				}
 			}
 
@@ -576,7 +588,7 @@ const initBackend = () => {
 
 				//If he already has an avatar -> show avatar
 				if (data.player.avatar !== undefined) {
-					showNewPlayer(data.player);
+					showNewPlayer(playerList);
 				}
 			}
 			/**
@@ -588,7 +600,7 @@ const initBackend = () => {
 					if (el.clientId === data.clientId) {
 						el.avatar = data.avatar;
 						el.status = 'connected';
-						showNewPlayer(el);
+						showNewPlayer(playerList);
 					}
 				});
 				//Show new player in playerlist
