@@ -1879,7 +1879,15 @@ const disconnectMultiplayer = () => {
  */
 const startGame = () => {
 	//Set correct highscore from the leaderboard
-	highscoreObject.innerHTML = leaderboard[0].score;
+	if (leaderboard !== undefined) {
+		if (leaderboard.length !== 0) {
+			highscoreObject.innerHTML = leaderboard[0].score;
+		} else {
+			highscoreObject.innerHTML = 0;
+		}
+	} else {
+		highscoreObject.innerHTML = 0;
+	}
 
 	//Set countdown
 	let countdown = 5;
