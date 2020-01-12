@@ -9,6 +9,8 @@ namespace afloat.models
         public int Status { get; set; }
         public DateTime DateTime { get; set; } = DateTime.Now;
         public int MenuId { get; set; } = 1;
+        public int ModeId { get; set; } = 0;
+
 
     }
 }
