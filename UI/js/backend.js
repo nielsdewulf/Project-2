@@ -131,14 +131,6 @@ const joinLobby = gameId => {
 	} else {
 		currentLobby = LobbyObj;
 	}
-	mqttClient.publish(
-		mainId,
-		JSON.stringify({
-			clientId: clientId,
-			status: 'canConnect',
-			lobby: currentLobby
-		})
-	);
 
 	//Reset playerList
 	playerList = [];
@@ -201,12 +193,18 @@ const leaveLobby = () => {
 	//If game has already ended -> do nothing
 	if (currentLobby.status === 2) return;
 
+	if (!isLoadingGame) {
+		document.querySelector('.js-main__lobby').classList.add('c-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+	}
+
 	console.log('leftLobby');
 	mqttClient.publish(
 		`afloat/lobby/${lobbyId}`,
 		JSON.stringify({
 			clientId: clientId,
-			status: 'disconnect'
+			status: 'disconnect',
+			player: currentPlayer
 		})
 	);
 	if (currentLobby.playerCount !== 0) currentLobby.playerCount--;
@@ -218,6 +216,8 @@ const leaveLobby = () => {
 			lobby: currentLobby
 		})
 	);
+	showNewLobbies(lobbies);
+	mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 	//Update playerCount in database
 	let message = {
@@ -422,7 +422,8 @@ const getTopHighscoresCallback = data => {
  * @param {int} top Gets only the top x highscores
  */
 const getTopHighscores = top => {
-	return handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
+	console.warn('loading leaderboard data');
+	handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
 };
 
 const saveHighscoreCallback = data => {
@@ -435,33 +436,34 @@ const saveHighscoreCallback = data => {
  * @param {int} score
  * @param {string} gameid
  */
-const saveHighscore = (name, score, gameid, avatar) => {
+const saveHighscore = (name, score, gameid = null, avatar) => {
 	let obj = {
-		name: name,
-		score: score,
-		gameId: gameid,
-		avatar: avatar
+		Name: name,
+		Score: score,
+		GameId: gameid,
+		Avatar: avatar
 	};
-	return handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
+	console.log(obj);
+	handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
 };
 
 /**
  * Initialise the backend
  */
 const initBackend = () => {
-	// //When user quits the page
-	// window.addEventListener('beforeunload', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
+	//When user quits the page
+	window.addEventListener('beforeunload', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
 
-	// //When user switches tabs
-	// window.addEventListener('blur', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
+	//When user switches tabs
+	window.addEventListener('blur', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
 
 	//Get the top highscores on page load
 	getTopHighscores(5);
@@ -644,8 +646,8 @@ const initBackend = () => {
 			 * When other user disconnects from the lobby
 			 */
 			if (data.status === 'disconnect') {
-				playerList = [];
-				playerList.push(currentPlayer);
+				playerList.pop(data.player);
+				showNewPlayer(playerList);
 			}
 		}
 	});
@@ -672,6 +674,7 @@ const handleData = function(url, callback = data => {}, method = 'GET', body = n
 		})
 		.then(function(textObject) {
 			if (textObject != '') callback(JSON.parse(textObject));
+			else callback(null);
 		});
 };
 const get = async url => {

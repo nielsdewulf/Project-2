@@ -53,10 +53,17 @@ namespace afloat
                             {
                                 PlayerId = Guid.Parse(result["PlayerId"].ToString()),
                                 Name = result["Name"].ToString(),
-                                GameId = Guid.Parse(result["GameId"].ToString()),
                                 Score = int.Parse(result["Score"].ToString()),
                                 Avatar = int.Parse(result["Avatar"].ToString())
                             };
+                            if (result["GameId"] != DBNull.Value)
+                            {
+                                score.GameId = Guid.Parse(result["GameId"].ToString());
+                            }
+                            else
+                            {
+                                score.GameId = null;
+                            }
 
                             list.Add(score);
                         }

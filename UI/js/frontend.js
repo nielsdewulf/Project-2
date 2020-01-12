@@ -6,6 +6,10 @@
  * getTopHighscores(5) : 5 = bv top 5
  */
 
+const showLeaderBoardPopup = () => {
+	document.querySelector('.js-main__score-results').classList.remove('c-hidden');
+};
+
 const showNewLobbies = data => {
 	/**
 	 * data.gameId
@@ -195,6 +199,14 @@ let buttonListeners = function() {
 		});
 	});
 
+	/* Singleplayer Startpage Button Event Listener */
+	let avatarsinglePlayerStartpageButton = document.querySelector('.js-button__avatar-startpage');
+	avatarsinglePlayerStartpageButton.addEventListener('click', function() {
+		console.log('Startpage button clicked');
+		document.querySelector('.js-main__avatar-singleplayer').classList.add('c-hidden');
+		document.querySelector('.js-main__start').classList.remove('c-hidden');
+	});
+
 	/* Start Page Multiplayer Button Event Listener */
 	let multiPlayerButton = document.querySelector('.js-button__multiplayer');
 	multiPlayerButton.addEventListener('click', function() {
@@ -259,11 +271,20 @@ let buttonListeners = function() {
 	});
 
 	/* Startpage Lobby Button Event Listener */
-	let startpageButtonLobby = document.querySelector('.js-button__lobby-startpage');
+	let startpageButtonLobby = document.querySelector('.js-button__lobbychoice-startpage');
 	startpageButtonLobby.addEventListener('click', function() {
 		console.log('Startpage Button Clicked');
 		document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
 		document.querySelector('.js-main__start').classList.remove('c-hidden');
+	});
+
+	/* Startpage Lobby Button Event Listener */
+	let lobbyStartpageButton = document.querySelector('.js-button__lobby-lobbychoice');
+	lobbyStartpageButton.addEventListener('click', function() {
+		console.log('Lobbychoice Button Clicked');
+		document.querySelector('.js-main__lobby').classList.add('c-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+		leaveLobby();
 	});
 
 	/* Scoreboard Resultaten Button Event Listener */
@@ -286,7 +307,8 @@ let buttonListeners = function() {
 	let resultsPopUpButton = document.querySelector('.js-button__score-results');
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
-		document.querySelector('.js-main__score-popup').classList.add('c-hidden');
+		document.querySelector('.js-main__score-results').classList.add('c-hidden');
+		saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
 	});
 };
 

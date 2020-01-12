@@ -810,7 +810,7 @@ function update() {
 						})
 					);
 				}
-			} else if (spawnChance <= 0.95) {
+			} else if (spawnChance <= 0.97) {
 				/**
 				 * Spawn penguin
 				 */
@@ -1807,7 +1807,6 @@ const endGame = () => {
 			//Disconnect from lobby and Mqtt lobbies
 			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
-			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 			/**
 			 * If singleplayer
@@ -1826,6 +1825,14 @@ const endGame = () => {
 			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
 				el.innerHTML = '1';
 			});
+		}
+
+		if (leaderboard !== undefined && leaderboard.length >= 5) {
+			if (score > leaderboard[4].score) {
+				showLeaderBoardPopup();
+			}
+		} else {
+			showLeaderBoardPopup();
 		}
 
 		//Remove resize listener
@@ -1847,8 +1854,7 @@ const endGame = () => {
 			el.classList.remove('c-game-overlay__heart--dead');
 		});
 
-		//Set score back to 0
-		score = 0;
+		
 		//Set alive back to true
 		alive = true;
 		//Set health back to 3
@@ -1880,7 +1886,15 @@ const disconnectMultiplayer = () => {
  */
 const startGame = () => {
 	//Set correct highscore from the leaderboard
-	highscoreObject.innerHTML = leaderboard[0].score;
+	if (leaderboard !== undefined) {
+		if (leaderboard.length !== 0) {
+			highscoreObject.innerHTML = leaderboard[0].score;
+		} else {
+			highscoreObject.innerHTML = 0;
+		}
+	} else {
+		highscoreObject.innerHTML = 0;
+	}
 
 	//Set countdown
 	let countdown = 5;
@@ -1926,6 +1940,9 @@ const initialiseNewGame = (currentPlayer, otherPlayer = undefined, multiplayerBo
 	if (host) console.warn('Starting game as host');
 	else console.warn('Starting game as slave');
 	multiplayer = multiplayerBool;
+
+	//Set score back to 0
+	score = 0;
 
 	//Set correct avatar
 	avatar = avatars[currentPlayer.avatar];

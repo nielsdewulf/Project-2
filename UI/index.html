@@ -103,7 +103,7 @@
                     <button class="c-button js-button__scoreboard-lobbychoice">
                         <span class="c-button__title">Scorebord</span>
                     </button>
-                    <button class="c-button js-button__lobby-startpage">
+                    <button class="c-button js-button__lobbychoice-startpage">
                         <span class="c-button__title">Terug naar start</span>
                     </button>
                 </div>
@@ -154,9 +154,14 @@
                         </div>
                     </div>
                 </div>
-                <button class="c-button js-button__avatar-singleplayer">
-                    <span class="c-button__title">Start spel</span>
-                </button>
+                <div class="c-buttons">
+                    <button class="c-button js-button__avatar-startpage">
+                        <span class="c-button__title">Terug naar start</span>
+                    </button>
+                    <button class="c-button js-button__avatar-singleplayer">
+                        <span class="c-button__title">Start spel</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -225,11 +230,14 @@
 
                     </div>
                 </div>
-
-                <button class="c-button js-button__lobby-startgame">
-                    <span class="c-button__title">Start spel</span>
-                </button>
-
+                <div class="c-buttons">
+                    <button class="c-button js-button__lobby-lobbychoice">
+                        <span class="c-button__title">Terug naar lobby</span>
+                    </button>
+                    <button class="c-button js-button__lobby-startgame">
+                        <span class="c-button__title">Start spel</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -356,8 +364,11 @@
                                 te zien op
                                 het
                                 scoreboard!</h3>
-                            <h2 class="c-scoreboard-popup__question">Wat is je naam?</h2>
-                            <input class="c-scoreboard-popup__name-input" type="text">
+                            <label for="scoreboard-popup-input">
+                                <h2 class="c-scoreboard-popup__question">Wat is je
+                                    naam?</h2>
+                            </label>
+                            <input id="scoreboard-popup-input" class="c-scoreboard-popup__name-input js-scoreboard-popup__input" type="text">
                             <button class="c-scoreboard-popup__button js-button__score-results">
                                 <span class="c-scoreboard-popup__button-title">Verder</span>
                             </button>
