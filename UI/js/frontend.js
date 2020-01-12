@@ -7,7 +7,7 @@
  */
 
 const showLeaderBoardPopup = () => {
-	document.querySelector('.js-main__score-results').classList.remove('c-hidden');
+	document.querySelector('.js-main__score-results').classList.remove('u-hidden');
 };
 
 const showNewLobbies = data => {
@@ -37,8 +37,8 @@ const showNewLobbies = data => {
 		el.addEventListener('click', function() {
 			console.log('Lobby clicked');
 			if (joinLobby(el.getAttribute('game-id'))) {
-				document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
-				document.querySelector('.js-main__avatar-multiplayer').classList.remove('c-hidden');
+				document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+				document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
 			}
 		});
 	});
@@ -181,20 +181,20 @@ let buttonListeners = function() {
 	let singlePlayerButton = document.querySelector('.js-button__singleplayer');
 	singlePlayerButton.addEventListener('click', function() {
 		console.log('Singleplayer button clicked');
-		document.querySelector('.js-main__start').classList.add('c-hidden');
-		document.querySelector('.js-main__avatar-singleplayer').classList.remove('c-hidden');
+		document.querySelector('.js-main__start').classList.add('u-hidden');
+		document.querySelector('.js-main__avatar-singleplayer').classList.remove('u-hidden');
 	});
 
 	/* Singleplayer Avatar Choice Button Event Listener */
 	let avatarSinglePlayerButton = document.querySelector('.js-button__avatar-singleplayer');
 	avatarSinglePlayerButton.addEventListener('click', function() {
 		console.log('Start game button clicked');
-		document.querySelector('.js-main__avatar-singleplayer').classList.add('c-hidden');
+		document.querySelector('.js-main__avatar-singleplayer').classList.add('u-hidden');
 		document.querySelectorAll('.js-singleplayer-avatar').forEach(el => {
 			if (el.checked) {
 				currentPlayer.avatar = parseInt(el.value);
 				initialiseNewGame(currentPlayer);
-				document.querySelector('.js-game').classList.remove('c-hidden');
+				document.querySelector('.js-game').classList.remove('u-hidden');
 			}
 		});
 	});
@@ -203,24 +203,24 @@ let buttonListeners = function() {
 	let avatarsinglePlayerStartpageButton = document.querySelector('.js-button__avatar-startpage');
 	avatarsinglePlayerStartpageButton.addEventListener('click', function() {
 		console.log('Startpage button clicked');
-		document.querySelector('.js-main__avatar-singleplayer').classList.add('c-hidden');
-		document.querySelector('.js-main__start').classList.remove('c-hidden');
+		document.querySelector('.js-main__avatar-singleplayer').classList.add('u-hidden');
+		document.querySelector('.js-main__start').classList.remove('u-hidden');
 	});
 
 	/* Start Page Multiplayer Button Event Listener */
 	let multiPlayerButton = document.querySelector('.js-button__multiplayer');
 	multiPlayerButton.addEventListener('click', function() {
 		console.log('Multiplayer button clicked');
-		document.querySelector('.js-main__start').classList.add('c-hidden');
-		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+		document.querySelector('.js-main__start').classList.add('u-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
 	});
 
 	/* Multiplayer Avatar Choice Button Event Listener */
 	let avatarMultiPlayerButton = document.querySelector('.js-button__avatar-multiplayer');
 	avatarMultiPlayerButton.addEventListener('click', function() {
 		console.log('Multiplayer avatar button clicked');
-		document.querySelector('.js-main__avatar-multiplayer').classList.add('c-hidden');
-		document.querySelector('.js-main__lobby').classList.remove('c-hidden');
+		document.querySelector('.js-main__avatar-multiplayer').classList.add('u-hidden');
+		document.querySelector('.js-main__lobby').classList.remove('u-hidden');
 		document.querySelectorAll('.js-multiplayer-avatar').forEach(el => {
 			if (el.checked) {
 				console.log(el.value);
@@ -233,8 +233,8 @@ let buttonListeners = function() {
 	let scoreboardButtonStartpage = document.querySelector('.js-button__scoreboard-startpage');
 	scoreboardButtonStartpage.addEventListener('click', function() {
 		console.log('Singleplayer button clicked');
-		document.querySelector('.js-main__start').classList.add('c-hidden');
-		document.querySelector('.js-main__scoreboard').classList.remove('c-hidden');
+		document.querySelector('.js-main__start').classList.add('u-hidden');
+		document.querySelector('.js-main__scoreboard').classList.remove('u-hidden');
 	});
 
 	/** New Lobby Button Event Listener*/
@@ -249,8 +249,8 @@ let buttonListeners = function() {
 	lobbyStartGameButton.addEventListener('click', function() {
 		console.log('Start game button clicked');
 		if (loadGame()) {
-			document.querySelector('.js-main__lobby').classList.add('c-hidden');
-			document.querySelector('.js-game').classList.remove('c-hidden');
+			document.querySelector('.js-main__lobby').classList.add('u-hidden');
+			document.querySelector('.js-game').classList.remove('u-hidden');
 		}
 	});
 
@@ -258,32 +258,32 @@ let buttonListeners = function() {
 	let scoreboardButtonLobbyChoice = document.querySelector('.js-button__scoreboard-lobbychoice');
 	scoreboardButtonLobbyChoice.addEventListener('click', function() {
 		console.log('Scoreboard Button Clicked');
-		document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
-		document.querySelector('.js-main__scoreboard').classList.remove('c-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+		document.querySelector('.js-main__scoreboard').classList.remove('u-hidden');
 	});
 
 	/* Startpage Scoreboard Button Event Listener */
 	let startpageButtonScoreboard = document.querySelector('.js-button__startpage-scoreboard');
 	startpageButtonScoreboard.addEventListener('click', function() {
 		console.log('Scoreboard Button Clicked');
-		document.querySelector('.js-main__scoreboard').classList.add('c-hidden');
-		document.querySelector('.js-main__start').classList.remove('c-hidden');
+		document.querySelector('.js-main__scoreboard').classList.add('u-hidden');
+		document.querySelector('.js-main__start').classList.remove('u-hidden');
 	});
 
 	/* Startpage Lobby Button Event Listener */
 	let startpageButtonLobby = document.querySelector('.js-button__lobbychoice-startpage');
 	startpageButtonLobby.addEventListener('click', function() {
 		console.log('Startpage Button Clicked');
-		document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
-		document.querySelector('.js-main__start').classList.remove('c-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+		document.querySelector('.js-main__start').classList.remove('u-hidden');
 	});
 
 	/* Startpage Lobby Button Event Listener */
 	let lobbyStartpageButton = document.querySelector('.js-button__lobby-lobbychoice');
 	lobbyStartpageButton.addEventListener('click', function() {
 		console.log('Lobbychoice Button Clicked');
-		document.querySelector('.js-main__lobby').classList.add('c-hidden');
-		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+		document.querySelector('.js-main__lobby').classList.add('u-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
 		leaveLobby();
 	});
 
@@ -291,23 +291,23 @@ let buttonListeners = function() {
 	let scoreboardResultsButton = document.querySelector('.js-button__scoreboard-results');
 	scoreboardResultsButton.addEventListener('click', function() {
 		console.log('Startpage Button Clicked');
-		document.querySelector('.js-main__results').classList.add('c-hidden');
-		document.querySelector('.js-main__scoreboard').classList.remove('c-hidden');
+		document.querySelector('.js-main__results').classList.add('u-hidden');
+		document.querySelector('.js-main__scoreboard').classList.remove('u-hidden');
 	});
 
 	/* Start page Resultaten Button Event Listener */
 	let startpageResultsButton = document.querySelector('.js-button__start-results');
 	startpageResultsButton.addEventListener('click', function() {
 		console.log('Startpage Button Clicked');
-		document.querySelector('.js-main__results').classList.add('c-hidden');
-		document.querySelector('.js-main__start').classList.remove('c-hidden');
+		document.querySelector('.js-main__results').classList.add('u-hidden');
+		document.querySelector('.js-main__start').classList.remove('u-hidden');
 	});
 
 	/* Resultaten Popup Button Event Listener */
 	let resultsPopUpButton = document.querySelector('.js-button__score-results');
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
-		document.querySelector('.js-main__score-results').classList.add('c-hidden');
+		document.querySelector('.js-main__score-results').classList.add('u-hidden');
 		saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
 	});
 };

@@ -71,7 +71,7 @@
 
     <!--__________________________________Lobbykeuze_________________________________________-->
 
-    <div class="c-page c-hidden js-main__lobbychoice">
+    <div class="c-page u-hidden js-main__lobbychoice">
         <div class="c-app__main">
             <div class="c-app__lobby">
                 <span class="c-app__title">Lobby</span>
@@ -116,7 +116,7 @@
     <!--____________________________________Avatar Singleplayer Page____________________________________________-->
 
 
-    <div class="c-page c-hidden js-main__avatar-singleplayer">
+    <div class="c-page u-hidden js-main__avatar-singleplayer">
         <div class="c-app__main">
             <div class="c-app__avatar">
                 <span class="c-app__title">
@@ -171,7 +171,7 @@
     <!--____________________________________Avatar Multiplayer Page____________________________________________-->
 
 
-    <div class="c-page c-hidden js-main__avatar-multiplayer">
+    <div class="c-page u-hidden js-main__avatar-multiplayer">
         <div class="c-app__main">
             <div class="c-app__avatar">
                 <span class="c-app__title">
@@ -220,7 +220,7 @@
     <!--____________________________________Lobby____________________________________________-->
 
 
-    <div class="c-page c-hidden js-main__lobby">
+    <div class="c-page u-hidden js-main__lobby">
         <div class="c-app__main">
             <div class="c-app__lobby">
                 <span class="c-app__title">Noordpool #<span class="js-lobby-menu-id"></span></span>
@@ -246,7 +246,7 @@
     <!--____________________________________Resultaten____________________________________________-->
 
 
-    <div class="c-page c-hidden js-main__results">
+    <div class="c-page u-hidden js-main__results">
         <div class="c-app__main">
             <div class="c-app__lobby">
                 <span class="c-app__title">Resultaten Noordpool #<span class="js-lobby-menu-id"></span></span>
@@ -290,7 +290,7 @@
     <!--____________________________________Scorebord____________________________________________-->
 
 
-    <div class="c-page c-hidden js-main__scoreboard">
+    <div class="c-page u-hidden js-main__scoreboard">
         <div class="c-app__main">
             <div class="c-app__lobby">
                 <span class="c-app__title">Scorebord</span>
@@ -353,7 +353,7 @@
     <!--__________________________________Scorebord Popup_________________________________________-->
 
 
-    <div class="c-page c-hidden js-main__score-results">
+    <div class="c-page u-hidden js-main__score-results">
         <div class="c-app__main">
             <div class="c-app__popup">
                 <div class="c-scoreboard-popup">
@@ -368,7 +368,8 @@
                                 <h2 class="c-scoreboard-popup__question">Wat is je
                                     naam?</h2>
                             </label>
-                            <input id="scoreboard-popup-input" class="c-scoreboard-popup__name-input js-scoreboard-popup__input" type="text">
+                            <input id="scoreboard-popup-input"
+                                class="c-scoreboard-popup__name-input js-scoreboard-popup__input" type="text">
                             <button class="c-scoreboard-popup__button js-button__score-results">
                                 <span class="c-scoreboard-popup__button-title">Verder</span>
                             </button>
@@ -380,7 +381,7 @@
     </div>
     <!--__________________________________Game_________________________________________-->
 
-    <div class="c-page c-hidden js-game">
+    <div class="c-page u-hidden js-game">
         <div class="c-game-overlay">
             <div class="c-game-overlay__row">
                 <div class="c-game-overlay__wrapper u-width-1-of-3-vw">
@@ -430,12 +431,12 @@
     </div>
 
     <!-- Deathscreen Popup -->
-    <div class="c-deathscreen">
+    <div class="c-deathscreen js-deathscreen-popup u-hidden">
         <div class="c-deathscreen-popup">
             <div class="c-deathscreen-popup__content">
                 <h2 class="c-deathscreen-popup__text">Je behaalde een score van <span
-                        class="c-deathscreen-popup__score">9</span> punten!</h2>
-                <h2 class="c-deathscreen-popup__text">Wacht op de tegenspeler om naar deresultaten te gaan!</h2>
+                        class="c-deathscreen-popup__score js-deathscreen-popup__score">9</span> punten!</h2>
+                <h2 class="c-deathscreen-popup__text">Wacht op de tegenspeler om naar de resultaten te gaan!</h2>
             </div>
         </div>
     </div>
