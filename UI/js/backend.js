@@ -131,14 +131,6 @@ const joinLobby = gameId => {
 	} else {
 		currentLobby = LobbyObj;
 	}
-	mqttClient.publish(
-		mainId,
-		JSON.stringify({
-			clientId: clientId,
-			status: 'canConnect',
-			lobby: currentLobby
-		})
-	);
 
 	//Reset playerList
 	playerList = [];
@@ -224,6 +216,7 @@ const leaveLobby = () => {
 			lobby: currentLobby
 		})
 	);
+	showNewLobbies(lobbies);
 	mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 	//Update playerCount in database
