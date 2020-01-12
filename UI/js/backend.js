@@ -425,6 +425,26 @@ const getTopHighscores = top => {
 	return handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
 };
 
+const saveHighscoreCallback = data => {
+	getTopHighscores(5);
+};
+
+/**
+ *
+ * @param {string} name
+ * @param {int} score
+ * @param {string} gameid
+ */
+const saveHighscore = (name, score, gameid, avatar) => {
+	let obj = {
+		name: name,
+		score: score,
+		gameId: gameid,
+		avatar: avatar
+	};
+	return handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
+};
+
 /**
  * Initialise the backend
  */
