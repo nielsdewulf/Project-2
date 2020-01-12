@@ -1628,21 +1628,23 @@ function processGyro(alpha, beta, gamma) {
 }
 
 function useHealthPowerup(obj) {
-	obj.destroy();
-	if (multiplayer) {
-		mqttClient.publish(
-			`afloat/lobby/${lobbyId}/game`,
-			JSON.stringify({
-				clientId: clientId,
-				status: 'usePowerup',
-				id: obj.name
-			})
-		);
-	}
-	if (health == 3) return;
+	if (alive) {
+		obj.destroy();
+		if (multiplayer) {
+			mqttClient.publish(
+				`afloat/lobby/${lobbyId}/game`,
+				JSON.stringify({
+					clientId: clientId,
+					status: 'usePowerup',
+					id: obj.name
+				})
+			);
+		}
+		if (health == 3) return;
 
-	healthObjects[health].classList.remove('c-game-overlay__heart--dead');
-	health++;
+		healthObjects[health].classList.remove('c-game-overlay__heart--dead');
+		health++;
+	}
 }
 
 /**
