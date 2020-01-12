@@ -1807,7 +1807,6 @@ const endGame = () => {
 			//Disconnect from lobby and Mqtt lobbies
 			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
-			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 			/**
 			 * If singleplayer

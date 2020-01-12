@@ -218,6 +218,7 @@ const leaveLobby = () => {
 			lobby: currentLobby
 		})
 	);
+	mqttClient.unsubscribe(`afloat/lobby/${lobbyId}`);
 
 	//Update playerCount in database
 	let message = {
