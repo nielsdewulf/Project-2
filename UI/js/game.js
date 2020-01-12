@@ -1759,6 +1759,7 @@ function die() {
 		if (!otherPlayerData.alive) {
 			endGame();
 		} else {
+			document.querySelector('.js-deathscreen-popup__score').innerHTML = score;
 			document.querySelector('.js-deathscreen-popup').classList.remove('u-hidden');
 		}
 		/**
