@@ -181,7 +181,7 @@ Styling default page
     display: flex;
     justify-content: center;
 
-    margin-bottom: 2%;
+   
 }
 
 .c-app__lobby {
@@ -529,14 +529,14 @@ Container for avatar choice
 */
 
 .c-avatar {
-    width:80%;
+    width:90%;
     height:55vh; 
 
     display: flex;
     flex-direction: column;
     justify-content: center;
 
-    margin-bottom: 5%;
+    
  }
 
 /* Avatar Choice Element */
@@ -544,7 +544,7 @@ Container for avatar choice
     display: flex;
     width:100%;
     align-self: center;
-    justify-content: space-between;
+    justify-content: space-around;
 }
 
 .o-hide-accessible{
@@ -577,8 +577,8 @@ Container for avatar choice
    
 
 .c-avatarchoice__image{
-    height: 100px;
-    width: 100px;
+    height:calc(((100vh+100vw)/2)/2);
+    width:calc(((100vh+100vw)/2)/2);
 }
 
 .c-avatar0-icon{
@@ -601,33 +601,7 @@ Container for avatar choice
     background-size: cover;
 }
 
-@media (min-width: 1024px) {
-    .c-avatarchoice__label{
-        height: 160px;
-        width: 160px;
-    
-        margin: 0;
-    }
 
-    .c-avatarchoice__image{
-        height: 160px;
-        width: 160px;
-    }
-}
-
-@media (min-width: 1200px) {
-    .c-avatarchoice__label{
-        height: 240px;
-        width: 240px;
-    
-        margin: 0;
-    }
-
-    .c-avatarchoice__image{
-        height: 240px;
-        width: 240px;
-    }
-}
 
 
 /* Scoreboard Popup Styling */
