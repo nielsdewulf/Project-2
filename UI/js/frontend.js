@@ -308,10 +308,7 @@ let buttonListeners = function() {
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
 		document.querySelector('.js-main__score-results').classList.add('c-hidden');
-<<<<<<< HEAD
 		saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
-=======
->>>>>>> develop
 	});
 };
 
