@@ -6,6 +6,10 @@
  * getTopHighscores(5) : 5 = bv top 5
  */
 
+const showLeaderBoardPopup = () => {
+	document.querySelector('.js-main__score-results').classList.remove('c-hidden');
+};
+
 const showNewLobbies = data => {
 	/**
 	 * data.gameId
@@ -303,7 +307,8 @@ let buttonListeners = function() {
 	let resultsPopUpButton = document.querySelector('.js-button__score-results');
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
-		document.querySelector('.js-main__score-popup').classList.add('c-hidden');
+		document.querySelector('.js-main__score-results').classList.add('c-hidden');
+		saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
 	});
 };
 

@@ -810,7 +810,7 @@ function update() {
 						})
 					);
 				}
-			} else if (spawnChance <= 0.95) {
+			} else if (spawnChance <= 0.97) {
 				/**
 				 * Spawn penguin
 				 */
@@ -1827,13 +1827,12 @@ const endGame = () => {
 			});
 		}
 
-		if (leaderboard !== undefined || leaderboard.length >= 5) {
+		if (leaderboard !== undefined && leaderboard.length >= 5) {
 			if (score > leaderboard[4].score) {
-				//TODO: Show leaderboard popup
+				showLeaderBoardPopup();
 			}
 		} else {
-			//No score in leaderboard
-			//TODO: Show leaderboard popup
+			showLeaderBoardPopup();
 		}
 
 		//Remove resize listener
@@ -1855,8 +1854,7 @@ const endGame = () => {
 			el.classList.remove('c-game-overlay__heart--dead');
 		});
 
-		//Set score back to 0
-		score = 0;
+		
 		//Set alive back to true
 		alive = true;
 		//Set health back to 3
@@ -1942,6 +1940,9 @@ const initialiseNewGame = (currentPlayer, otherPlayer = undefined, multiplayerBo
 	if (host) console.warn('Starting game as host');
 	else console.warn('Starting game as slave');
 	multiplayer = multiplayerBool;
+
+	//Set score back to 0
+	score = 0;
 
 	//Set correct avatar
 	avatar = avatars[currentPlayer.avatar];
