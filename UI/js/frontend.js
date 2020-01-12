@@ -302,7 +302,7 @@ let buttonListeners = function() {
 	let resultsPopUpButton = document.querySelector('.js-button__score-results');
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
-		document.querySelector('.js-main__score-popup').classList.add('c-hidden');
+		document.querySelector('.js-main__score-results').classList.add('c-hidden');
 	});
 };
 
