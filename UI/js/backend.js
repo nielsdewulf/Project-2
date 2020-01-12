@@ -449,19 +449,19 @@ const saveHighscore = (name, score, gameid, avatar) => {
  * Initialise the backend
  */
 const initBackend = () => {
-	// //When user quits the page
-	// window.addEventListener('beforeunload', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
+	//When user quits the page
+	window.addEventListener('beforeunload', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
 
-	// //When user switches tabs
-	// window.addEventListener('blur', () => {
-	// 	if (currentLobby !== undefined) {
-	// 		leaveLobby();
-	// 	}
-	// });
+	//When user switches tabs
+	window.addEventListener('blur', () => {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	});
 
 	//Get the top highscores on page load
 	getTopHighscores(5);
