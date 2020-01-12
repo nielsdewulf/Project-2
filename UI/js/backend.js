@@ -422,7 +422,8 @@ const getTopHighscoresCallback = data => {
  * @param {int} top Gets only the top x highscores
  */
 const getTopHighscores = top => {
-	return handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
+	console.warn('loading leaderboard data');
+	handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
 };
 
 const saveHighscoreCallback = data => {
@@ -443,7 +444,7 @@ const saveHighscore = (name, score, gameid = null, avatar) => {
 		Avatar: avatar
 	};
 	console.log(obj);
-	return handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
+	handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
 };
 
 /**
@@ -673,6 +674,7 @@ const handleData = function(url, callback = data => {}, method = 'GET', body = n
 		})
 		.then(function(textObject) {
 			if (textObject != '') callback(JSON.parse(textObject));
+			else callback(null);
 		});
 };
 const get = async url => {
