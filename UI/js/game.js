@@ -2096,14 +2096,16 @@ const initFramework = () => {
 			 */
 			try {
 				document.documentElement.requestFullscreen();
-				screen.orientation.lock('landscape');
 			} catch {}
-			/**
-			 * Request landscape mode
-			 */
-			try {
-				ScreenOrientation.lock('landscape');
-			} catch {}
+			if (document.documentElement.requestFullscreen) {
+				document.documentElement.requestFullscreen();
+			} else if (document.documentElement.msRequestFullscreen) {
+				document.documentElement.msRequestFullscreen();
+			} else if (document.documentElement.mozRequestFullScreen) {
+				document.documentElement.mozRequestFullScreen();
+			} else if (document.documentElement.webkitRequestFullscreen) {
+				document.documentElement.webkitRequestFullscreen();
+			}
 
 			/**
 			 * Disable screen sleeping
@@ -2117,20 +2119,37 @@ const initFramework = () => {
 			 * Initialise game object
 			 */
 			setTimeout(() => {
+				/**
+				 * Request landscape mode
+				 */
+				try {
+					screen.orientation.lock('landscape-primary');
+				} catch {}
+				try {
+					ScreenOrientation.lock('landscape-primary');
+				} catch {}
+				try {
+					screen.msLockOrientation.lock('landscape-primary');
+				} catch {}
+				try {
+					screen.mozLockOrientation.lock('landscape-primary');
+				} catch {}
 				initGame();
 			}, 500);
 
 			/**
 			 * Request gyroscope permission for iOS users
 			 */
-			if (typeof DeviceMotionEvent.requestPermission === 'function') {
-				DeviceMotionEvent.requestPermission()
-					.then(response => {
-						if (response == 'granted') {
-						}
-					})
-					.catch(console.error);
-			}
+			try {
+				if (typeof DeviceMotionEvent.requestPermission === 'function') {
+					DeviceMotionEvent.requestPermission()
+						.then(response => {
+							if (response == 'granted') {
+							}
+						})
+						.catch(console.error);
+				}
+			} catch {}
 		}
 	});
 };
