@@ -72,7 +72,7 @@ body {
 }
 
 h2 {
-    font-size: 2.3vw;
+    font-size: calc((10vh + 10vw ) / 6.818);
     color: #7B7BFF;
 }
 
@@ -172,7 +172,7 @@ Styling default page
 
 .c-app__title {
     font-family: 'Roboto', 'Sans Serif';
-    font-size: 3vw;
+    font-size: calc((10vh + 10vw ) / 5.357);
     font-weight: 600;
     color: white;
     display: flex;
@@ -249,7 +249,7 @@ Styling default page
 
 .c-button__title {
     font-family: 'Roboto';
-    font-size: 2.30vw;
+    font-size: calc((10vh + 10vw ) / 6.818);
     font-weight: 600;
     color: white;
 }
@@ -301,7 +301,7 @@ Vertical Grid Styling
 
 .c-horizontal-grid__text {
     font-family: 'Roboto';
-    font-size: 1.875vw;
+    font-size: calc((10vh + 10vw ) / 8.333);
     line-height: 3.33vh;
     color: white;
 
@@ -356,7 +356,7 @@ Vertical Grid Styling
 
 .c-horizontal-grid__text-lobby {
     font-family: 'Roboto';
-    font-size: 1.875vw;
+    font-size: calc((10vh + 10vw ) / 8.333);
     line-height: 3.33vh;
     color: white;
 
@@ -436,7 +436,7 @@ Container for Lobby page
 
 .c-lobbychoice__title {
     font-family: 'Roboto';
-    font-size: 1.67vw;
+    font-size: calc((10vh + 10vw ) / 9.375);
     color: white;
 
     text-align: center;
@@ -447,7 +447,7 @@ Container for Lobby page
 
 .c-lobbychoice__players-title {
     font-family: 'Roboto';
-    font-size: 1.46vw;
+    font-size: calc((10vh + 10vw ) / 10.714);
     color: white;
 
     text-align: center;
@@ -458,7 +458,7 @@ Container for Lobby page
 
 .c-lobbychoice__players-count {
     font-family: 'Roboto';
-    font-size: 2.08vw;
+    font-size: calc((10vh + 10vw ) / 7.5);
     color: white;
 
     text-align: center;
@@ -473,7 +473,7 @@ Container for Lobby page
 
     border-radius: 50%;
 
-    font-size: 5vw;
+    font-size: calc((10vh + 10vw ) / 3.125);
     color: white;
 
     display: flex;
@@ -492,7 +492,7 @@ Container for Lobby page
 
         border-radius: 50%;
 
-        font-size: 6vw;
+        font-size: calc((10vh + 10vw ) / 2.609);
         color: white;
 
         display: flex;
@@ -510,7 +510,7 @@ Container for Lobby page
 
         border-radius: 50%;
 
-        font-size: 7.5vw;
+        font-size: calc((10vh + 10vw ) / 2.083);
         color: white;
 
         display: flex;
@@ -646,13 +646,13 @@ Container for avatar choice
 
 .c-scoreboard-popup__description {
     font-family: 'Roboto';
-    font-size: 1.67vw;
+    font-size: calc((10vh + 10vw ) / 9.375);
     color: #707070;
 }
 
 .c-scoreboard-popup__question {
     font-family: 'Roboto';
-    font-size: 1.875vw;
+    font-size: calc((10vh + 10vw ) / 7.895);
     color: #707070;
 }
 
@@ -686,7 +686,7 @@ Container for avatar choice
 
 .c-scoreboard-popup__button-title {
     font-family: 'Roboto';
-    font-size: 2.30vw;
+    font-size: calc((10vh + 10vw ) / 6.818);
     font-weight: 600;
 
     color: white;
@@ -704,17 +704,17 @@ Container for avatar choice
 }
 
 .c-deathscreen-popup {
-    margin-top: 10px;
+    margin-top: 1vh;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
     background-color: white;
-    width: 1150px;
-    height: 130px;
+    width: 60vw;
+    height:12vh;
 
-    border-radius: 20px;
+    border-radius: 10px;
     box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
 }
 
@@ -723,11 +723,11 @@ Container for avatar choice
 
     text-align: center;
     margin: 0;
-    margin-bottom: 10px;
+    margin-bottom: 1vh;
 
     font-family: 'Roboto';
     font-weight: 600;
-    font-size: 32px;
+    font-size: calc((10vw + 10vh) / 9.375);
 }
 
 .c-deathscreen-popup__score {
