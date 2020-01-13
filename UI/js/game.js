@@ -240,6 +240,8 @@ function preload() {
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
 
 	this.load.image('heart', 'assets/heart.png');
+
+	this.load.audio('themesong', 'assets/AfloatBeat.wav');
 }
 
 /**
@@ -270,6 +272,16 @@ function create() {
 	this.scale.resize(width, height);
 	this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
 	this.scale.refresh();
+
+	/**
+	 * Audio
+	 */
+
+	music = this.sound.add('themesong');
+
+	music.loop = true;
+	music.play();
+	// this.sfx.sonido.loopFull();
 
 	/**
 	 * Background
