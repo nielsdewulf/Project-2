@@ -182,7 +182,7 @@ let buttonListeners = function() {
 	singlePlayerButton.addEventListener('click', function() {
 		console.log('Singleplayer button clicked');
 		document.querySelector('.js-main__start').classList.add('u-hidden');
-		document.querySelector('.js-main__avatar-singleplayer').classList.remove('u-hidden');
+		document.querySelector('.js-main__position-singleplayer').classList.remove('u-hidden');
 	});
 
 	/* Singleplayer Avatar Choice Button Event Listener */
@@ -199,6 +199,14 @@ let buttonListeners = function() {
 		});
 	});
 
+	/* Singleplayerposition Avatar Button Event Listener */
+	let positionSinglePlayerAvatarButton = document.querySelector('.js-button__avatar-singleplayerposition');
+	positionSinglePlayerAvatarButton.addEventListener('click', function() {
+		console.log('Next button clicked');
+		document.querySelector('.js-main__position-singleplayer').classList.add('u-hidden');
+		document.querySelector('.js-main__avatar-singleplayer').classList.remove('u-hidden');
+	});
+
 	/* Singleplayer Startpage Button Event Listener */
 	let avatarsinglePlayerStartpageButton = document.querySelector('.js-button__avatar-startpage');
 	avatarsinglePlayerStartpageButton.addEventListener('click', function() {
@@ -212,7 +220,7 @@ let buttonListeners = function() {
 	multiPlayerButton.addEventListener('click', function() {
 		console.log('Multiplayer button clicked');
 		document.querySelector('.js-main__start').classList.add('u-hidden');
-		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
+		document.querySelector('.js-main__position-multiplayer').classList.remove('u-hidden');
 	});
 
 	/* Multiplayer Avatar Choice Button Event Listener */
@@ -227,6 +235,14 @@ let buttonListeners = function() {
 				finaliseConnection(parseInt(el.value));
 			}
 		});
+	});
+
+	/* Multiplayerposition Avatar Button Event Listener */
+	let positionMultiPlayerAvatarButton = document.querySelector('.js-button__avatar-multiplayerposition');
+	positionMultiPlayerAvatarButton.addEventListener('click', function() {
+		console.log('Next button clicked');
+		document.querySelector('.js-main__position-multiplayer').classList.add('u-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
 	});
 	/* Start Page Scoreboard Button Event Listener */
 
