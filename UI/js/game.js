@@ -1,82 +1,82 @@
 /**
  * Screen width and height
  */
-var width, height;
+let width, height;
 
 /**
  * Width based on height multiplied by 16:9 ratio, height = screen height
  */
-var boundingWidth, boundingHeight;
+let boundingWidth, boundingHeight;
 
 /**
  * Orientation = eg 90deg or (-)180deg
  */
-var screenangle = window.orientation;
+let screenangle = window.orientation;
 
 /**
  * Game object. Is undefined if not loaded properly
  */
-var game;
+let game;
 
 /**
  * If gyroscope setup does not work we should display error. Gyroscope goes to true if it works
  */
-var gyroscope = false;
+let gyroscope = false;
 
 /**
  * No screen sleep object.
  */
-var noSleep = new NoSleep();
+let noSleep = new NoSleep();
 
 /**
  * variable if game is in fullscreen
  */
-var isFullscreen = false;
+let isFullscreen = false;
 
 /**
  * DOM objects
  */
-var scoreObject, highscoreObject, healthObjects, countdownWrapperObject;
+let scoreObject, highscoreObject, healthObjects, countdownWrapperObject;
 
 /**
  * Multiplayer toggle
  */
-var multiplayer = false;
+let multiplayer = false;
 
 /**
  * If host this code toggles if he can spawn objects or not
  */
-var host = true;
+let host = true;
 
 /**
  * If connected to the MQTT room
  */
-var connectedCloud = false;
+let connectedCloud = false;
 
 /**
  * Check if the on message event listener has been registered already
  */
-var setupMqttGameListener = false;
+let setupMqttGameListener = false;
 
 /**
  * Check if game has started
  */
-var started = false;
+let started = false;
 
 /**
  * Platform where objects can stand on
  */
-var platforms;
+let platforms;
 
 /**
  * Variable which defines gravity
  */
-var gravity;
+let gravity;
 
 /**
  * Avatar list
  */
-var avatars = [
+let avatars = [
 	{
 		key: 'player1',
 		crop: true
@@ -98,17 +98,17 @@ var avatars = [
 /**
  * Current player object
  */
-var player;
+let player;
 
 /**
  * Player object that defines if current player is alive or not
  */
-var alive = true;
+let alive = true;
 
 /**
  * Health object. can range from 0->3
  */
-var health = 3;
+let health = 3;
 
 /**
  * Holds the current player score
@@ -118,17 +118,17 @@ let score = 0;
 /**
  * Defines if current player should be invincible
  */
-var invincible = false;
+let invincible = false;
 
 /**
  * Defines what avatar the current player has chosen
  */
-var avatar = avatars[1];
+let avatar = avatars[1];
 
 /**
  * Object for multiplayer that checks if it's not sending double redundant data
  */
-var beforePlayerData = {
+let beforePlayerData = {
 	clientId: clientId,
 	isRunning: false,
 	direction: 0
@@ -137,12 +137,12 @@ var beforePlayerData = {
 /**
  * Object for multiplayer that holds the other player object
  */
-var otherPlayer;
+let otherPlayer;
 
 /**
  * Object for multiplayer that holds the other player game information
  */
-var otherPlayerData = {
+let otherPlayerData = {
 	avatar: avatars[0],
 	score: 0,
 	alive: true,
@@ -157,7 +157,7 @@ var otherPlayerData = {
 /**
  * Modi
  */
-var modi = [
+let modi = [
 	{
 		minSpawnTime:1500,
 		maxSpawnTime:3500,
@@ -215,33 +215,33 @@ var modi = [
  * Selected modus
  */
 
-var modus = modi[0]
+let modus = modi[0]
 
 /**
  * Holds the current scene
  */
-var currentScene;
+let currentScene;
 
 /**
  * Holds all penguin objects
  */
-var penguinsLEFT = [];
-var penguinsRIGHT = [];
+let penguinsLEFT = [];
+let penguinsRIGHT = [];
 
 /**
  * Holds all enemies
  */
-var enemies = [];
+let enemies = [];
 
 /**
  * Heart powerups
  */
-var healthPowerups = [];
+let healthPowerups = [];
 
 /**
  * If client is the host it saves when the last time was when it spawned something
  */
-var lastTimeSpawn = new Date().getTime();
+let lastTimeSpawn = new Date().getTime();
 
 /**
  * When the player is invincible this should tell how long it's been since it switched opacity
@@ -253,6 +253,10 @@ let gracePeriodFlickerTime = new Date().getTime();
  */
 let gracePeriodAlpha = false;
 
+/**
+ * Music object
+ */
+let music;
 /**
  * Game life cycles
  */
@@ -517,7 +521,7 @@ function create() {
 	 * Setup gyroscope
 	 */
 
-	var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+	let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	if (!iOS) {
 		if (window.DeviceOrientationEvent) {
 			window.addEventListener(
@@ -1841,7 +1845,7 @@ const endGame = () => {
 		 */
 		if (multiplayer) {
 			//Send scores of both players
-			var scores = [
+			let scores = [
 				{
 					avatar: avatars.indexOf(avatar),
 					score: score,
@@ -1912,6 +1916,9 @@ const endGame = () => {
 		} else {
 			showLeaderBoardPopup();
 		}
+
+		//Stop the theme song
+		music.stop();
 
 		//Remove resize listener
 		window.removeEventListener('resize', resize);
@@ -2109,7 +2116,7 @@ const initGame = () => {
 	[boundingWidth, boundingHeight] = calcGameBounds(height);
 	gravity = height;
 
-	var config = {
+	let config = {
 		type: Phaser.CANVAS,
 		width: width,
 		height: height,
