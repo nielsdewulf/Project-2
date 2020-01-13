@@ -113,6 +113,21 @@ Styling logo
 
 }
 
+.o-logo_howest {
+    width:100%;
+   
+    display: flex;
+   
+    align-self: center;
+    justify-content: space-between;
+}
+
+
+
+
+
+
+
 
 
 
@@ -220,7 +235,35 @@ Styling default page
     margin-right: auto;
 }
 
+.c-app__position {
+    width: 80vw;
+    height: 81.5vh;
 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    margin-left: auto;
+    margin-right: auto;
+    
+}
+
+
+/*
+    Components: Logo
+    ---
+    style of the logos
+*/
+
+
+.c-logo__mark {
+    width:20%;
+    
+    display: flex;
+    justify-items: center;
+    align-content: center;
+    fill:white;
+}
 
 /*
     Components: Button
@@ -518,6 +561,46 @@ Container for Lobby page
         align-self: center;
         justify-content: center;
     }
+}
+
+/*
+Components: Lobby
+--- 
+Container for Lobby page
+
+*/
+
+.c-position {
+    width:90%;
+    
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.c-position__title {
+    color:white;
+}
+
+
+.c-position__options {
+    height:37vh;
+    width:18.23vw;
+    background-color: #FFD54A;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color:white;
+    font-size:calc((10vh + 10vw) / 6.818 )
+}
+
+.c-positionchoice__radio:checked+.c-position__label div {
+    box-shadow: inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
+    
+
+    box-sizing: border-box;
 }
 
 /*
