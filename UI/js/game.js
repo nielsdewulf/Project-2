@@ -153,21 +153,69 @@ var otherPlayerData = {
 	y: 0
 };
 
-/**
- * Icicle config data for tweaking purposes
- */
-var icicleConfig = {
-	gravity: 0.1, //10% of height
-	minSpawnOffset: 1.15,
-	maxSpawnOffset: 0.85
-};
 
 /**
- * Penguin config data for tweaking purposes
+ * Modi
  */
-var penguinConfig = {
-	speed: 0.3
-};
+var modi = [
+	{
+		minSpawnTime:1500,
+		maxSpawnTime:3500,
+		penguinChance:.37,
+		icicleChance:.6,
+		healthPowerupChance:.03,
+		icicleConfig: {
+			gravity: 0.1, //10% of height
+			minSpawnOffset: 1.15,
+			maxSpawnOffset: 0.85
+		},
+		penguinConfig: {
+			speed: 0.3
+		},
+		jumpSensitivity:10,
+		walkSensitivity:3
+	},
+	{
+		minSpawnTime:1500,
+		maxSpawnTime:3500,
+		penguinChance:.37,
+		icicleChance:.6,
+		healthPowerupChance:.03,
+		icicleConfig: {
+			gravity: 0.1, //10% of height
+			minSpawnOffset: 1.15,
+			maxSpawnOffset: 0.85
+		},
+		penguinConfig: {
+			speed: 0.3
+		},
+		jumpSensitivity:10,
+		walkSensitivity:3
+	},
+	{
+		minSpawnTime:1500,
+		maxSpawnTime:3500,
+		penguinChance:.37,
+		icicleChance:.6,
+		healthPowerupChance:.03,
+		icicleConfig: {
+			gravity: 0.1, //10% of height
+			minSpawnOffset: 1.15,
+			maxSpawnOffset: 0.85
+		},
+		penguinConfig: {
+			speed: 0.3
+		},
+		jumpSensitivity:10,
+		walkSensitivity:3
+	}
+];
+
+/**
+ * Selected modus
+ */
+
+var modus = modi[0]
 
 /**
  * Holds the current scene
@@ -240,6 +288,8 @@ function preload() {
 	this.load.image('icicle', 'assets/IcicleAfloat.png');
 
 	this.load.image('heart', 'assets/heart.png');
+
+	this.load.audio('themesong', 'assets/AfloatBeat.wav');
 }
 
 /**
@@ -270,6 +320,16 @@ function create() {
 	this.scale.resize(width, height);
 	this.scale.scaleMode = Phaser.Scale.ScaleModes.FIT;
 	this.scale.refresh();
+
+	/**
+	 * Audio
+	 */
+
+	music = this.sound.add('themesong');
+
+	music.loop = true;
+	music.play();
+	// this.sfx.sonido.loopFull();
 
 	/**
 	 * Background
@@ -526,10 +586,10 @@ function update() {
 	 */
 	if (started) {
 		penguinsLEFT.forEach((el, i) => {
-			el.body.velocity.x = boundingWidth * penguinConfig.speed * -1;
+			el.body.velocity.x = boundingWidth * modus.penguinConfig.speed * -1;
 		});
 		penguinsRIGHT.forEach((el, i) => {
-			el.body.velocity.x = boundingWidth * penguinConfig.speed;
+			el.body.velocity.x = boundingWidth * modus.penguinConfig.speed;
 		});
 	}
 
@@ -762,29 +822,29 @@ function update() {
 		/**
 		 * Randomize when an object is being spawned
 		 */
-		let random = Math.random() * (3500 - 1500) + 1500;
+		let random = Math.random() * (modus.maxSpawnTime - modus.minSpawnTime) + modus.minSpawnTime;
 		if (new Date().getTime() - lastTimeSpawn > random) {
 			/**
 			 * 80% chance for icicle
 			 * 20% chance for penguin
 			 */
 			let spawnChance = Math.random();
-			if (spawnChance <= 0.7) {
+			if (spawnChance <= modus.icicleChance) {
 				/**
 				 * Spawn icicle
 				 */
 
 				//Randomize spawn location
 				let x =
-					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
-					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
+					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * modus.icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset) +
+					((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset;
 
 				//Add sprite to the canvas
 				ice = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'icicle');
 				ice.scaleY = ice.scaleX = boundingWidth / 6000;
 
 				//Set custom gravity (Icicle speed)
-				ice.setGravityY(gravity * icicleConfig.gravity);
+				ice.setGravityY(gravity * modus.icicleConfig.gravity);
 
 				//Icicle should always be on top of player
 				ice.setDepth(1000);
@@ -810,7 +870,7 @@ function update() {
 						})
 					);
 				}
-			} else if (spawnChance <= 0.97) {
+			} else if (spawnChance <= modus.penguinChance + modus.icicleChance) {
 				/**
 				 * Spawn penguin
 				 */
@@ -880,8 +940,8 @@ function update() {
 
 				//Randomize spawn location
 				let x =
-					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset) +
-					((width - boundingWidth * 0.85) / 2) * icicleConfig.minSpawnOffset;
+					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * modus.icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset) +
+					((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset;
 
 				//Add sprite to the canvas
 				let health = this.physics.add.sprite(x, -1 * (boundingHeight * 0.4), 'heart');
@@ -1103,6 +1163,19 @@ function initMqtt(gameObj) {
 							avatar: avatars.indexOf(avatar)
 						})
 					);
+					/**
+					 * If player has joined the game should start
+					 */
+					if (host) {
+						mqttClient.publish(
+							`afloat/lobby/${lobbyId}/game`,
+							JSON.stringify({
+								clientId: clientId,
+								status: 'start'
+							})
+						);
+						startGame();
+					}
 				}
 
 				/**
@@ -1154,7 +1227,7 @@ function initMqtt(gameObj) {
 						//Add Icicle to the canvas
 						ice = gameObj.physics.add.sprite(x, y, 'icicle');
 						ice.scaleY = ice.scaleX = boundingWidth / 6000;
-						ice.setGravityY(gravity * icicleConfig.gravity);
+						ice.setGravityY(gravity * modus.icicleConfig.gravity);
 
 						ice.setDepth(1000);
 						ice.setOrigin(0.5, 0);
@@ -1745,6 +1818,9 @@ function die() {
 		//If both players are dead -> End Game
 		if (!otherPlayerData.alive) {
 			endGame();
+		} else {
+			document.querySelector('.js-deathscreen-popup__score').innerHTML = score;
+			document.querySelector('.js-deathscreen-popup').classList.remove('u-hidden');
 		}
 		/**
 		 * If singleplayer End Game
@@ -1808,6 +1884,8 @@ const endGame = () => {
 			endGameLobby();
 			mqttClient.unsubscribe(`afloat/lobby/${lobbyId}/game`);
 
+			document.querySelector('.js-deathscreen-popup').classList.add('u-hidden');
+
 			/**
 			 * If singleplayer
 			 */
@@ -1839,9 +1917,9 @@ const endGame = () => {
 		window.removeEventListener('resize', resize);
 
 		//Hide game layer
-		document.querySelector('.js-game').classList.add('c-hidden');
+		document.querySelector('.js-game').classList.add('u-hidden');
 		//Show results page
-		document.querySelector('.js-main__results').classList.remove('c-hidden');
+		document.querySelector('.js-main__results').classList.remove('u-hidden');
 
 		//Stop game scene
 		currentScene.scene.stop();
@@ -1854,7 +1932,6 @@ const endGame = () => {
 			el.classList.remove('c-game-overlay__heart--dead');
 		});
 
-		
 		//Set alive back to true
 		alive = true;
 		//Set health back to 3

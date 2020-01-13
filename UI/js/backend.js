@@ -171,8 +171,8 @@ const joinLobby = gameId => {
 	});
 
 	//Show avatar choice page
-	document.querySelector('.js-main__lobbychoice').classList.add('c-hidden');
-	document.querySelector('.js-main__avatar-multiplayer').classList.remove('c-hidden');
+	document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+	document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
 
 	//Update playercount in the database
 	let message = {
@@ -194,8 +194,8 @@ const leaveLobby = () => {
 	if (currentLobby.status === 2) return;
 
 	if (!isLoadingGame) {
-		document.querySelector('.js-main__lobby').classList.add('c-hidden');
-		document.querySelector('.js-main__lobbychoice').classList.remove('c-hidden');
+		document.querySelector('.js-main__lobby').classList.add('u-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
 	}
 
 	console.log('leftLobby');
@@ -427,6 +427,13 @@ const getTopHighscores = top => {
 };
 
 const saveHighscoreCallback = data => {
+	mqttClient.publish(
+		mainId,
+		JSON.stringify({
+			clientId: clientId,
+			status: 'newHighscore'
+		})
+	);
 	getTopHighscores(5);
 };
 
@@ -520,6 +527,14 @@ const initBackend = () => {
 				lobbies.pop(lobby);
 				showNewLobbies(lobbies);
 			}
+
+			/**
+			 * Status newHighscore
+			 */
+			if (data.status === 'newHighscore') {
+				getTopHighscores(5);
+			}
+
 			/**
 			 * when a player issues a playerCall
 			 */
@@ -633,13 +648,13 @@ const initBackend = () => {
 			if (data.status === 'startGameLobby') {
 				console.log('Started Game');
 
-				document.querySelector('.js-main__lobby').classList.add('c-hidden');
+				document.querySelector('.js-main__lobby').classList.add('u-hidden');
 				let otherPlayer;
 				playerList.forEach(p => {
 					if (!p.offlinePlayer) otherPlayer = p;
 				});
 				initialiseNewGame(currentPlayer, otherPlayer, true);
-				document.querySelector('.js-game').classList.remove('c-hidden');
+				document.querySelector('.js-game').classList.remove('u-hidden');
 			}
 
 			/**
