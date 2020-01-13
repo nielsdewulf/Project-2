@@ -427,6 +427,13 @@ const getTopHighscores = top => {
 };
 
 const saveHighscoreCallback = data => {
+	mqttClient.publish(
+		mainId,
+		JSON.stringify({
+			clientId: clientId,
+			status: 'newHighscore'
+		})
+	);
 	getTopHighscores(5);
 };
 
@@ -520,6 +527,14 @@ const initBackend = () => {
 				lobbies.pop(lobby);
 				showNewLobbies(lobbies);
 			}
+
+			/**
+			 * Status newHighscore
+			 */
+			if (data.status === 'newHighscore') {
+				getTopHighscores(5);
+			}
+
 			/**
 			 * when a player issues a playerCall
 			 */
