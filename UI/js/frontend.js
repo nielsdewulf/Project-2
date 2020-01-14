@@ -214,6 +214,14 @@ let buttonListeners = function() {
 		});
 	});
 
+	/* Positionchoice Singleplayer Startpage Button Event Listener */
+	let positionSinglePlayerStartpageButton = document.querySelector('.js-button__singleplayerpositionchoice-startpage');
+	positionSinglePlayerStartpageButton.addEventListener('click', function() {
+		console.log('Startpage button clicked');
+		document.querySelector('.js-main__position-singleplayer').classList.add('u-hidden');
+		document.querySelector('.js-main__start').classList.remove('u-hidden');
+	});
+
 	/* Singleplayer Startpage Button Event Listener */
 	let avatarsinglePlayerStartpageButton = document.querySelector('.js-button__avatar-startpage');
 	avatarsinglePlayerStartpageButton.addEventListener('click', function() {
@@ -260,6 +268,17 @@ let buttonListeners = function() {
 		});
 		createNewLobby();
 	});
+
+
+	/* Positionchoice Multiplayer Startpage Button Event Listener */
+	let positionchoiceMultiPlayerStartpageButton = document.querySelector('.js-button__multiplayerpositionchoice-startpage');
+	positionchoiceMultiPlayerStartpageButton.addEventListener('click', function() {
+		console.log('Startpage button clicked');
+		document.querySelector('.js-main__position-multiplayer').classList.add('u-hidden');
+		document.querySelector('.js-main__start').classList.remove('u-hidden');
+	});
+
+
 	/* Start Page Scoreboard Button Event Listener */
 
 	let scoreboardButtonStartpage = document.querySelector('.js-button__scoreboard-startpage');
