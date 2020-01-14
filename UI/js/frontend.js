@@ -264,9 +264,9 @@ let buttonListeners = function() {
 		document.querySelectorAll('.js-multiplayer-position').forEach(el => {
 			if (el.checked) {
 				modus = modi[parseInt(el.value)];
+				createNewLobby();
 			}
 		});
-		createNewLobby();
 	});
 
 
