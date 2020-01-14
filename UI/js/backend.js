@@ -535,6 +535,40 @@ const initBackend = () => {
 				getTopHighscores(5);
 			}
 
+			// if (data.status === 'joiningLobby') {
+			// 	if(host && currentLobby !== undefined){
+			// 		if(currentLobby.gameId === data.lobby.gameId){
+			// 			if(playerList.length == 2){
+			// 				mqttClient.publish(
+			// 					topic,
+			// 					JSON.stringify({
+			// 						clientId: clientId,
+			// 						receiver: data.clientId,
+			// 						status: 'joiningLobbyResponse',
+			// 						lobby: currentLobby,
+			// 						canJoin: false
+			// 					})
+			// 				);
+			// 			}else{
+			// 				mqttClient.publish(
+			// 					topic,
+			// 					JSON.stringify({
+			// 						clientId: clientId,
+			// 						receiver: data.clientId,
+			// 						status: 'joiningLobbyResponse',
+			// 						lobby: currentLobby,
+			// 						canJoin: true
+			// 					})
+			// 				);
+			// 			}
+			// 		}
+			// 	}
+			// }
+			// if (data.status === 'joiningLobbyResponse') {
+			// 	if(data.receiver === clientId){
+			// 		joinLobby(data.currentLobby.lobby)
+			// 	}
+			// }
 			/**
 			 * when a player issues a playerCall
 			 */
@@ -585,7 +619,7 @@ const initBackend = () => {
 			 */
 			if (data.status === 'connected') {
 				//If playerList exceeds 1 -> Reset
-				if (host && playerList.length > 1) {
+				if (host && playerList.length == 2) {
 					// playerList = [];
 					// playerList.push(currentPlayer);
 				} else {
