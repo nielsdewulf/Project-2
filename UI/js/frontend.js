@@ -209,7 +209,7 @@ let buttonListeners = function() {
 		//Save position
 		document.querySelectorAll('.js-singleplayer-position').forEach(el => {
 			if (el.checked) {
-				modus[parseInt(el.value)];
+				modus = modi[parseInt(el.value)];
 			}
 		});
 	});
@@ -255,7 +255,7 @@ let buttonListeners = function() {
 
 		document.querySelectorAll('.js-multiplayer-position').forEach(el => {
 			if (el.checked) {
-				modus[parseInt(el.value)];
+				modus = modi[parseInt(el.value)];
 			}
 		});
 		createNewLobby();
