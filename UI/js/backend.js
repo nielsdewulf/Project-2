@@ -48,6 +48,8 @@ const createNewLobbyCallback = data => {
 		lobby: data
 	};
 
+	console.log(obj.lobby);
+
 	//Send new lobby update to all other clients
 	mqttClient.publish(mainId, JSON.stringify(obj));
 
@@ -80,7 +82,7 @@ const createNewLobby = () => {
 		ModeId: modi.indexOf(modus)
 	};
 
-	handleData('https://project2mct.azurewebsites.net/api/game/', createNewLobbyCallback, 'POST', '{"PlayerCount":0,"Status":0}');
+	handleData('https://project2mct.azurewebsites.net/api/game/', createNewLobbyCallback, 'POST', JSON.stringify(message));
 };
 
 /**
@@ -503,6 +505,8 @@ const initBackend = () => {
 				lobbies.sort(function(a, b) {
 					return a.menuId - b.menuId;
 				});
+				console.log(data.lobby);
+
 				showNewLobbies(lobbies);
 			}
 
