@@ -7,9 +7,9 @@ namespace afloat.models
         public Guid GameId { get; set; }
         public int PlayerCount { get; set; }
         public int Status { get; set; }
-        public DateTime DateTime { get; set; } = DateTime.Now;
-        public int MenuId { get; set; } = 1;
-        public int ModeId { get; set; } = 0;
+        public DateTime DateTime { get; set; }
+        public int MenuId { get; set; }
+        public int ModeId { get; set; }
 
 
     }

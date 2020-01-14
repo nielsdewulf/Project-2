@@ -26,6 +26,7 @@ namespace afloat
                 string stream = await new StreamReader(req.Body).ReadToEndAsync();
                 Game game = JsonConvert.DeserializeObject<Game>(stream);
                 game.GameId = Guid.NewGuid();
+                game.DateTime = DateTime.Now;
                 using (SqlConnection connection = new SqlConnection())
                 {
                     connection.ConnectionString = connectionString;
