@@ -2184,6 +2184,12 @@ const initFramework = () => {
 		}
 	});
 
+	window.addEventListener('orientationchange', () => {
+		if (game !== undefined) {
+			if (orientation === 0 || orientation === 180) location.reload();
+		}
+	});
+
 	//Setup DOM objects
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreObject = document.querySelector('.js-highscore');
