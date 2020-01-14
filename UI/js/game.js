@@ -153,17 +153,16 @@ let otherPlayerData = {
 	y: 0
 };
 
-
 /**
  * Modi
  */
 let modi = [
 	{
-		minSpawnTime:1500,
-		maxSpawnTime:3500,
-		penguinChance:.37,
-		icicleChance:.6,
-		healthPowerupChance:.03,
+		minSpawnTime: 1500,
+		maxSpawnTime: 3500,
+		penguinChance: 0.37,
+		icicleChance: 0.6,
+		healthPowerupChance: 0.03,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
@@ -172,15 +171,15 @@ let modi = [
 		penguinConfig: {
 			speed: 0.3
 		},
-		jumpSensitivity:10,
-		walkSensitivity:3
+		jumpSensitivity: 10,
+		walkSensitivity: 3
 	},
 	{
-		minSpawnTime:1500,
-		maxSpawnTime:3500,
-		penguinChance:.37,
-		icicleChance:.6,
-		healthPowerupChance:.03,
+		minSpawnTime: 1500,
+		maxSpawnTime: 3500,
+		penguinChance: 0.37,
+		icicleChance: 0.6,
+		healthPowerupChance: 0.03,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
@@ -189,15 +188,15 @@ let modi = [
 		penguinConfig: {
 			speed: 0.3
 		},
-		jumpSensitivity:10,
-		walkSensitivity:3
+		jumpSensitivity: 10,
+		walkSensitivity: 3
 	},
 	{
-		minSpawnTime:1500,
-		maxSpawnTime:3500,
-		penguinChance:.37,
-		icicleChance:.6,
-		healthPowerupChance:.03,
+		minSpawnTime: 1500,
+		maxSpawnTime: 3500,
+		penguinChance: 0.37,
+		icicleChance: 0.6,
+		healthPowerupChance: 0.03,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
@@ -206,8 +205,8 @@ let modi = [
 		penguinConfig: {
 			speed: 0.3
 		},
-		jumpSensitivity:10,
-		walkSensitivity:3
+		jumpSensitivity: 10,
+		walkSensitivity: 3
 	}
 ];
 
@@ -215,7 +214,7 @@ let modi = [
  * Selected modus
  */
 
-let modus = modi[0]
+let modus = modi[0];
 
 /**
  * Holds the current scene
@@ -840,7 +839,8 @@ function update() {
 
 				//Randomize spawn location
 				let x =
-					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * modus.icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset) +
+					Math.random() *
+						(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * modus.icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset) +
 					((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset;
 
 				//Add sprite to the canvas
@@ -944,7 +944,8 @@ function update() {
 
 				//Randomize spawn location
 				let x =
-					Math.random() * (((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * modus.icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset) +
+					Math.random() *
+						(((width - boundingWidth * 0.85) / 2 + boundingWidth * 0.85) * modus.icicleConfig.maxSpawnOffset - ((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset) +
 					((width - boundingWidth * 0.85) / 2) * modus.icicleConfig.minSpawnOffset;
 
 				//Add sprite to the canvas
@@ -1370,7 +1371,7 @@ function processGyro(alpha, beta, gamma) {
 			/**
 			 * Player goes left
 			 */
-			if (beta > 3) {
+			if (beta > modus.walkSensitivity) {
 				//Set velocity
 				player.body.velocity.x = boundingWidth * -0.3;
 
@@ -1412,7 +1413,7 @@ function processGyro(alpha, beta, gamma) {
 				/**
 				 * Go right
 				 */
-			} else if (beta < -3) {
+			} else if (beta < modus.walkSensitivity * -1) {
 				//Set velocity
 				player.body.velocity.x = boundingWidth * 0.3;
 
@@ -1499,7 +1500,7 @@ function processGyro(alpha, beta, gamma) {
 			/**
 			 * Jumping
 			 */
-			if (gamma > 10 || gamma < -10) {
+			if (gamma > modus.jumpSensitivity || gamma < modus.jumpSensitivity * -1) {
 				//Jump
 				if (player.body.touching.down) {
 					player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
@@ -1535,7 +1536,7 @@ function processGyro(alpha, beta, gamma) {
 			/**
 			 * Go right
 			 */
-			if (beta > 3) {
+			if (beta > modus.walkSensitivity) {
 				//Set velocity
 				player.body.velocity.x = boundingWidth * 0.3;
 				//Play animation
@@ -1577,7 +1578,7 @@ function processGyro(alpha, beta, gamma) {
 				/**
 				 * Go left
 				 */
-			} else if (beta < -3) {
+			} else if (beta < modus.walkSensitivity * -1) {
 				//Set velocity
 				player.body.velocity.x = boundingWidth * -0.3;
 				//Play animation
@@ -1660,7 +1661,7 @@ function processGyro(alpha, beta, gamma) {
 				}
 			}
 
-			if (gamma > 10 || gamma < -10) {
+			if (gamma > modus.jumpSensitivity || gamma < modus.jumpSensitivity * -1) {
 				//Jump
 				if (player.body.touching.down) {
 					player.body.velocity.y = (boundingHeight / 2) * 1.5 * -1;
