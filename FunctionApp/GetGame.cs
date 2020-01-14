@@ -40,7 +40,9 @@ namespace afloat
                                 GameId = Guid.Parse(result["GameId"].ToString()),
                                 PlayerCount = int.Parse(result["PlayerCount"].ToString()),
                                 Status = int.Parse(result["Status"].ToString()),
-                                DateTime = DateTime.Parse(result["DateTime"].ToString())
+                                DateTime = DateTime.Parse(result["DateTime"].ToString()),
+                                MenuId = int.Parse(result["MenuId"].ToString()),
+                                ModeId = int.Parse(result["ModeId"].ToString())
                             };
 
                         }
