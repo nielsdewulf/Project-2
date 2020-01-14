@@ -76,7 +76,8 @@ const createNewLobby = () => {
 	 */
 	let message = {
 		PlayerCount: 0,
-		Status: 0
+		Status: 0,
+		ModeId: modi.indexOf(modus)
 	};
 
 	handleData('https://project2mct.azurewebsites.net/api/game/', createNewLobbyCallback, 'POST', '{"PlayerCount":0,"Status":0}');

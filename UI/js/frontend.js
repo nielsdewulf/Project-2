@@ -25,7 +25,8 @@ const showNewLobbies = data => {
             <h2 class="c-lobbychoice__title">Noordpool #${el.menuId}</h2>
             <div class="c-lobbychoice__players">
                 <h2 class="c-lobbychoice__players-title">Spelers:</h2>
-                <h2 class="c-lobbychoice__players-count">${el.playerCount} / 2</h2>
+				<h2 class="c-lobbychoice__players-count">${el.playerCount} / 2</h2>
+				<h2 class="c-lobbychoice__players-count">Houding ${el.ModeId}</h2>
             </div>
         </div>
     </div>`;
@@ -205,6 +206,12 @@ let buttonListeners = function() {
 		console.log('Next button clicked');
 		document.querySelector('.js-main__position-singleplayer').classList.add('u-hidden');
 		document.querySelector('.js-main__avatar-singleplayer').classList.remove('u-hidden');
+		//Save position
+		document.querySelectorAll('.js-singleplayer-position').forEach(el => {
+			if (el.checked) {
+				modus[parseInt(el.value)];
+			}
+		});
 	});
 
 	/* Singleplayer Startpage Button Event Listener */
@@ -220,7 +227,8 @@ let buttonListeners = function() {
 	multiPlayerButton.addEventListener('click', function() {
 		console.log('Multiplayer button clicked');
 		document.querySelector('.js-main__start').classList.add('u-hidden');
-		document.querySelector('.js-main__position-multiplayer').classList.remove('u-hidden');
+		// document.querySelector('.js-main__position-multiplayer').classList.remove('u-hidden');
+		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
 	});
 
 	/* Multiplayer Avatar Choice Button Event Listener */
@@ -242,7 +250,15 @@ let buttonListeners = function() {
 	positionMultiPlayerAvatarButton.addEventListener('click', function() {
 		console.log('Next button clicked');
 		document.querySelector('.js-main__position-multiplayer').classList.add('u-hidden');
-		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
+		document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
+		//Create new lobby with selected mode
+
+		document.querySelectorAll('.js-multiplayer-position').forEach(el => {
+			if (el.checked) {
+				modus[parseInt(el.value)];
+			}
+		});
+		createNewLobby();
 	});
 	/* Start Page Scoreboard Button Event Listener */
 
@@ -258,7 +274,9 @@ let buttonListeners = function() {
 	let lobbyAddButton = document.querySelector('.js-new-lobby');
 	lobbyAddButton.addEventListener('click', function() {
 		console.log('New Lobby button clicked');
-		createNewLobby();
+		document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+		document.querySelector('.js-main__position-multiplayer').classList.remove('u-hidden');
+		// createNewLobby();
 	});
 	/* Start Game Lobby Button Event Listener */
 	let lobbyStartGameButton = document.querySelector('.js-button__lobby-startgame');
