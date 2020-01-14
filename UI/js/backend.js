@@ -132,7 +132,7 @@ const joinLobby = gameId => {
 	} else {
 		currentLobby = LobbyObj;
 	}
-
+	modus = modi[currentLobby.ModeId];
 	//Reset playerList
 	playerList = [];
 	playerList.push(currentPlayer);
