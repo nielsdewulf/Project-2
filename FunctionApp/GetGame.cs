@@ -16,7 +16,7 @@ namespace afloat
     {
         [FunctionName("GetGame")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "game/{GameId}")] HttpRequest req, string GameId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{GameId}")] HttpRequest req, string GameId,
             ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
@@ -31,7 +31,8 @@ namespace afloat
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
-                        command.CommandText = @"SELECT * from Game";
+                        command.CommandText = @"SELECT * from Game where GameId = @gameid";
+                        command.Parameters.AddWithValue("@gameid", GameId);
                         var result = await command.ExecuteReaderAsync();
                         while (await result.ReadAsync())
                         {
