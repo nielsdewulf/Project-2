@@ -135,58 +135,63 @@ const joinLobby = gameId => {
 		currentLobby = LobbyObj;
 	}
 	let finished = false;
-	handleData(`https://project2mct.azurewebsites.net/api/games/${gameId}/join`, data => {
-		if (data.status === 'Ok') {
-			finished = true;
-			modus = modi[currentLobby.ModeId];
-			//Reset playerList
-			playerList = [];
-			playerList.push(currentPlayer);
+	let random = Math.random() * 200;
 
-			console.log('Joined lobby with id: ' + gameId);
+	setTimeout(() => {
+		handleData(`https://project2mct.azurewebsites.net/api/games/${gameId}/join`, data => {
+			if (data.status === 'Ok') {
+				finished = true;
+				modus = modi[currentLobby.ModeId];
+				//Reset playerList
+				playerList = [];
+				playerList.push(currentPlayer);
 
-			//Reset isLoadingGame
-			isLoadingGame = false;
+				console.log('Joined lobby with id: ' + gameId);
 
-			//Update playerCount
-			if (currentLobby.playerCount !== 2) currentLobby.playerCount++;
+				//Reset isLoadingGame
+				isLoadingGame = false;
 
-			mqttClient.publish(
-				mainId,
-				JSON.stringify({
-					clientId: clientId,
-					status: 'playerUpdate',
-					lobby: currentLobby
-				})
-			);
+				//Update playerCount
+				if (currentLobby.playerCount !== 2) currentLobby.playerCount++;
 
-			//Set gameId as lobbyId
-			lobbyId = gameId;
-			mqttClient.subscribe(`afloat/lobby/${lobbyId}`);
-			mqttClient.publish(
-				`afloat/lobby/${lobbyId}`,
-				JSON.stringify({
-					clientId: clientId,
-					status: 'connected',
-					player: currentPlayer
-				})
-			);
+				mqttClient.publish(
+					mainId,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'playerUpdate',
+						lobby: currentLobby
+					})
+				);
 
-			//Show correct menu id
-			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
-				el.innerHTML = currentLobby.menuId;
-			});
+				//Set gameId as lobbyId
+				lobbyId = gameId;
+				mqttClient.subscribe(`afloat/lobby/${lobbyId}`);
+				mqttClient.publish(
+					`afloat/lobby/${lobbyId}`,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'connected',
+						player: currentPlayer
+					})
+				);
 
-			//Show avatar choice page
-			document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
-			document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
+				//Show correct menu id
+				document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
+					el.innerHTML = currentLobby.menuId;
+				});
 
-			return true;
-		} else {
-			currentLobby = undefined;
-			finished = false;
-		}
-	});
+				//Show avatar choice page
+				document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+				document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
+
+				return true;
+			} else {
+				currentLobby = undefined;
+				finished = false;
+			}
+		});
+	}, random);
+
 	return finished;
 };
 
@@ -383,22 +388,20 @@ const pingPlayers = () => {
 				if (el.status !== 2 && el.playersResponded !== undefined) {
 					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
 					el.playerCount = el.playersResponded;
-					if (el.playerCount !== el.playersResponded) {
-						mqttClient.publish(
-							mainId,
-							JSON.stringify({
-								clientId: clientId,
-								status: 'playerUpdate',
-								lobby: el
-							})
-						);
+					// mqttClient.publish(
+					// 	mainId,
+					// 	JSON.stringify({
+					// 		clientId: clientId,
+					// 		status: 'playerUpdate',
+					// 		lobby: el
+					// 	})
+					// );
 
-						let message = {
-							PlayerCount: el.playerCount
-						};
+					let message = {
+						PlayerCount: el.playerCount
+					};
 
-						handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
-					}
+					handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 				}
 			});
 			showNewLobbies(lobbies);
@@ -465,18 +468,18 @@ const saveHighscore = (name, score, gameid = null, avatar) => {
  */
 const initBackend = () => {
 	//When user quits the page
-	window.addEventListener('beforeunload', () => {
-		if (currentLobby !== undefined) {
-			leaveLobby();
-		}
-	});
+	// window.addEventListener('beforeunload', () => {
+	// 	if (currentLobby !== undefined) {
+	// 		leaveLobby();
+	// 	}
+	// });
 
-	//When user switches tabs
-	window.addEventListener('blur', () => {
-		if (currentLobby !== undefined) {
-			leaveLobby();
-		}
-	});
+	// //When user switches tabs
+	// window.addEventListener('blur', () => {
+	// 	if (currentLobby !== undefined) {
+	// 		leaveLobby();
+	// 	}
+	// });
 
 	//Get the top highscores on page load
 	getTopHighscores(5);

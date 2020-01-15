@@ -11,8 +11,6 @@ using Newtonsoft.Json;
 using afloat.models;
 using System.Data.SqlClient;
 using System.Text;
-using CaseOnline.Azure.WebJobs.Extensions.Mqtt.Messaging;
-using CaseOnline.Azure.WebJobs.Extensions.Mqtt;
 
 namespace afloat
 {
@@ -20,19 +18,19 @@ namespace afloat
     {
         [FunctionName("JoinGame")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{game}/join")] HttpRequest req, string gameid,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{gameid}/join")] HttpRequest req, string gameid,
             ILogger log)
         {
-            string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
 
             try
             {
+                string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
+
                 using (SqlConnection connection = new SqlConnection())
                 {
-                    connection.ConnectionString = connectionString;
-                    await connection.OpenAsync();
                     Game gameObj = new Game();
                     connection.ConnectionString = connectionString;
+                    await connection.OpenAsync();
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
