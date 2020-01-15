@@ -82,7 +82,7 @@ const createNewLobby = () => {
 		ModeId: modi.indexOf(modus)
 	};
 
-	handleData('https://project2mct.azurewebsites.net/api/game/', createNewLobbyCallback, 'POST', JSON.stringify(message));
+	handleData('https://project2mct.azurewebsites.net/api/games/', createNewLobbyCallback, 'POST', JSON.stringify(message));
 };
 
 /**
@@ -109,7 +109,7 @@ const getLobbies = () => {
 	 * data.Status
 	 */
 
-	handleData('https://project2mct.azurewebsites.net/api/game/?status=0', getLobbiesCallback);
+	handleData('https://project2mct.azurewebsites.net/api/games/?status=0', getLobbiesCallback);
 };
 
 /**
@@ -134,57 +134,60 @@ const joinLobby = gameId => {
 	} else {
 		currentLobby = LobbyObj;
 	}
-	modus = modi[currentLobby.ModeId];
-	//Reset playerList
-	playerList = [];
-	playerList.push(currentPlayer);
+	let finished = false;
+	handleData(`https://project2mct.azurewebsites.net/api/games/${gameId}/join`, data => {
+		if (data.status === 'Ok') {
+			finished = true;
+			modus = modi[currentLobby.ModeId];
+			//Reset playerList
+			playerList = [];
+			playerList.push(currentPlayer);
 
-	console.log('Joined lobby with id: ' + gameId);
+			console.log('Joined lobby with id: ' + gameId);
 
-	//Reset isLoadingGame
-	isLoadingGame = false;
+			//Reset isLoadingGame
+			isLoadingGame = false;
 
-	//Update playerCount
-	if (currentLobby.playerCount !== 2) currentLobby.playerCount++;
+			//Update playerCount
+			if (currentLobby.playerCount !== 2) currentLobby.playerCount++;
 
-	mqttClient.publish(
-		mainId,
-		JSON.stringify({
-			clientId: clientId,
-			status: 'playerUpdate',
-			lobby: currentLobby
-		})
-	);
+			mqttClient.publish(
+				mainId,
+				JSON.stringify({
+					clientId: clientId,
+					status: 'playerUpdate',
+					lobby: currentLobby
+				})
+			);
 
-	//Set gameId as lobbyId
-	lobbyId = gameId;
-	mqttClient.subscribe(`afloat/lobby/${lobbyId}`);
-	mqttClient.publish(
-		`afloat/lobby/${lobbyId}`,
-		JSON.stringify({
-			clientId: clientId,
-			status: 'connected',
-			player: currentPlayer
-		})
-	);
+			//Set gameId as lobbyId
+			lobbyId = gameId;
+			mqttClient.subscribe(`afloat/lobby/${lobbyId}`);
+			mqttClient.publish(
+				`afloat/lobby/${lobbyId}`,
+				JSON.stringify({
+					clientId: clientId,
+					status: 'connected',
+					player: currentPlayer
+				})
+			);
 
-	//Show correct menu id
-	document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
-		el.innerHTML = currentLobby.menuId;
+			//Show correct menu id
+			document.querySelectorAll('.js-lobby-menu-id').forEach(el => {
+				el.innerHTML = currentLobby.menuId;
+			});
+
+			//Show avatar choice page
+			document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
+			document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
+
+			return true;
+		} else {
+			currentLobby = undefined;
+			finished = false;
+		}
 	});
-
-	//Show avatar choice page
-	document.querySelector('.js-main__lobbychoice').classList.add('u-hidden');
-	document.querySelector('.js-main__avatar-multiplayer').classList.remove('u-hidden');
-
-	//Update playercount in the database
-	let message = {
-		playerCount: currentLobby.playerCount
-	};
-
-	handleData(`https://project2mct.azurewebsites.net/api/game/${gameId}`, data => {}, 'PUT', JSON.stringify(message));
-
-	return true;
+	return finished;
 };
 
 /**
@@ -227,7 +230,7 @@ const leaveLobby = () => {
 		PlayerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/games/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 	currentLobby = undefined;
 };
 
@@ -312,7 +315,7 @@ const loadGame = () => {
 	let message = {
 		status: 1
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/games/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 
 	console.log('Started Game');
 
@@ -327,7 +330,7 @@ const endGameLobby = () => {
 	let message = {
 		status: 2
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/game/${lobbyId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(`https://project2mct.azurewebsites.net/api/games/${lobbyId}`, data => {}, 'PUT', JSON.stringify(message));
 	leaveLobby();
 };
 
@@ -394,7 +397,7 @@ const pingPlayers = () => {
 							PlayerCount: el.playerCount
 						};
 
-						handleData(`https://project2mct.azurewebsites.net/api/game/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+						handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 					}
 				}
 			});
