@@ -73,7 +73,7 @@ namespace afloat
 
                         }
 
-                        return new OkObjectResult(new Dictionary<string, object>() { { "status", "Ok" } })
+                        return new OkObjectResult(new Dictionary<string, object>() { { "status", "Ok" } });
 
                     }
                 }
