@@ -20,12 +20,10 @@ namespace afloat
     {
         [FunctionName("JoinGame")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games/{game}/join")] HttpRequest req, string gameid,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{game}/join")] HttpRequest req, string gameid,
             ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
-            string stream = await new StreamReader(req.Body).ReadToEndAsync();
-            Dictionary<string, object> obj = JsonConvert.DeserializeObject<Dictionary<string, object>>(stream);
 
             try
             {
