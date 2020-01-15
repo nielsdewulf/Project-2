@@ -388,22 +388,20 @@ const pingPlayers = () => {
 				if (el.status !== 2 && el.playersResponded !== undefined) {
 					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
 					el.playerCount = el.playersResponded;
-					if (el.playerCount !== el.playersResponded) {
-						mqttClient.publish(
-							mainId,
-							JSON.stringify({
-								clientId: clientId,
-								status: 'playerUpdate',
-								lobby: el
-							})
-						);
+					// mqttClient.publish(
+					// 	mainId,
+					// 	JSON.stringify({
+					// 		clientId: clientId,
+					// 		status: 'playerUpdate',
+					// 		lobby: el
+					// 	})
+					// );
 
-						let message = {
-							PlayerCount: el.playerCount
-						};
+					let message = {
+						PlayerCount: el.playerCount
+					};
 
-						handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
-					}
+					handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 				}
 			});
 			showNewLobbies(lobbies);
