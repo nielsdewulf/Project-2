@@ -17,7 +17,7 @@ namespace afloat
     {
         [FunctionName("AddGame")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "game")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "games")] HttpRequest req,
             ILogger log)
         {
             try

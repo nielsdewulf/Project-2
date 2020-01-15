@@ -17,7 +17,7 @@ namespace afloat
     {
         [FunctionName("GetAllGames")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "game")] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games")] HttpRequest req,
             ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
