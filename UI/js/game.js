@@ -158,55 +158,58 @@ let otherPlayerData = {
  */
 let modi = [
 	{
-		minSpawnTime: 1500,
-		maxSpawnTime: 3500,
-		penguinChance: 0.37,
+		name: 'Plank',
+		minSpawnTime: 2300,
+		maxSpawnTime: 4000,
+		penguinChance: 0.3,
 		icicleChance: 0.6,
-		healthPowerupChance: 0.03,
+		healthPowerupChance: 0.1,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
 			maxSpawnOffset: 0.85
 		},
 		penguinConfig: {
-			speed: 0.3
+			speed: 0.25
 		},
-		jumpSensitivity: 10,
+		jumpSensitivity: 5,
 		walkSensitivity: 3
 	},
 	{
-		minSpawnTime: 1500,
-		maxSpawnTime: 3500,
-		penguinChance: 0.37,
-		icicleChance: 0.6,
-		healthPowerupChance: 0.03,
+		name: 'Staan',
+		minSpawnTime: 3500,
+		maxSpawnTime: 5500,
+		penguinChance: 0.2,
+		icicleChance: 0.7,
+		healthPowerupChance: 0.1,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
 			maxSpawnOffset: 0.85
 		},
 		penguinConfig: {
-			speed: 0.3
+			speed: 0.2
 		},
-		jumpSensitivity: 10,
-		walkSensitivity: 3
+		jumpSensitivity: 5.25,
+		walkSensitivity: 4
 	},
 	{
-		minSpawnTime: 1500,
-		maxSpawnTime: 3500,
-		penguinChance: 0.37,
-		icicleChance: 0.6,
-		healthPowerupChance: 0.03,
+		name: 'Staan + squat',
+		minSpawnTime: 3500,
+		maxSpawnTime: 5500,
+		penguinChance: 0.2,
+		icicleChance: 0.7,
+		healthPowerupChance: 0.1,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
 			maxSpawnOffset: 0.85
 		},
 		penguinConfig: {
-			speed: 0.3
+			speed: 0.2
 		},
-		jumpSensitivity: 10,
-		walkSensitivity: 3
+		jumpSensitivity: 5.25,
+		walkSensitivity: 4
 	}
 ];
 
@@ -1732,6 +1735,24 @@ function hit() {
 	//Do nothing if player is invincible
 	if (invincible || !alive) return;
 
+	if (!started) {
+		if (player.body.y > height) {
+			//Place him on the platform
+			player.setPosition(width / 2, height - height * 0.5);
+
+			if (multiplayer) {
+				mqttClient.publish(
+					`afloat/lobby/${lobbyId}/game`,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'respawn'
+					})
+				);
+			}
+		}
+		return;
+	}
+
 	health--;
 
 	/**
@@ -1982,7 +2003,7 @@ const startGame = () => {
 	}
 
 	//Set countdown
-	let countdown = 5;
+	let countdown = 10;
 
 	let countdownInterval;
 
