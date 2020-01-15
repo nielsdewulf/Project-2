@@ -26,7 +26,7 @@ const showNewLobbies = data => {
             <div class="c-lobbychoice__players">
                 <h2 class="c-lobbychoice__players-title">Spelers:</h2>
 				<h2 class="c-lobbychoice__players-count">${el.playerCount} / 2</h2>
-				<h2 class="c-lobbychoice__players-count">Houding ${el.modeId}</h2>
+				<h2 class="c-lobbychoice__players-position">Houding ${el.modeId}</h2>
             </div>
         </div>
     </div>`;
