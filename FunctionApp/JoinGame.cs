@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,16 +8,19 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Data.SqlClient;
 using afloat.models;
+using System.Data.SqlClient;
+using System.Text;
+using CaseOnline.Azure.WebJobs.Extensions.Mqtt.Messaging;
+using CaseOnline.Azure.WebJobs.Extensions.Mqtt;
 
 namespace afloat
 {
-    public static class GetGame
+    public static class JoinGame
     {
-        [FunctionName("GetGame")]
+        [FunctionName("JoinGame")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{GameId}")] HttpRequest req, string GameId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "games/{game}/join")] HttpRequest req, string gameid,
             ILogger log)
         {
             string connectionString = Environment.GetEnvironmentVariable("AzureSQL");
@@ -25,18 +29,19 @@ namespace afloat
             {
                 using (SqlConnection connection = new SqlConnection())
                 {
-                    Game game = new Game();
                     connection.ConnectionString = connectionString;
                     await connection.OpenAsync();
+                    Game gameObj = new Game();
+                    connection.ConnectionString = connectionString;
                     using (SqlCommand command = new SqlCommand())
                     {
                         command.Connection = connection;
                         command.CommandText = @"SELECT * from Game where GameId = @gameid";
-                        command.Parameters.AddWithValue("@gameid", GameId);
+                        command.Parameters.AddWithValue("@gameid", gameid);
                         var result = await command.ExecuteReaderAsync();
                         while (await result.ReadAsync())
                         {
-                            game = new Game()
+                            gameObj = new Game()
                             {
                                 GameId = Guid.Parse(result["GameId"].ToString()),
                                 PlayerCount = int.Parse(result["PlayerCount"].ToString()),
@@ -47,14 +52,36 @@ namespace afloat
                             };
 
                         }
+                        result.Close();
                     }
-                    return new OkObjectResult(game);
+                    if (gameObj.PlayerCount == 2)
+                    {
+                        return new OkObjectResult(new Dictionary<string, object>() { { "status", "Lobby is full" } });
+                    }
+                    else
+                    {
+                        gameObj.PlayerCount++;
+                        using (SqlCommand command = new SqlCommand())
+                        {
+                            command.Connection = connection;
+
+                            command.CommandText = $"update Game set PlayerCount = @playercount where GameId = @id;";
+                            command.Parameters.AddWithValue("@id", gameid);
+                            command.Parameters.AddWithValue("@playercount", gameObj.PlayerCount);
+
+                            await command.ExecuteNonQueryAsync();
+
+                        }
+
+                        return new OkObjectResult(new Dictionary<string, object>() { { "status", "Ok" } });
+
+                    }
                 }
             }
             catch (Exception ex)
             {
 
-                log.LogError(ex, "Error at GetGame");
+                log.LogError("Error at JoinGame: " + ex.ToString());
                 return new StatusCodeResult(500);
             }
         }
