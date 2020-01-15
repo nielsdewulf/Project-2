@@ -505,6 +505,17 @@ Container for Lobby page
     margin: 0;
 }
 
+.c-lobbychoice__players-position {
+    font-family: 'Roboto';
+    font-size: calc((10vh + 10vw ) / 10.714);
+    color: white;
+
+    text-align: center;
+
+    margin-top: 5vh;
+    margin-bottom: 0.74vh;
+}
+
 .c-button-add__lobby {
     width: 40px;
     height: 40px;
