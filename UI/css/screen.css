@@ -122,9 +122,20 @@ Styling logo
     justify-content: space-between;
 }
 
+.c-logo__mark {
+    width:20%;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+    
+}
 
-
-
+.c-logo__mct {
+    width:100%;
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
 
 
 
@@ -249,21 +260,6 @@ Styling default page
 }
 
 
-/*
-    Components: Logo
-    ---
-    style of the logos
-*/
-
-
-.c-logo__mark {
-    width:20%;
-    
-    display: flex;
-    justify-items: center;
-    align-content: center;
-    fill:white;
-}
 
 /*
     Components: Button
