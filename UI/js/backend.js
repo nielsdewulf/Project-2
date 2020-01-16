@@ -50,6 +50,8 @@ const createNewLobbyCallback = data => {
 
 	console.log(obj.lobby);
 
+	obj.lobby.latestUpdate = new Date().getTime();
+
 	//Send new lobby update to all other clients
 	mqttClient.publish(mainId, JSON.stringify(obj));
 
@@ -93,6 +95,9 @@ const getLobbiesCallback = data => {
 	lobbies = data;
 	lobbies.sort(function(a, b) {
 		return a.menuId - b.menuId;
+	});
+	lobbies.forEach(el => {
+		el.latestUpdate = new Date().getTime();
 	});
 	pingPlayers();
 	showNewLobbies(data);
@@ -379,6 +384,7 @@ const pingPlayers = () => {
 			lobby.playersResponded++;
 		}
 
+		let playerCallStarted = new Date().getTime();
 		/**
 		 * Timeout: after a second it'll check who responded
 		 * 1second should be sufficient for the load the MQTT server could get.
@@ -388,20 +394,22 @@ const pingPlayers = () => {
 				if (el.status !== 2 && el.playersResponded !== undefined) {
 					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
 					el.playerCount = el.playersResponded;
-					// mqttClient.publish(
-					// 	mainId,
-					// 	JSON.stringify({
-					// 		clientId: clientId,
-					// 		status: 'playerUpdate',
-					// 		lobby: el
-					// 	})
-					// );
+					if (el.latestUpdate < playerCallStarted) {
+						// mqttClient.publish(
+						// 	mainId,
+						// 	JSON.stringify({
+						// 		clientId: clientId,
+						// 		status: 'playerUpdate',
+						// 		lobby: el
+						// 	})
+						// );
+						el.latestUpdate = new Date().getTime();
+						let message = {
+							PlayerCount: el.playerCount
+						};
 
-					let message = {
-						PlayerCount: el.playerCount
-					};
-
-					handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+						handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+					}
 				}
 			});
 			showNewLobbies(lobbies);
@@ -507,7 +515,9 @@ const initBackend = () => {
 			 */
 			if (data.status === 'newLobby') {
 				//Show new lobby
+				data.lobby.latestUpdate = new Date().getTime();
 				lobbies.push(data.lobby);
+
 				lobbies.sort(function(a, b) {
 					return a.menuId - b.menuId;
 				});
@@ -523,6 +533,8 @@ const initBackend = () => {
 				//updates the lobbies
 				console.log('Lobby update', data.lobby);
 				let lobby = getLobbyById(data.lobby.gameId);
+				lobby.latestUpdate = new Date().getTime();
+
 				lobby.playerCount = data.lobby.playerCount;
 				showNewLobbies(lobbies);
 			}
@@ -535,6 +547,7 @@ const initBackend = () => {
 				console.log('Lobby update', data.lobby);
 				let lobby = getLobbyById(data.lobby.gameId);
 				lobby.status = data.lobby.status;
+				lobby.latestUpdate = new Date().getTime();
 				lobbies.pop(lobby);
 				showNewLobbies(lobbies);
 			}
