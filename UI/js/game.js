@@ -2115,20 +2115,10 @@ const calcGameBounds = height => {
  * On resize
  */
 const resize = () => {
-	let newWidth,
-		newHeight = calcWidthHeight();
-
-	let newBoundingWidth,
-		newBoundingHeight = calcGameBounds(newHeight);
-
-	if (newWidth === width && newHeight === height && newBoundingWidth === boundingWidth && newBoundingHeight === boundingHeight) return;
-
-	[width, height] = [newWidth, newHeight];
-
-	[boundingWidth, boundingHeight] = [newBoundingWidth, newBoundingHeight];
-
-	disconnectMultiplayer();
-	leaveLobby();
+	if(multiplayer){
+		disconnectMultiplayer();
+		leaveLobby();
+	}
 	location.reload();
 };
 
