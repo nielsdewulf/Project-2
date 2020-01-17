@@ -269,7 +269,6 @@ let buttonListeners = function() {
 		});
 	});
 
-
 	/* Positionchoice Multiplayer Startpage Button Event Listener */
 	let positionchoiceMultiPlayerStartpageButton = document.querySelector('.js-button__multiplayerpositionchoice-startpage');
 	positionchoiceMultiPlayerStartpageButton.addEventListener('click', function() {
@@ -277,7 +276,6 @@ let buttonListeners = function() {
 		document.querySelector('.js-main__position-multiplayer').classList.add('u-hidden');
 		document.querySelector('.js-main__start').classList.remove('u-hidden');
 	});
-
 
 	/* Start Page Scoreboard Button Event Listener */
 
@@ -361,7 +359,14 @@ let buttonListeners = function() {
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
 		document.querySelector('.js-main__score-results').classList.add('u-hidden');
-		saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
+		let val = document
+			.querySelector('.js-scoreboard-popup__input')
+			.value.toString()
+			.trim();
+		if (!(val === null || val.match(/^ *$/) !== null)) {
+			saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
+			document.querySelector('.js-scoreboard-popup__input').value = '';
+		}
 	});
 };
 
