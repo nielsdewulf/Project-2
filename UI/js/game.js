@@ -268,9 +268,6 @@ let music;
  */
 function preload() {
 	this.load.image('bg', 'assets/bg.png');
-	this.load.image('platform', 'assets/PlatformAfloatCenter.png');
-	this.load.image('platform-edge-left', 'assets/PlatformAfloatLeft.png');
-	this.load.image('platform-edge-right', 'assets/PlatformAfloatRight.png');
 	this.load.image('platform-full', 'assets/PlatformAfloatFullHigher.png');
 
 	this.load.spritesheet('player1', 'assets/AvatarAfloatOne.png', {
@@ -349,7 +346,7 @@ function create() {
 	platforms = this.physics.add.staticGroup();
 
 	/**
-	 * Middle platform
+	 * Platform
 	 */
 	//tileSprite(x,y,width,height,imagekey)
 	ts = this.add.tileSprite(width / 2, height - height * 0.1, boundingWidth * 0.85, (boundingWidth / 1344) * 96, 'platform-full');
@@ -566,6 +563,13 @@ function create() {
 			} else {
 			}
 		}
+	}
+
+	/**
+	 * Start game automatically if singleplayer
+	 */
+	if (!multiplayer) {
+		startGame();
 	}
 }
 /**
@@ -2060,9 +2064,8 @@ const initialiseNewGame = (currentPlayer, otherPlayer = undefined, multiplayerBo
 	 * If singleplayer -> Start the game immediately
 	 * else -> wait for the other player to join
 	 */
-	if (!multiplayer) {
-		startGame();
-	} else {
+
+	if (multiplayer) {
 		//Set the correct avatar
 		otherPlayerData.avatar = avatars[otherPlayer.avatar];
 	}
@@ -2226,17 +2229,25 @@ const initFramework = () => {
 			 * Setup fullscreen
 			 */
 			try {
-				document.documentElement.requestFullscreen();
+				if (document.documentElement.requestFullscreen) {
+					document.documentElement.requestFullscreen();
+				} else if (document.documentElement.msRequestFullscreen) {
+					document.documentElement.msRequestFullscreen();
+				} else if (document.documentElement.mozRequestFullScreen) {
+					document.documentElement.mozRequestFullScreen();
+				} else if (document.documentElement.webkitRequestFullscreen) {
+					document.documentElement.webkitRequestFullscreen();
+				}
 			} catch {}
-			if (document.documentElement.requestFullscreen) {
-				document.documentElement.requestFullscreen();
-			} else if (document.documentElement.msRequestFullscreen) {
-				document.documentElement.msRequestFullscreen();
-			} else if (document.documentElement.mozRequestFullScreen) {
-				document.documentElement.mozRequestFullScreen();
-			} else if (document.documentElement.webkitRequestFullscreen) {
-				document.documentElement.webkitRequestFullscreen();
-			}
+
+			try {
+				if (document.addEventListener) {
+					document.addEventListener('fullscreenchange', exitHandler, false);
+					document.addEventListener('mozfullscreenchange', exitHandler, false);
+					document.addEventListener('MSFullscreenChange', exitHandler, false);
+					document.addEventListener('webkitfullscreenchange', exitHandler, false);
+				}
+			} catch {}
 
 			/**
 			 * Disable screen sleeping
@@ -2266,7 +2277,7 @@ const initFramework = () => {
 					screen.mozLockOrientation.lock('landscape-primary');
 				} catch {}
 				initGame();
-			}, 500);
+			}, 50);
 
 			/**
 			 * Request gyroscope permission for iOS users
@@ -2288,3 +2299,18 @@ const initFramework = () => {
 document.addEventListener('DOMContentLoaded', () => {
 	initFramework();
 });
+
+function exitHandler() {
+	if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement !== null)) {
+		if (isLoadingGame || started) {
+			if (currentScene != undefined) {
+				if (multiplayer && connectedCloud) {
+					disconnectMultiplayer();
+					endGame();
+				} else {
+					endGame();
+				}
+			}
+		}
+	}
+}

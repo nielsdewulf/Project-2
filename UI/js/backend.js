@@ -206,6 +206,7 @@ const joinLobby = gameId => {
 const leaveLobby = () => {
 	clearPlayerList();
 
+	if (currentLobby.status === undefined) return;
 	//If game has already ended -> do nothing
 	if (currentLobby.status === 2) return;
 
@@ -393,22 +394,25 @@ const pingPlayers = () => {
 			lobbies.forEach(el => {
 				if (el.status !== 2 && el.playersResponded !== undefined) {
 					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
-					el.playerCount = el.playersResponded;
-					if (el.latestUpdate < playerCallStarted) {
-						// mqttClient.publish(
-						// 	mainId,
-						// 	JSON.stringify({
-						// 		clientId: clientId,
-						// 		status: 'playerUpdate',
-						// 		lobby: el
-						// 	})
-						// );
-						el.latestUpdate = new Date().getTime();
-						let message = {
-							PlayerCount: el.playerCount
-						};
+					if (el.playerCount !== el.playersResponded) {
+						el.playerCount = el.playersResponded;
 
-						handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+						if (el.latestUpdate < playerCallStarted) {
+							// mqttClient.publish(
+							// 	mainId,
+							// 	JSON.stringify({
+							// 		clientId: clientId,
+							// 		status: 'playerUpdate',
+							// 		lobby: el
+							// 	})
+							// );
+							el.latestUpdate = new Date().getTime();
+							let message = {
+								PlayerCount: el.playerCount
+							};
+
+							handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+						}
 					}
 				}
 			});
@@ -481,6 +485,15 @@ const initBackend = () => {
 			leaveLobby();
 		}
 	});
+
+	try {
+		if (document.addEventListener) {
+			document.addEventListener('fullscreenchange', exitLobbyHandler, false);
+			document.addEventListener('mozfullscreenchange', exitLobbyHandler, false);
+			document.addEventListener('MSFullscreenChange', exitLobbyHandler, false);
+			document.addEventListener('webkitfullscreenchange', exitLobbyHandler, false);
+		}
+	} catch {}
 
 	//When user switches tabs
 	window.addEventListener('blur', () => {
@@ -758,3 +771,11 @@ const get = async url => {
 	});
 	return f.json();
 };
+
+function exitLobbyHandler() {
+	if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement !== null)) {
+		if (currentLobby !== undefined) {
+			leaveLobby();
+		}
+	}
+}
