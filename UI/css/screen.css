@@ -72,7 +72,7 @@ body {
 }
 
 h2 {
-    font-size: calc((10vh + 10vw ) / 6.818);
+    font-size: calc((10vh + 10vw) / 6.818);
     color: #7B7BFF;
 }
 
@@ -114,24 +114,22 @@ Styling logo
 }
 
 .o-logo_howest {
-    width:100%;
-   
+    width: 100%;
+    margin-bottom: 7.5%;
+
     display: flex;
-   
-    align-self: center;
     justify-content: space-between;
 }
 
 .c-logo__mark {
-    width:20%;
-    display: flex;
-    flex-direction: column;
-    align-self: center;
-    
+    fill: white;
+    height: 2vw;
+    /* height: 7vh; */
+    display: block;
 }
 
 .c-logo__mct {
-    width:100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-self: center;
@@ -198,7 +196,7 @@ Styling default page
 
 .c-app__title {
     font-family: 'Roboto', 'Sans Serif';
-    font-size: calc((10vh + 10vw ) / 5.357);
+    font-size: calc((10vh + 10vw) / 5.357);
     font-weight: 600;
     color: white;
     display: flex;
@@ -256,7 +254,7 @@ Styling default page
 
     margin-left: auto;
     margin-right: auto;
-    
+
 }
 
 
@@ -288,7 +286,7 @@ Styling default page
 
 .c-button__title {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 6.818);
+    font-size: calc((10vh + 10vw) / 6.818);
     font-weight: 600;
     color: white;
 }
@@ -340,7 +338,7 @@ Vertical Grid Styling
 
 .c-horizontal-grid__text {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 8.333);
+    font-size: calc((10vh + 10vw) / 8.333);
     line-height: 3.33vh;
     color: white;
 
@@ -395,7 +393,7 @@ Vertical Grid Styling
 
 .c-horizontal-grid__text-lobby {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 8.333);
+    font-size: calc((10vh + 10vw) / 8.333);
     line-height: 3.33vh;
     color: white;
 
@@ -475,7 +473,7 @@ Container for Lobby page
 
 .c-lobbychoice__title {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 9.375);
+    font-size: calc((10vh + 10vw) / 9.375);
     color: white;
 
     text-align: center;
@@ -486,7 +484,7 @@ Container for Lobby page
 
 .c-lobbychoice__players-title {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 10.714);
+    font-size: calc((10vh + 10vw) / 10.714);
     color: white;
 
     text-align: center;
@@ -497,7 +495,7 @@ Container for Lobby page
 
 .c-lobbychoice__players-count {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 7.5);
+    font-size: calc((10vh + 10vw) / 7.5);
     color: white;
 
     text-align: center;
@@ -507,7 +505,7 @@ Container for Lobby page
 
 .c-lobbychoice__players-position {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 10.714);
+    font-size: calc((10vh + 10vw) / 10.714);
     color: white;
 
     text-align: center;
@@ -523,7 +521,7 @@ Container for Lobby page
 
     border-radius: 50%;
 
-    font-size: calc((10vh + 10vw ) / 3.125);
+    font-size: calc((10vh + 10vw) / 3.125);
     color: white;
 
     display: flex;
@@ -542,7 +540,7 @@ Container for Lobby page
 
         border-radius: 50%;
 
-        font-size: calc((10vh + 10vw ) / 2.609);
+        font-size: calc((10vh + 10vw) / 2.609);
         color: white;
 
         display: flex;
@@ -560,7 +558,7 @@ Container for Lobby page
 
         border-radius: 50%;
 
-        font-size: calc((10vh + 10vw ) / 2.083);
+        font-size: calc((10vh + 10vw) / 2.083);
         color: white;
 
         display: flex;
@@ -578,34 +576,34 @@ Container for Lobby page
 */
 
 .c-position {
-    width:90%;
-    
+    width: 90%;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .c-position__title {
-    color:white;
+    color: white;
 }
 
 
 .c-position__options {
-    height:37vh;
-    width:18.23vw;
+    height: 37vh;
+    width: 18.23vw;
     background-color: #FFD54A;
     border-radius: 10px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    color:white;
-    font-size:calc((10vh + 10vw) / 6.818 )
+    color: white;
+    font-size: calc((10vh + 10vw) / 6.818)
 }
 
 .c-positionchoice__radio:checked+.c-position__label div {
     box-shadow: inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
-    
+
 
     box-sizing: border-box;
 }
@@ -736,13 +734,13 @@ Container for avatar choice
 
 .c-scoreboard-popup__description {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 9.375);
+    font-size: calc((10vh + 10vw) / 9.375);
     color: #707070;
 }
 
 .c-scoreboard-popup__question {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 7.895);
+    font-size: calc((10vh + 10vw) / 7.895);
     color: #707070;
 }
 
@@ -776,7 +774,7 @@ Container for avatar choice
 
 .c-scoreboard-popup__button-title {
     font-family: 'Roboto';
-    font-size: calc((10vh + 10vw ) / 6.818);
+    font-size: calc((10vh + 10vw) / 6.818);
     font-weight: 600;
 
     color: white;
@@ -802,7 +800,7 @@ Container for avatar choice
 
     background-color: white;
     width: 60vw;
-    height:12vh;
+    height: 12vh;
 
     border-radius: 10px;
     box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
