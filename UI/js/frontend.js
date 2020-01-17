@@ -364,7 +364,7 @@ let buttonListeners = function() {
 			.value.toString()
 			.trim();
 		if (!(val === null || val.match(/^ *$/) !== null)) {
-			saveHighscore(document.querySelector('.js-scoreboard-popup__input').value, score, lobbyId, currentPlayer.avatar);
+			saveHighscore(val, score, lobbyId, currentPlayer.avatar);
 			document.querySelector('.js-scoreboard-popup__input').value = '';
 		}
 	});
