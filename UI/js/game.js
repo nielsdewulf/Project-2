@@ -2269,7 +2269,7 @@ const initFramework = () => {
 			}, 50);
 			setTimeout(() => {
 				initGame();
-			}, 500);
+			}, 800);
 			/**
 			 * Request gyroscope permission for iOS users
 			 */
