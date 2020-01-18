@@ -262,7 +262,7 @@ const finaliseConnection = avatarId => {
 	);
 
 	//Show player in list
-	showNewPlayer(playerList);
+	showPlayers(playerList);
 };
 
 /**
@@ -396,7 +396,11 @@ const pingPlayers = () => {
 					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
 					if (el.playerCount !== el.playersResponded) {
 						el.playerCount = el.playersResponded;
-
+						if (playerList.length > el.playersResponded) {
+							playerList = [];
+							playerList.push(currentPlayer);
+							showPlayers(playerList);
+						}
 						if (el.latestUpdate < playerCallStarted) {
 							// mqttClient.publish(
 							// 	mainId,
@@ -674,7 +678,7 @@ const initBackend = () => {
 					data.player.offlinePlayer = false;
 					playerList.push(data.player);
 					if (data.player.avatar !== undefined) {
-						showNewPlayer(playerList);
+						showPlayers(playerList);
 					}
 				}
 			}
@@ -696,7 +700,7 @@ const initBackend = () => {
 
 				//If he already has an avatar -> show avatar
 				if (data.player.avatar !== undefined) {
-					showNewPlayer(playerList);
+					showPlayers(playerList);
 				}
 			}
 			/**
@@ -708,7 +712,7 @@ const initBackend = () => {
 					if (el.clientId === data.clientId) {
 						el.avatar = data.avatar;
 						el.status = 'connected';
-						showNewPlayer(playerList);
+						showPlayers(playerList);
 					}
 				});
 				//Show new player in playerlist
@@ -733,7 +737,7 @@ const initBackend = () => {
 			 */
 			if (data.status === 'disconnect') {
 				playerList.pop(data.player);
-				showNewPlayer(playerList);
+				showPlayers(playerList);
 			}
 		}
 	});

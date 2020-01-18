@@ -126,7 +126,7 @@ const showResults = data => {
 	});
 	parent.innerHTML = result;
 };
-const showNewPlayer = data => {
+const showPlayers = data => {
 	/**
 	 * data.clientId
 	 * data.status
