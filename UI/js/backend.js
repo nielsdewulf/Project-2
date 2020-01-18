@@ -148,7 +148,8 @@ const joinLobby = gameId => {
 		handleData(BASE_URL + `games/${gameId}/join`, data => {
 			if (data.status === 'Ok') {
 				finished = true;
-				modus = modi[currentLobby.ModeId];
+
+				modus = modi[LobbyObj.modeId];
 				//Reset playerList
 				playerList = [];
 				playerList.push(currentPlayer);
