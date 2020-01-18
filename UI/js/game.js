@@ -2115,7 +2115,7 @@ const calcGameBounds = height => {
  * On resize
  */
 const resize = () => {
-	if(multiplayer){
+	if (multiplayer) {
 		disconnectMultiplayer();
 		leaveLobby();
 	}
@@ -2266,9 +2266,10 @@ const initFramework = () => {
 				try {
 					screen.mozLockOrientation.lock('landscape-primary');
 				} catch {}
-				initGame();
 			}, 50);
-
+			setTimeout(() => {
+				initGame();
+			}, 500);
 			/**
 			 * Request gyroscope permission for iOS users
 			 */
