@@ -1,3 +1,5 @@
+const BASE_URL = 'https://project2mct.azurewebsites.net/api/';
+
 /**
  * Make sure MQTT JS is loaded before this
  */
@@ -84,7 +86,7 @@ const createNewLobby = () => {
 		ModeId: modi.indexOf(modus)
 	};
 
-	handleData('https://project2mct.azurewebsites.net/api/games/', createNewLobbyCallback, 'POST', JSON.stringify(message));
+	handleData(BASE_URL + 'games/', createNewLobbyCallback, 'POST', JSON.stringify(message));
 };
 
 /**
@@ -114,7 +116,7 @@ const getLobbies = () => {
 	 * data.Status
 	 */
 
-	handleData('https://project2mct.azurewebsites.net/api/games/?status=0', getLobbiesCallback);
+	handleData(BASE_URL + 'games/?status=0', getLobbiesCallback);
 };
 
 /**
@@ -143,7 +145,7 @@ const joinLobby = gameId => {
 	let random = Math.random() * 200;
 
 	setTimeout(() => {
-		handleData(`https://project2mct.azurewebsites.net/api/games/${gameId}/join`, data => {
+		handleData(BASE_URL + `games/${gameId}/join`, data => {
 			if (data.status === 'Ok') {
 				finished = true;
 				modus = modi[currentLobby.ModeId];
@@ -241,7 +243,7 @@ const leaveLobby = () => {
 		PlayerCount: currentLobby.playerCount
 	};
 
-	handleData(`https://project2mct.azurewebsites.net/api/games/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(BASE_URL + `games/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 	currentLobby = undefined;
 };
 
@@ -326,7 +328,7 @@ const loadGame = () => {
 	let message = {
 		status: 1
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/games/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(BASE_URL + `games/${currentLobby.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 
 	console.log('Started Game');
 
@@ -341,7 +343,7 @@ const endGameLobby = () => {
 	let message = {
 		status: 2
 	};
-	handleData(`https://project2mct.azurewebsites.net/api/games/${lobbyId}`, data => {}, 'PUT', JSON.stringify(message));
+	handleData(BASE_URL + `games/${lobbyId}`, data => {}, 'PUT', JSON.stringify(message));
 	leaveLobby();
 };
 
@@ -415,7 +417,7 @@ const pingPlayers = () => {
 								PlayerCount: el.playerCount
 							};
 
-							handleData(`https://project2mct.azurewebsites.net/api/games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
+							handleData(BASE_URL + `games/${el.gameId}`, data => {}, 'PUT', JSON.stringify(message));
 						}
 					}
 				}
@@ -448,7 +450,7 @@ const getTopHighscoresCallback = data => {
  */
 const getTopHighscores = top => {
 	console.warn('loading leaderboard data');
-	handleData(`https://project2mct.azurewebsites.net/api/scores/?top=${top}`, getTopHighscoresCallback);
+	handleData(BASE_URL + `scores/?top=${top}`, getTopHighscoresCallback);
 };
 
 const saveHighscoreCallback = data => {
@@ -476,7 +478,7 @@ const saveHighscore = (name, score, gameid = null, avatar) => {
 		Avatar: avatar
 	};
 	console.log(obj);
-	handleData(`https://project2mct.azurewebsites.net/api/scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
+	handleData(BASE_URL + `scores/`, saveHighscoreCallback, 'POST', JSON.stringify(obj));
 };
 
 /**
