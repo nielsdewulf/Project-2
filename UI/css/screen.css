@@ -35,6 +35,11 @@
     --grid-baseline: 5px;
 
     --grid-header-height: 70px;
+
+    
+    /*loader pi*/
+     --pi: 3.14159265359;
+      
 }
 
 /*------------------------------------*\
@@ -256,6 +261,14 @@ Styling default page
     margin-right: auto;
 
 }
+
+.c-app__loader {
+    width:100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
 
 
 
@@ -946,3 +959,72 @@ canvas {
 .u-hidden {
     display: none !important;
 }
+
+
+.c-center{
+    position:absolute;
+    z-index:-1;
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    
+}
+
+/*Game Loader*/
+
+.c-loader {
+    --loader-viewbox: 50px;
+    --circle-stroke-width: 4px;
+    --circle-center: calc(var(--loader-viewbox) / 2);
+    --circle-radius: calc(var(--loader-viewbox) / 2 - var(--circle-stroke-width) / 2); 
+    --circle-circumference: calc(var(--circle-radius) * 2 * var(--pi));
+    --circle-gap: 20px;
+    --circle-circumference-gap: calc(var(--circle-circumference) - var(--circle-gap));
+    --animation-duration: 1.25s;
+      width:10vw;
+  
+}
+  
+.c-loader__circle {
+    stroke: white;
+    fill: transparent;
+    stroke-linecap: round;
+    stroke-width: var(--circle-stroke-width);
+    stroke-dasharray: var(--circle-gap), var(--circle-circumference-gap);
+    stroke-dashoffset: 0;
+    r: var(--circle-radius);
+    cx: var(--circle-center);
+    cy: var(--circle-center);
+    animation: rotateCircle calc(var(--animation-duration) + 0.25s) linear infinite, 
+      strokeCircle var(--animation-duration) infinite;
+    transform-origin: center;
+}
+
+.c-loader__avatar{
+    background: url('../img/png/JelleyAvatarIcon.png');
+    background-size:cover;
+    width:7vw;
+    height:7vw;  
+}
+  
+@keyframes rotateCircle {
+    100% {
+      transform: rotate(360deg);
+    }
+}
+  
+@keyframes strokeCircle {
+    50% {
+      stroke-dasharray: var(--circle-circumference-gap), var(--circle-gap);
+      stroke-dashoffset: 0;
+    }
+    100% {
+      stroke-dasharray: var(--circle-gap), var(--circle-circumference-gap);
+      stroke-dashoffset: calc(var(--circle-circumference) * -1);
+    }
+}
+  
+  
+  
