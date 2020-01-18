@@ -176,7 +176,18 @@ const showPlayers = data => {
 const clearPlayerList = () => {
 	document.querySelector('.js-multiplayer-lobby-grid').innerHTML = '';
 };
-
+const getPathById = id => {
+	switch (id) {
+		case 0:
+			return './img/png/JelleyAvatarIcon.png';
+		case 1:
+			return './img/png/StokeleyAvatarIcon.png';
+		case 2:
+			return './img/png/SpikeyAvatarIcon.png';
+		case 3:
+			return './img/png/VlamAvatarIcon.png';
+	}
+};
 let buttonListeners = function() {
 	/* Start Page Singleplayer Button Event Listener */
 	let singlePlayerButton = document.querySelector('.js-button__singleplayer');
@@ -195,7 +206,7 @@ let buttonListeners = function() {
 			if (el.checked) {
 				currentPlayer.avatar = parseInt(el.value);
 				initialiseNewGame(currentPlayer);
-				document.querySelector('.js-game').classList.remove('u-hidden');
+				document.querySelector('.js-game__loader-avatar').style.backgroundImage = `url('${getPathById(parseInt(el.value))}')`;
 			}
 		});
 	});
@@ -248,6 +259,7 @@ let buttonListeners = function() {
 		document.querySelectorAll('.js-multiplayer-avatar').forEach(el => {
 			if (el.checked) {
 				console.log(el.value);
+				document.querySelector('.js-game__loader-avatar').style.backgroundImage = `url('${getPathById(parseInt(el.value))}')`;
 				finaliseConnection(parseInt(el.value));
 			}
 		});

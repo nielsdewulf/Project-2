@@ -1996,6 +1996,7 @@ const disconnectMultiplayer = () => {
  */
 const startGame = () => {
 	//Set correct highscore from the leaderboard
+
 	if (leaderboard !== undefined) {
 		if (leaderboard.length !== 0) {
 			highscoreObject.innerHTML = leaderboard[0].score;
@@ -2006,6 +2007,8 @@ const startGame = () => {
 		highscoreObject.innerHTML = 0;
 	}
 
+	document.querySelector('.js-game__loader').classList.add('u-hidden');
+	document.querySelector('.js-game').classList.remove('u-hidden');
 	//Set countdown
 	let countdown = 10;
 
@@ -2047,6 +2050,8 @@ const startGame = () => {
  */
 const initialiseNewGame = (currentPlayer, otherPlayer = undefined, multiplayerBool = false) => {
 	//Set multiplayer variable
+	document.querySelector('.js-game__loader').classList.remove('u-hidden');
+
 	if (host) console.warn('Starting game as host');
 	else console.warn('Starting game as slave');
 	multiplayer = multiplayerBool;
