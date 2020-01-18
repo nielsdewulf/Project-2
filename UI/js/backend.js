@@ -732,7 +732,6 @@ const initBackend = () => {
 					if (!p.offlinePlayer) otherPlayer = p;
 				});
 				initialiseNewGame(currentPlayer, otherPlayer, true);
-				document.querySelector('.js-game').classList.remove('u-hidden');
 			}
 
 			/**
