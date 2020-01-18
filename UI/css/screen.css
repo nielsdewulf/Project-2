@@ -677,8 +677,8 @@ Container for avatar choice
 
 
 .c-avatarchoice__image {
-    height: calc(((100vh+100vw)/2)/2);
-    width: calc(((100vh+100vw)/2)/2);
+    height: calc((( 100vh + 100vw ) / 2 ) / 5 );
+    width: calc((( 100vh + 100vw ) / 2 ) / 5 );
 }
 
 .c-avatar0-icon {
