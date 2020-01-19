@@ -398,13 +398,14 @@ const pingPlayers = () => {
 				if (el.status !== 2 && el.playersResponded !== undefined) {
 					console.warn(`Updated playerCount from ${el.playerCount} to ${el.playersResponded}`);
 					if (el.playerCount !== el.playersResponded) {
-						el.playerCount = el.playersResponded;
-						if (playerList.length > el.playersResponded) {
-							playerList = [];
-							playerList.push(currentPlayer);
-							showPlayers(playerList);
-						}
 						if (el.latestUpdate < playerCallStarted) {
+							el.playerCount = el.playersResponded;
+
+							if (playerList.length > el.playersResponded) {
+								playerList = [];
+								playerList.push(currentPlayer);
+								showPlayers(playerList);
+							}
 							// mqttClient.publish(
 							// 	mainId,
 							// 	JSON.stringify({
