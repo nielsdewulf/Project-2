@@ -13,7 +13,7 @@ namespace afloat {
     public static class clearLeaderboard {
         [FunctionName ("clearLeaderboard")]
         public static async Task<IActionResult> Run (
-            [HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "/scores/clear")] HttpRequest req,
+            [HttpTrigger (AuthorizationLevel.Anonymous, "get", Route = "scores/clear")] HttpRequest req,
             ILogger log) {
             try {
                 string connectionString = Environment.GetEnvironmentVariable ("AzureSQL");
