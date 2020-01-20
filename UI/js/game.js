@@ -1127,7 +1127,7 @@ function initMqtt(gameObj) {
 			// 	})
 			// );
 
-			let random = Math.random() * 200;
+			let random = Math.random() * 1000;
 
 			setTimeout(() => {
 				mqttClient.publish(
@@ -2018,17 +2018,6 @@ const disconnectMultiplayer = () => {
  */
 const startGame = () => {
 	//Set correct highscore from the leaderboard
-
-	if (leaderboard !== undefined) {
-		if (leaderboard.length !== 0) {
-			highscoreObject.innerHTML = leaderboard[0].score;
-		} else {
-			highscoreObject.innerHTML = 0;
-		}
-	} else {
-		highscoreObject.innerHTML = 0;
-	}
-
 	document.querySelector('.js-game__loader').classList.add('u-hidden');
 	document.querySelector('.js-game').classList.remove('u-hidden');
 	//Set countdown
