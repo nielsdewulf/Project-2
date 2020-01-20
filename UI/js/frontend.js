@@ -323,7 +323,6 @@ let buttonListeners = function() {
 		console.log('Start game button clicked');
 		if (loadGame()) {
 			document.querySelector('.js-main__lobby').classList.add('u-hidden');
-			document.querySelector('.js-game').classList.remove('u-hidden');
 		}
 	});
 
