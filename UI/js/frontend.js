@@ -26,7 +26,7 @@ const showNewLobbies = data => {
             <div class="c-lobbychoice__players">
                 <h2 class="c-lobbychoice__players-title">Spelers:</h2>
 				<h2 class="c-lobbychoice__players-count">${el.playerCount} / 2</h2>
-				<h2 class="c-lobbychoice__players-position">Houding ${el.modeId}</h2>
+				<h2 class="c-lobbychoice__players-position">${getPositionNameById(el.modeId)}</h2>
             </div>
         </div>
     </div>`;
@@ -186,6 +186,16 @@ const getPathById = id => {
 			return './img/png/SpikeyAvatarIcon.png';
 		case 3:
 			return './img/png/VlamAvatarIcon.png';
+	}
+};
+const getPositionNameById = id => {
+	switch (id) {
+		case 0:
+			return 'Plank';
+		case 1:
+			return 'Rechtstaand';
+		case 2:
+			return 'Squat';
 	}
 };
 let buttonListeners = function() {
