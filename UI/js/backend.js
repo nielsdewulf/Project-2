@@ -290,8 +290,11 @@ const loadGame = () => {
 	//If not all players are ready
 	if (!playersReady) return false;
 
+	//Remove lobby from list
+	lobbies.pop(currentLobby);
+
 	//Update lobby status
-	currentLobby.status = 2;
+	currentLobby.status = 1;
 
 	//Set isLoadingGame
 	isLoadingGame = true;
@@ -318,9 +321,6 @@ const loadGame = () => {
 			lobby: currentLobby
 		})
 	);
-
-	//Remove lobby from list
-	lobbies.pop(currentLobby);
 
 	//Reload lobby list
 	showNewLobbies(lobbies);
@@ -728,11 +728,17 @@ const initBackend = () => {
 				console.log('Started Game');
 
 				document.querySelector('.js-main__lobby').classList.add('u-hidden');
+
 				let otherPlayer;
 				playerList.forEach(p => {
 					if (!p.offlinePlayer) otherPlayer = p;
 				});
 				initialiseNewGame(currentPlayer, otherPlayer, true);
+
+				//Remove lobby from list
+				lobbies.pop(currentLobby);
+				currentLobby.status = 1;
+				showNewLobbies(lobbies);
 			}
 
 			/**
