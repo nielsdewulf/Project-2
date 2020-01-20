@@ -218,6 +218,9 @@ const leaveLobby = () => {
 		document.querySelector('.js-main__lobbychoice').classList.remove('u-hidden');
 	}
 
+	currentPlayer.avatar = undefined;
+	currentPlayer.status = 'connected';
+
 	console.log('leftLobby');
 	mqttClient.publish(
 		`afloat/lobby/${lobbyId}`,
@@ -554,10 +557,12 @@ const initBackend = () => {
 				//updates the lobbies
 				console.log('Lobby update', data.lobby);
 				let lobby = getLobbyById(data.lobby.gameId);
-				lobby.latestUpdate = new Date().getTime();
+				if (lobby !== undefined) {
+					lobby.latestUpdate = new Date().getTime();
 
-				lobby.playerCount = data.lobby.playerCount;
-				showNewLobbies(lobbies);
+					lobby.playerCount = data.lobby.playerCount;
+					showNewLobbies(lobbies);
+				}
 			}
 
 			/**
@@ -736,9 +741,7 @@ const initBackend = () => {
 				initialiseNewGame(currentPlayer, otherPlayer, true);
 
 				//Remove lobby from list
-				lobbies.pop(currentLobby);
 				currentLobby.status = 1;
-				showNewLobbies(lobbies);
 			}
 
 			/**
