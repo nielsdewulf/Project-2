@@ -1068,6 +1068,28 @@ function update() {
 	if (player.body.y > height) {
 		hit();
 	}
+
+	/**
+	 * Update highscore missions
+	 */
+
+	if (leaderboard !== undefined) {
+		if (leaderboard.length !== 0) {
+			let lowestScoreToBeat;
+			let position = 1;
+			leaderboard.forEach((el, i) => {
+				if ((el.score < lowestScoreToBeat && el.score > score) || lowestScoreToBeat === undefined) {
+					lowestScoreToBeat = el.score;
+					position = i + 1;
+				}
+			});
+			highscoreObject.innerHTML = `${position}e ${lowestScoreToBeat}`;
+		} else {
+			highscoreObject.innerHTML = `1e 1`;
+		}
+	} else {
+		highscoreObject.innerHTML = `1e 1`;
+	}
 }
 
 /**
