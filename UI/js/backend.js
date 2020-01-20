@@ -211,7 +211,7 @@ const leaveLobby = () => {
 
 	if (currentLobby.status === undefined) return;
 	//If game has already ended -> do nothing
-	if (currentLobby.status === 2) return;
+	if (currentLobby.status === 1) return;
 
 	if (!isLoadingGame) {
 		document.querySelector('.js-main__lobby').classList.add('u-hidden');
