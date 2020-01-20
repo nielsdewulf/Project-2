@@ -144,7 +144,7 @@ let otherPlayer;
  */
 let otherPlayerData = {
 	avatar: avatars[0],
-	score: 0,
+	score: undefined,
 	alive: true,
 	isRunning: false,
 	direction: 0,
@@ -1901,7 +1901,7 @@ const endGame = () => {
 				},
 				{
 					avatar: avatars.indexOf(otherPlayerData.avatar),
-					score: otherPlayerData.score,
+					score: otherPlayerData.score !== undefined ? otherPlayerData.score : score,
 					offlinePlayer: false
 				}
 			];
