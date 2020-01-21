@@ -793,5 +793,6 @@ function exitLobbyHandler() {
 		if (currentLobby !== undefined) {
 			leaveLobby();
 		}
+		location.reload();
 	}
 }
