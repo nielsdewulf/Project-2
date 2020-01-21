@@ -2314,10 +2314,8 @@ function exitHandler() {
 				if (multiplayer && connectedCloud) {
 					disconnectMultiplayer();
 					endGame();
-					location.reload();
 				} else {
 					endGame();
-					location.reload();
 				}
 			}
 		}
