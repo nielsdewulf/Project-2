@@ -36,7 +36,7 @@ let isFullscreen = false;
 /**
  * DOM objects
  */
-let scoreObject, highscoreObject, healthObjects, countdownWrapperObject;
+let scoreObject, highscorePositionObject, highscoreScoreObject, healthObjects, countdownWrapperObject;
 
 /**
  * Multiplayer toggle
@@ -1083,12 +1083,16 @@ function update() {
 					position = i + 1;
 				}
 			});
-			highscoreObject.innerHTML = `${position}e ${lowestScoreToBeat}`;
+			highscorePositionObject.innerHTML = `${position}e`;
+			highscoreScoreObject.innerHTML = lowestScoreToBeat;
 		} else {
-			highscoreObject.innerHTML = `1e 1`;
+			highscorePositionObject.innerHTML = `${position}e`;
+			highscoreScoreObject.innerHTML = 1;
+
 		}
 	} else {
-		highscoreObject.innerHTML = `1e 1`;
+		highscorePositionObject.innerHTML = `${position}e`;
+		highscoreScoreObject.innerHTML = 1;
 	}
 }
 
@@ -2222,7 +2226,10 @@ const initFramework = () => {
 
 	//Setup DOM objects
 	scoreObject = document.querySelector('.js-current-score');
-	highscoreObject = document.querySelector('.js-highscore');
+	highscoreScoreObject = document.querySelector('.js-highscore__score');
+	
+	highscorePositionObject = document.querySelector('.js-highscore__position');
+
 	healthObjects = document.querySelectorAll('.js-health-heart');
 	countdownWrapperObject = document.querySelector('.js-countdown-wrapper');
 
