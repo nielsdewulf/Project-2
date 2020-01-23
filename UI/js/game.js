@@ -1088,7 +1088,6 @@ function update() {
 		} else {
 			highscorePositionObject.innerHTML = `${position}e`;
 			highscoreScoreObject.innerHTML = 1;
-
 		}
 	} else {
 		highscorePositionObject.innerHTML = `${position}e`;
@@ -2219,15 +2218,14 @@ const initFramework = () => {
 	});
 
 	window.addEventListener('orientationchange', () => {
-		if (game !== undefined) {
-			if (orientation === 0 || orientation === 180) location.reload();
-		}
+		orientationCheck();
 	});
+	orientationCheck();
 
 	//Setup DOM objects
 	scoreObject = document.querySelector('.js-current-score');
 	highscoreScoreObject = document.querySelector('.js-highscore__score');
-	
+
 	highscorePositionObject = document.querySelector('.js-highscore__position');
 
 	healthObjects = document.querySelectorAll('.js-health-heart');
@@ -2237,10 +2235,13 @@ const initFramework = () => {
 	 * When user clicks go to fullscreen
 	 */
 	document.documentElement.addEventListener('click', () => {
-		if (!isFullscreen) {
+		if (!isFullscreen && document.querySelector('.js-main__start').classList.contains('u-hidden')) {
 			/**
 			 * Setup fullscreen
 			 */
+			document.querySelector('.js-main__start').classList.remove('u-hidden');
+			document.querySelector('.js-fullscreen').classList.add('u-hidden');
+
 			try {
 				if (document.documentElement.requestFullscreen) {
 					document.documentElement.requestFullscreen();
@@ -2314,6 +2315,27 @@ document.addEventListener('DOMContentLoaded', () => {
 	initFramework();
 });
 
+function orientationCheck() {
+	if (game !== undefined) {
+		if (window.orientation == 0 || window.orientation == 180) location.reload();
+	}
+	if (window.orientation == 90 || window.orientation == -90) {
+		if (isFullscreen) {
+			document.querySelector('.js-main__start').classList.remove('u-hidden');
+			document.querySelector('.js-turnpage').classList.add('u-hidden');
+		} else {
+			document.querySelector('.js-fullscreen').classList.remove('u-hidden');
+			document.querySelector('.js-turnpage').classList.add('u-hidden');
+		}
+	} else {
+		if (!document.querySelector('.js-main__start').classList.contains('u-hidden') || !document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
+			document.querySelector('.js-main__start').classList.add('u-hidden');
+			document.querySelector('.js-turnpage').classList.remove('u-hidden');
+		} else {
+			location.reload();
+		}
+	}
+}
 function exitHandler() {
 	if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement !== null)) {
 		if (isLoadingGame || started) {
