@@ -284,7 +284,36 @@ Styling default page
     justify-content: center;
 }
 
+.c-app__turnscreen {
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 
+    font-size: calc((10vh+10vw) / 2.8);
+}
+
+
+.c-app__turnscreen-content {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+    
+}
+
+.c-app__turnscreen-logo {
+    background-image: url("../img/png/TurnScreenIcon.png");
+    background-size: cover;
+
+    width:calc(((100vh + 100vw) /2 ) / 3);
+    height:calc(((100vh + 100vw) /2 ) / 3.582431754675073);
+    
+    margin-bottom:10%;
+
+    
+    
+}
 
 
 /*
@@ -623,7 +652,8 @@ Container for Lobby page
     border-radius: 10px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-end;
+    padding-bottom: 3vh;
     align-items: center;
     color: white;
     font-size: calc((10vh + 10vw) / 6.818)
@@ -634,6 +664,51 @@ Container for Lobby page
 
 
     box-sizing: border-box;
+}
+
+.c-position__options-icon {
+    margin-bottom: 10%;
+   
+   
+
+    display: flex;
+    justify-content: center;
+}
+
+.c-position__options-icon1 {
+    margin-bottom: 10%;
+    width:calc(((100vh + 100vw) / 2) / 5.859375);
+    height:calc(((100vh + 100vw) / 2) / 10.06711409395973);
+   
+    background-image: url("../img/png/HoudingenAfloatPlankhouding.png");
+    background-size: cover;
+
+    display: flex;
+    justify-content: center;
+}
+
+.c-position__options-icon2 {
+    margin-bottom: 10%;
+    width:calc(((100vh + 100vw) / 2) / 12.60504201680672);
+    height:calc(((100vh + 100vw) / 2) / 6.578947368421053);
+    
+    background-image: url("../img/png/HoudingenAfloatRechtstaand.png");
+    background-size: cover;
+
+    display: flex;
+    justify-content: center;
+}
+
+.c-position__options-icon3 {
+    margin-bottom: 10%;
+    width:calc(((100vh + 100vw) / 2) / 12.29508196721311);
+    height:calc(((100vh + 100vw) / 2) / 6.976744186046512);
+    
+    background-image: url("../img/png/HoudingenAfloatSquat.png");
+    background-size: cover;
+
+    display: flex;
+    justify-content: center;
 }
 
 /*
