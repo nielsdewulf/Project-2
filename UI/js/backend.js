@@ -498,12 +498,10 @@ const initBackend = () => {
 	});
 
 	try {
-		if (document.addEventListener) {
-			document.addEventListener('fullscreenchange', exitLobbyHandler, false);
-			document.addEventListener('mozfullscreenchange', exitLobbyHandler, false);
-			document.addEventListener('MSFullscreenChange', exitLobbyHandler, false);
-			document.addEventListener('webkitfullscreenchange', exitLobbyHandler, false);
-		}
+		document.addEventListener('fullscreenchange', exitLobbyHandler);
+		document.addEventListener('mozfullscreenchange', exitLobbyHandler);
+		document.addEventListener('MSFullscreenChange', exitLobbyHandler);
+		document.addEventListener('webkitfullscreenchange', exitLobbyHandler);
 	} catch {}
 
 	//When user switches tabs
@@ -789,7 +787,7 @@ const get = async url => {
 };
 
 function exitLobbyHandler() {
-	if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement !== null)) {
+	if (isFullscreen && document.fullscreenElement == null) {
 		if (currentLobby !== undefined) {
 			leaveLobby();
 		}

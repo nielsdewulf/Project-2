@@ -2337,7 +2337,7 @@ function orientationCheck() {
 	}
 }
 function exitHandler() {
-	if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement !== null)) {
+	if (isFullscreen && document.fullscreenElement == null) {
 		if (isLoadingGame || started) {
 			if (currentScene != undefined) {
 				if (multiplayer && connectedCloud) {
