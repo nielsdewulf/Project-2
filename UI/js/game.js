@@ -2235,7 +2235,7 @@ const initFramework = () => {
 	 * When user clicks go to fullscreen
 	 */
 	document.documentElement.addEventListener('click', () => {
-		if (!isFullscreen && document.querySelector('.js-main__start').classList.contains('u-hidden')) {
+		if (!isFullscreen && !document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
 			/**
 			 * Setup fullscreen
 			 */
@@ -2331,6 +2331,7 @@ function orientationCheck() {
 		if (!document.querySelector('.js-main__start').classList.contains('u-hidden') || !document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
 			document.querySelector('.js-main__start').classList.add('u-hidden');
 			document.querySelector('.js-turnpage').classList.remove('u-hidden');
+			document.querySelector('.js-fullscreen').classList.add('u-hidden');
 		} else {
 			location.reload();
 		}
