@@ -429,7 +429,7 @@ const pingPlayers = () => {
 			});
 			showNewLobbies(lobbies);
 		}, 1000);
-	} catch {}
+	} catch (ex) {}
 };
 
 /**
@@ -502,7 +502,7 @@ const initBackend = () => {
 		document.addEventListener('mozfullscreenchange', exitLobbyHandler);
 		document.addEventListener('MSFullscreenChange', exitLobbyHandler);
 		document.addEventListener('webkitfullscreenchange', exitLobbyHandler);
-	} catch {}
+	} catch (ex) {}
 
 	//When user switches tabs
 	window.addEventListener('blur', () => {
@@ -641,7 +641,7 @@ const initBackend = () => {
 
 					try {
 						lobby.playersResponded++;
-					} catch {}
+					} catch (ex) {}
 				}
 			}
 		}
