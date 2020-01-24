@@ -9,23 +9,45 @@
 :root {
     /* colors */
     /*--color-alpha-light: MEDIUMSLATEBLUE;*/
-    --color-alpha-light: #F2F2F9;
+    /* --color-alpha-light: #F2F2F9;
     --color-alpha: #A3A0FB;
     --color-alpha-x: #A5A4BF;
     --color-alpha-dark: #4C4B6B;
     --color-alpha-x-dark: #43435D;
     --color-alpha-xx-dark: #4d4f5c;
-
-
     --color-beta: #3B86FF;
-    --color-gamma: #FF6565;
+    --color-gamma: #FF6565; */
 
-    --color-neutral-light: #fff;
+
+
+
+    --color-neutral-xx-light: #fff;
+    --color-neutral-x-light:#E2E2E2;
+    --color-neutral-light:#707070;
     --color-neutral-dark: #43425D;
+    --color-neutral-x-dark:#000;
+
+    --color-beta-x-light:#FFD54A;
+    --color-beta-light:#FE5499;
+    --color-beta-dark:#7B7BFF;
+    --color-beta-x-dark:#5B5BFF;
+    --color-beta-xx-dark:#FA0F2D;
+    --color-beta-xxx-dark:#E70000;
+    
+    
+
+
 
     /* Shadows */
-    --shadow-neutral: 0 2px 6px rgba(0, 0, 0, .04);
+    --shadow-neutral: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
+    --shadow-neutral-inside:inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
+
+
+
     /* border radius */
+    --radius-basic:10px;
+    --radius-circle:50%;
+    
 
     /* transitions */
     --transition-alpha: .1s;
@@ -93,7 +115,7 @@ textarea,
 
 h2 {
     font-size: calc((10vh + 10vw) / 6.818);
-    color: #7B7BFF;
+    color: var(--color-beta-dark);
 }
 
 /*
@@ -142,7 +164,7 @@ Styling logo
 }
 
 .c-logo__mark {
-    fill: white;
+    fill: var(--color-neutral-xx-light);
     height: 2vw;
     /* height: 7vh; */
     display: block;
@@ -174,7 +196,7 @@ Class used to control and navigate the pages in the one page site
 */
 
 .c-disabled {
-    background-color: lightgrey;
+    background-color: var(--color-neutral-xx-light);
 }
 
 /*
@@ -218,7 +240,7 @@ Styling default page
     font-family: 'Roboto', 'Sans Serif';
     font-size: calc((10vh + 10vw) / 5.357);
     font-weight: 600;
-    color: white;
+    color: var(--color-neutral-xx-light);
     display: flex;
     justify-content: center;
 
@@ -249,8 +271,8 @@ Styling default page
     margin-left: auto;
     margin-right: auto;
 
-    background-color: white;
-    border-radius: 10px;
+    background-color: var(--color-neutral-xx-light);
+    border-radius: var(--radius-basic);
 }
 
 .c-app__popup {
@@ -285,7 +307,7 @@ Styling default page
 }
 
 .c-app__turnscreen {
-    background-color: white;
+    background-color: var(--color-neutral-xx-light);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -331,10 +353,10 @@ Styling default page
 
 
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--radius-basic);
 
-    background-color: #FE5499;
-    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
+    background-color: var(--color-beta-light);
+    box-shadow: var(--shadow-neutral);
 }
 
 .c-button:focus {
@@ -345,7 +367,7 @@ Styling default page
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 6.818);
     font-weight: 600;
-    color: white;
+    color: var(--color-neutral-xx-light);
 }
 
 .c-button__content {
@@ -358,7 +380,7 @@ Styling default page
 
 .c-button__icon {
     height: 80%;
-    fill: white;
+    fill: var(--color-neutral-xx-light);
 }
 
 .c-buttons {
@@ -385,9 +407,9 @@ Vertical Grid Styling
     height: 7.87vh;
     max-width: 100%;
 
-    border-radius: 10px;
+    border-radius: var(--radius-basic);
 
-    background-color: #5B5BFF;
+    background-color: var(--color-beta-x-dark);
 
     display: grid;
     grid-template-columns: 9.375vw 9.375vw 1fr 9.375vw;
@@ -397,7 +419,7 @@ Vertical Grid Styling
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 8.333);
     line-height: 3.33vh;
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     margin: 0;
 }
@@ -440,9 +462,9 @@ Vertical Grid Styling
     height: 7.87vh;
     max-width: 100%;
 
-    border-radius: 10px;
+    border-radius: var(--radius-basic);
 
-    background-color: #5B5BFF;
+    background-color: var(--color-beta-x-dark);
 
     display: grid;
     grid-template-columns: 9.375vw 1fr;
@@ -452,7 +474,7 @@ Vertical Grid Styling
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 8.333);
     line-height: 3.33vh;
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     margin: 0;
 }
@@ -512,10 +534,10 @@ Container for Lobby page
 }
 
 .c-lobbychoice__item {
-    background-color: #5B5BFF;
+    background-color: var(--color-beta-x-dark);
 
-    border-radius: 10px;
-    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
+    border-radius: var(--radius-basic);
+    box-shadow: var(--shadow-neutral);
 
     min-width: 16.77vw;
 
@@ -531,7 +553,7 @@ Container for Lobby page
 .c-lobbychoice__title {
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 9.375);
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     text-align: center;
 
@@ -542,7 +564,7 @@ Container for Lobby page
 .c-lobbychoice__players-title {
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 10.714);
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     text-align: center;
 
@@ -553,7 +575,7 @@ Container for Lobby page
 .c-lobbychoice__players-count {
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 7.5);
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     text-align: center;
 
@@ -563,7 +585,7 @@ Container for Lobby page
 .c-lobbychoice__players-position {
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 10.714);
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     text-align: center;
 
@@ -574,12 +596,12 @@ Container for Lobby page
 .c-button-add__lobby {
     width: 40px;
     height: 40px;
-    background-color: #FFD54A;
+    background-color: var(--color-beta-x-light);
 
-    border-radius: 50%;
+    border-radius: var(--radius-circle);
 
     font-size: calc((10vh + 10vw) / 3.125);
-    color: white;
+    color: var(--color-neutral-xx-light);
 
     display: flex;
     align-items: center;
@@ -593,12 +615,12 @@ Container for Lobby page
     .c-button-add__lobby {
         width: 80px;
         height: 80px;
-        background-color: #FFD54A;
+        background-color: var(--color-beta-x-light);
 
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
 
         font-size: calc((10vh + 10vw) / 2.609);
-        color: white;
+        color: var(--color-neutral-xx-light);
 
         display: flex;
         align-items: center;
@@ -611,12 +633,12 @@ Container for Lobby page
     .c-button-add__lobby {
         width: 112px;
         height: 112px;
-        background-color: #FFD54A;
+        background-color: var(--color-beta-x-light);
 
-        border-radius: 50%;
+        border-radius: var(--radius-circle);
 
         font-size: calc((10vh + 10vw) / 2.083);
-        color: white;
+        color: var(--color-neutral-xx-light);
 
         display: flex;
         align-items: center;
@@ -641,39 +663,33 @@ Container for Lobby page
 }
 
 .c-position__title {
-    color: white;
+    color: var(--color-neutral-xx-light);
 }
+  
 
 
 .c-position__options {
     height: 37vh;
     width: 18.23vw;
-    background-color: #FFD54A;
-    border-radius: 10px;
+    background-color: var(--color-beta-x-light);
+    border-radius: var(--radius-basic);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
     padding-bottom: 3vh;
     align-items: center;
-    color: white;
-    font-size: calc((10vh + 10vw) / 6.818)
+    color: var(--color-neutral-xx-light);
+    font-size: calc((10vh + 10vw) / 6.818);
 }
 
 .c-positionchoice__radio:checked+.c-position__label div {
-    box-shadow: inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
+    box-shadow: var(--shadow-neutral-inside);
 
 
     box-sizing: border-box;
 }
 
-.c-position__options-icon {
-    margin-bottom: 10%;
-   
-   
 
-    display: flex;
-    justify-content: center;
-}
 
 .c-position__options-icon1 {
     margin-bottom: 10%;
@@ -759,8 +775,8 @@ Container for avatar choice
 }
 
 .c-avatarchoice__radio:checked+.c-avatarchoice__label div {
-    box-shadow: inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
-    border-radius: 50%;
+    box-shadow: var(--shadow-neutral-inside);
+    border-radius: var(--radius-circle);
 
     box-sizing: border-box;
 }
@@ -811,11 +827,11 @@ Container for avatar choice
 
 .c-scoreboard-popup__box {
     width: 100%;
-    background-color: white;
+    background-color: var(--color-neutral-xx-light);
     height: 70.37vh;
 
-    border-radius: 10px;
-    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
+    border-radius: var(--radius-basic);
+    box-shadow: var(--shadow-neutral);
 
     display: flex;
     align-items: center;
@@ -838,23 +854,23 @@ Container for avatar choice
 .c-scoreboard-popup__description {
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 9.375);
-    color: #707070;
+    color: var(--color-neutral-light);
 }
 
 .c-scoreboard-popup__question {
     font-family: 'Roboto';
     font-size: calc((10vh + 10vw) / 7.895);
-    color: #707070;
+    color: var(--color-neutral-light);
 }
 
 .c-scoreboard-popup__name-input {
     width: 41.67vw;
     height: 7.41vh;
 
-    background-color: #E2E2E2;
+    background-color: var(--color-neutral-x-light);
 
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-basic);
 
     margin-bottom: 4.63vh;
 }
@@ -865,10 +881,10 @@ Container for avatar choice
     height: 10.19vh;
 
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--radius-basic);
 
-    background-color: #E70000;
-    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
+    background-color: var(--color-beta-xxx-dark);
+    box-shadow: var(--shadow-neutral);
 }
 
 .c-scoreboard-popup__button:focus {
@@ -880,7 +896,7 @@ Container for avatar choice
     font-size: calc((10vh + 10vw) / 6.818);
     font-weight: 600;
 
-    color: white;
+    color: var(--color-neutral-xx-light);
 }
 
 /* Deathscreen Pop-up */
@@ -901,16 +917,16 @@ Container for avatar choice
     justify-content: center;
     align-items: center;
 
-    background-color: white;
+    background-color: var(--color-neutral-xx-light);
     width: 60vw;
     height: 12vh;
 
-    border-radius: 10px;
-    box-shadow: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
+    border-radius: var(--radius-basic);
+    box-shadow: var(--shadow-neutral);
 }
 
 .c-deathscreen-popup__text {
-    color: #707070;
+    color: var(--color-neutral-light);
 
     text-align: center;
     margin: 0;
@@ -922,7 +938,7 @@ Container for avatar choice
 }
 
 .c-deathscreen-popup__score {
-    color: #5B5BFF !important;
+    color: var(--color-beta-x-dark) !important;
 }
 
 canvas {
@@ -940,7 +956,7 @@ canvas {
 }
 
 .c-game-overlay {
-    color: white;
+    color: var(--color-neutral-xx-light);
     position: absolute;
     z-index: 1000;
     width: 100%;
@@ -955,7 +971,7 @@ canvas {
 .c-game-overlay h3 {
     font-weight: 500;
     margin: 0;
-    color: white;
+    color: var(--color-neutral-xx-light);
 }
 
 .c-game-overlay h3 {
@@ -988,7 +1004,7 @@ canvas {
 .c-game-overlay__health .c-game-overlay__heart {
     width: 3vw;
     height: 3vw;
-    fill: #FA0F2D;
+    fill: var(--color-beta-xx-dark);
     stroke: none;
 }
 
@@ -998,7 +1014,7 @@ canvas {
     stroke-linejoin: round;
     stroke-width: 2px;
     stroke-opacity: .2;
-    stroke: #000;
+    stroke: var(--color-neutral-x-dark);
     fill: none;
 }
 
@@ -1078,7 +1094,7 @@ canvas {
 }
 
 .c-loader__circle {
-    stroke: white;
+    stroke: var(--color-neutral-xx-light);
     fill: transparent;
     stroke-linecap: round;
     stroke-width: var(--circle-stroke-width);
