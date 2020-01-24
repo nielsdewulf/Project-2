@@ -199,6 +199,12 @@ const getPositionNameById = id => {
 	}
 };
 let buttonListeners = function() {
+	document.querySelectorAll('.js-singleplayer-position').forEach(el => {
+		el.addEventListener('click', el => {
+			console.log(el.target.checked);
+		});
+	});
+
 	/* Start Page Singleplayer Button Event Listener */
 	let singlePlayerButton = document.querySelector('.js-button__singleplayer');
 	singlePlayerButton.addEventListener('click', function() {
