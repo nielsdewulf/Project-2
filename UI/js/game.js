@@ -1087,12 +1087,12 @@ function update() {
 			highscorePositionObject.innerHTML = `${position}e`;
 			highscoreScoreObject.innerHTML = lowestScoreToBeat;
 		} else {
-			highscorePositionObject.innerHTML = `${position}e`;
-			highscoreScoreObject.innerHTML = 1;
+			highscorePositionObject.innerHTML = `1e`;
+			highscoreScoreObject.innerHTML = 0;
 		}
 	} else {
-		highscorePositionObject.innerHTML = `${position}e`;
-		highscoreScoreObject.innerHTML = 1;
+		highscorePositionObject.innerHTML = `1e`;
+		highscoreScoreObject.innerHTML = 0;
 	}
 }
 
