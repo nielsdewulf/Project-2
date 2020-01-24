@@ -1396,7 +1396,7 @@ function initMqtt(gameObj) {
  */
 function processGyro(alpha, beta, gamma) {
 	//We should only process it if the player is still alive
-	if (alive && started) {
+	if (alive) {
 		/**
 		 * If orientation is alternative landscape
 		 */
