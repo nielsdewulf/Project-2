@@ -1,7 +1,8 @@
 /**
  * Screen width and height
  */
-let width, height;
+let width;
+let height;
 
 /**
  * Width based on height multiplied by 16:9 ratio, height = screen height
@@ -1378,7 +1379,7 @@ function initMqtt(gameObj) {
 							otherPlayerData.y = y;
 							otherPlayer.setPosition(x + otherPlayer.body.width / 2, otherPlayer.body.y + otherPlayer.body.height / 2);
 						}
-					} catch {}
+					} catch (ex) {}
 				}
 			}
 		});
@@ -2260,7 +2261,7 @@ const initFramework = () => {
 					} else if (document.documentElement.webkitRequestFullscreen) {
 						document.documentElement.webkitRequestFullscreen();
 					}
-				} catch {}
+				} catch (ex) {}
 
 				try {
 					if (document.addEventListener) {
@@ -2269,7 +2270,7 @@ const initFramework = () => {
 						document.addEventListener('MSFullscreenChange', exitHandler, false);
 						document.addEventListener('webkitfullscreenchange', exitHandler, false);
 					}
-				} catch {}
+				} catch (ex) {}
 
 				/**
 				 * Disable screen sleeping
@@ -2288,16 +2289,16 @@ const initFramework = () => {
 					 */
 					try {
 						screen.orientation.lock('landscape-primary');
-					} catch {}
+					} catch (ex) {}
 					try {
 						ScreenOrientation.lock('landscape-primary');
-					} catch {}
+					} catch (ex) {}
 					try {
 						screen.msLockOrientation.lock('landscape-primary');
-					} catch {}
+					} catch (ex) {}
 					try {
 						screen.mozLockOrientation.lock('landscape-primary');
-					} catch {}
+					} catch (ex) {}
 				}, 50);
 				setTimeout(() => {
 					initGame();
@@ -2314,7 +2315,7 @@ const initFramework = () => {
 							})
 							.catch(console.error);
 					}
-				} catch {}
+				} catch (ex) {}
 			}
 		},
 		true
