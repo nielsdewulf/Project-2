@@ -634,6 +634,7 @@ h2 {
   font-size: calc((10vh + 10vw) / 9.375);
   font-weight: 600;
   text-align: center;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   color: var(--color-neutral-xx-light);
   display: -webkit-box;
   display: -ms-flexbox;
@@ -692,6 +693,7 @@ h2 {
   align-items: center;
   color: var(--color-neutral-xx-light);
   font-size: calc((10vh + 10vw) / 6.818);
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
 
 .c-positionchoice__radio:checked + .c-position__label {
