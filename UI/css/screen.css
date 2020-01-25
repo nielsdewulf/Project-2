@@ -15,29 +15,38 @@
     --color-alpha-xx-dark: #4d4f5c;
     --color-beta: #3B86FF;
     --color-gamma: #FF6565; */
+
   --color-neutral-xx-light: #fff;
   --color-neutral-x-light: #e2e2e2;
   --color-neutral-light: #707070;
   --color-neutral-dark: #43425d;
   --color-neutral-x-dark: #000;
-  --color-beta-x-light: #ffd54a;
-  --color-beta-light: #fe5499;
+
+  --color-beta-xx-light: #FFC917;
+  --color-beta-x-light: #FF1E7A;
+  --color-beta-light:#DB44FF;
   --color-beta-dark: #7b7bff;
   --color-beta-x-dark: #5b5bff;
   --color-beta-xx-dark: #fa0f2d;
   --color-beta-xxx-dark: #e70000;
+
   /* Shadows */
   --shadow-neutral: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
-  --shadow-neutral-inside: inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
+  --shadow-neutral-inside: inset 0px 0px 0px 0.5vw rgba(255, 255, 255, 1);
+  --shadow-neutral-inside-blue: 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
+
   /* border radius */
   --radius-basic: 10px;
   --radius-circle: 50%;
+
   /* transitions */
   --transition-alpha: 0.1s;
+
   /*grid*/
   --grid-sidebar-width: 260px;
   --grid-baseline: 5px;
   --grid-header-height: 70px;
+
   /*loader pi*/
   --pi: 3.14159265359;
 }
@@ -373,7 +382,7 @@ Styling default page
   justify-self: center;
   border: 0;
   border-radius: var(--radius-basic);
-  background-color: var(--color-beta-light);
+  background-color: var(--color-beta-x-light);
   -webkit-box-shadow: var(--shadow-neutral);
   box-shadow: var(--shadow-neutral);
 }
@@ -426,7 +435,6 @@ Vertical Grid Styling
 .c-vertical-grid {
   display: -ms-grid;
   display: grid;
-  -ms-grid-rows: (7vh)[5];
   grid-template-rows: repeat(5, 7vh);
   grid-row-gap: 3vh;
   width: 100%;
@@ -487,7 +495,6 @@ Vertical Grid Styling
 .c-vertical-grid-lobby {
   display: -ms-grid;
   display: grid;
-  -ms-grid-rows: (7vh)[2];
   grid-template-rows: repeat(2, 7vh);
   grid-row-gap: 3vh;
   width: 100%;
@@ -625,11 +632,15 @@ Container for Lobby page
 }
 
 .c-button-add__lobby {
-  width: 40px;
-  height: 40px;
-  background-color: var(--color-beta-x-light);
-  border-radius: var(--radius-circle);
-  font-size: calc((10vh + 10vw) / 3.125);
+  width: calc(((100vw+100vh) / 2 ) / 6);
+  height: calc(((100vw+100vh) / 2 ) / 6);
+  background-color: var(--color-beta-xx-light);
+  border-radius: var(--radius-basic);
+  font-size: calc((10vh + 10vw) / 9.375);
+  font-weight: 600;
+  text-align: center;
+ 
+  
   color: var(--color-neutral-xx-light);
   display: -webkit-box;
   display: -ms-flexbox;
@@ -642,50 +653,6 @@ Container for Lobby page
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
-}
-
-@media (min-width: 1024px) {
-  .c-button-add__lobby {
-    width: 80px;
-    height: 80px;
-    background-color: var(--color-beta-x-light);
-    border-radius: var(--radius-circle);
-    font-size: calc((10vh + 10vw) / 2.609);
-    color: var(--color-neutral-xx-light);
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -ms-flex-item-align: center;
-    align-self: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-  }
-}
-
-@media (min-width: 1200px) {
-  .c-button-add__lobby {
-    width: 112px;
-    height: 112px;
-    background-color: var(--color-beta-x-light);
-    border-radius: var(--radius-circle);
-    font-size: calc((10vh + 10vw) / 2.083);
-    color: var(--color-neutral-xx-light);
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-align: center;
-    -ms-flex-align: center;
-    align-items: center;
-    -ms-flex-item-align: center;
-    align-self: center;
-    -webkit-box-pack: center;
-    -ms-flex-pack: center;
-    justify-content: center;
-  }
 }
 
 /*
@@ -714,7 +681,7 @@ Container for Lobby page
 .c-position__options {
   height: 37vh;
   width: 18.23vw;
-  background-color: var(--color-beta-x-light);
+  background-color: var(--color-beta-xx-light);
   border-radius: var(--radius-basic);
   display: -webkit-box;
   display: -ms-flexbox;
@@ -735,8 +702,9 @@ Container for Lobby page
 }
 
 .c-positionchoice__radio:checked+.c-position__label div {
-  -webkit-box-shadow: var(--shadow-neutral-inside);
-  box-shadow: var(--shadow-neutral-inside);
+  background-color:var(--color-beta-light);
+  transform:scale(1.1,1.1);
+  box-shadow: var(--shadow-neutral);
 }
 
 .c-position__label {
@@ -813,7 +781,7 @@ Container for avatar choice
   display: flex;
   width: 100%;
   -ms-flex-item-align: center;
-  align-self: center;
+  align-items: center;
   -ms-flex-pack: distribute;
   justify-content: space-around;
 }
@@ -825,8 +793,12 @@ Container for avatar choice
 }
 
 .c-avatarchoice__radio:checked+.c-avatarchoice__label div {
-  -webkit-box-shadow: var(--shadow-neutral-inside);
-  box-shadow: var(--shadow-neutral-inside);
+  
+
+  box-shadow:  var(--shadow-neutral-inside), var(--shadow-neutral-inside-blue);
+ 
+
+
   border-radius: var(--radius-circle);
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
@@ -840,21 +812,25 @@ Container for avatar choice
 .c-avatar0-icon {
   background-image: url("../img/png/JelleyAvatarIcon.png");
   background-size: cover;
+ 
 }
 
 .c-avatar1-icon {
   background-image: url("../img/png/StokeleyAvatarIcon.png");
   background-size: cover;
+
 }
 
 .c-avatar2-icon {
   background-image: url("../img/png/SpikeyAvatarIcon.png");
   background-size: cover;
+
 }
 
 .c-avatar3-icon {
   background-image: url("../img/png/VlamAvatarIcon.png");
   background-size: cover;
+ 
 }
 
 .js-main__score-results {
