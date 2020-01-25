@@ -8,13 +8,13 @@
 	/* colors */
 	/*--color-alpha-light: MEDIUMSLATEBLUE;*/
 	/* --color-alpha-light: #F2F2F9;
-    --color-alpha: #A3A0FB;
-    --color-alpha-x: #A5A4BF;
-    --color-alpha-dark: #4C4B6B;
-    --color-alpha-x-dark: #43435D;
-    --color-alpha-xx-dark: #4d4f5c;
-    --color-beta: #3B86FF;
-    --color-gamma: #FF6565; */
+	  --color-alpha: #A3A0FB;
+	  --color-alpha-x: #A5A4BF;
+	  --color-alpha-dark: #4C4B6B;
+	  --color-alpha-x-dark: #43435D;
+	  --color-alpha-xx-dark: #4d4f5c;
+	  --color-beta: #3B86FF;
+	  --color-gamma: #FF6565; */
 
 	--color-neutral-xx-light: #fff;
 	--color-neutral-x-light: #e2e2e2;
@@ -22,8 +22,9 @@
 	--color-neutral-dark: #43425d;
 	--color-neutral-x-dark: #000;
 
-	--color-beta-x-light: #ffd54a;
-	--color-beta-light: #fe5499;
+	--color-beta-xx-light: #ffc917;
+	--color-beta-x-light: #ff1e7a;
+	--color-beta-light: #db44ff;
 	--color-beta-dark: #7b7bff;
 	--color-beta-x-dark: #5b5bff;
 	--color-beta-xx-dark: #fa0f2d;
@@ -31,7 +32,8 @@
 
 	/* Shadows */
 	--shadow-neutral: 0px 5px 6px 0px rgba(0, 0, 0, 0.16);
-	--shadow-neutral-inside: inset 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
+	--shadow-neutral-inside: inset 0px 0px 0px 0.5vw rgba(255, 255, 255, 1);
+	--shadow-neutral-inside-blue: 0px 0px 0px 0.5vw rgba(123, 123, 255, 1);
 
 	/* border radius */
 	--radius-basic: 10px;
@@ -43,7 +45,6 @@
 	/*grid*/
 	--grid-sidebar-width: 260px;
 	--grid-baseline: 5px;
-
 	--grid-header-height: 70px;
 
 	/*loader pi*/
@@ -51,13 +52,13 @@
 }
 
 /*------------------------------------*\
-#GENERIC
-\*------------------------------------*/
+  #GENERIC
+  \*------------------------------------*/
 /*
-    Generic: Page
-    ---
-    Global page styles + universal box-sizing:
-*/
+	  Generic: Page
+	  ---
+	  Global page styles + universal box-sizing:
+  */
 html {
 	font-size: 16px;
 	/*=1REM*/
@@ -105,30 +106,30 @@ h2 {
 }
 
 /*
-* Remove text-shadow in selection highlight:
-* https://twitter.com/miketaylr/status/12228805301
-*
-* Customize the background color to match your design.
-*/
+  * Remove text-shadow in selection highlight:
+  * https://twitter.com/miketaylr/status/12228805301
+  *
+  * Customize the background color to match your design.
+  */
 /* ::-moz-selection {
-    background: var(--color-alpha);
-    color: white;
-    text-shadow: none;
-}
-
-::selection {
-    background: var(--color-alpha);
-    color: white;
-    text-shadow: none;
-} */
+	  background: var(--color-alpha);
+	  color: white;
+	  text-shadow: none;
+  }
+  
+  ::selection {
+	  background: var(--color-alpha);
+	  color: white;
+	  text-shadow: none;
+  } */
 /*------------------------------------*\
-#Objects
-\*------------------------------------*/
+  #Objects
+  \*------------------------------------*/
 /*
-Objects : Logo
----
-Styling logo
-*/
+  Objects : Logo
+  ---
+  Styling logo
+  */
 .o-hide-accessible {
 	position: absolute;
 	width: 1px;
@@ -179,22 +180,22 @@ Styling logo
 }
 
 /*------------------------------------*\
-#Components
-\*------------------------------------*/
+  #Components
+  \*------------------------------------*/
 /*
-Components : Navigation
----
-Class used to control and navigate the pages in the one page site
-*/
+  Components : Navigation
+  ---
+  Class used to control and navigate the pages in the one page site
+  */
 .c-disabled {
 	background-color: var(--color-neutral-xx-light);
 }
 
 /*
-Components : Page
----
-Styling default page
-*/
+  Components : Page
+  ---
+  Styling default page
+  */
 .c-page {
 	height: 100vh;
 }
@@ -238,7 +239,11 @@ Styling default page
 	font-size: calc((10vh + 10vw) / 5.357);
 	font-weight: 600;
 	color: var(--color-neutral-xx-light);
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
 	justify-content: center;
 }
 
@@ -261,14 +266,18 @@ Styling default page
 .c-app__avatar {
 	width: 100%;
 	height: 81.5vh;
-
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
 	flex-direction: column;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
-
 	margin-left: auto;
 	margin-right: auto;
-
 	background-color: var(--color-neutral-xx-light);
 	border-radius: var(--radius-basic);
 }
@@ -319,11 +328,19 @@ Styling default page
 
 .c-app__turnscreen {
 	background-color: var(--color-neutral-xx-light);
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
 	flex-direction: column;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
 	justify-content: center;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
-
 	font-size: calc((10vh+10vw) / 2.8);
 }
 
@@ -353,20 +370,20 @@ Styling default page
 }
 
 /*
-    Components: Button
-    ---
-    style of the buttons
-*/
+	  Components: Button
+	  ---
+	  style of the buttons
+  */
 .c-button {
 	width: 25.5vw;
 	height: 10.37vh;
 	margin-bottom: 5%;
+	-ms-grid-column-align: center;
 	justify-self: center;
-
 	border: 0;
 	border-radius: var(--radius-basic);
-
-	background-color: var(--color-beta-light);
+	background-color: var(--color-beta-x-light);
+	-webkit-box-shadow: var(--shadow-neutral);
 	box-shadow: var(--shadow-neutral);
 }
 
@@ -411,10 +428,10 @@ Styling default page
 }
 
 /*
-Component: Grid
----
-Vertical Grid Styling 
- */
+  Component: Grid
+  ---
+  Vertical Grid Styling 
+   */
 .c-vertical-grid {
 	display: -ms-grid;
 	display: grid;
@@ -426,12 +443,11 @@ Vertical Grid Styling
 .c-vertical-grid__box {
 	height: 7.87vh;
 	max-width: 100%;
-
 	border-radius: var(--radius-basic);
-
 	background-color: var(--color-beta-x-dark);
-
+	display: -ms-grid;
 	display: grid;
+	-ms-grid-columns: 9.375vw 9.375vw 1fr 9.375vw;
 	grid-template-columns: 9.375vw 9.375vw 1fr 9.375vw;
 }
 
@@ -440,7 +456,6 @@ Vertical Grid Styling
 	font-size: calc((10vh + 10vw) / 8.333);
 	line-height: 3.33vh;
 	color: var(--color-neutral-xx-light);
-
 	margin: 0;
 }
 
@@ -488,12 +503,11 @@ Vertical Grid Styling
 .c-vertical-grid__box-lobby {
 	height: 7.87vh;
 	max-width: 100%;
-
 	border-radius: var(--radius-basic);
-
 	background-color: var(--color-beta-x-dark);
-
+	display: -ms-grid;
 	display: grid;
+	-ms-grid-columns: 9.375vw 1fr;
 	grid-template-columns: 9.375vw 1fr;
 }
 
@@ -502,7 +516,6 @@ Vertical Grid Styling
 	font-size: calc((10vh + 10vw) / 8.333);
 	line-height: 3.33vh;
 	color: var(--color-neutral-xx-light);
-
 	margin: 0;
 }
 
@@ -530,11 +543,11 @@ Vertical Grid Styling
 }
 
 /*
-Components: Lobby
---- 
-Container for Lobby page
-
-*/
+  Components: Lobby
+  --- 
+  Container for Lobby page
+  
+  */
 .c-lobby {
 	width: 100%;
 	height: 55vh;
@@ -564,14 +577,18 @@ Container for Lobby page
 
 .c-lobbychoice__item {
 	background-color: var(--color-beta-x-dark);
-
 	border-radius: var(--radius-basic);
+	-webkit-box-shadow: var(--shadow-neutral);
 	box-shadow: var(--shadow-neutral);
-
 	min-width: 16.77vw;
-
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
 	justify-content: center;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
 }
 
@@ -583,9 +600,7 @@ Container for Lobby page
 	font-family: 'Roboto';
 	font-size: calc((10vh + 10vw) / 9.375);
 	color: var(--color-neutral-xx-light);
-
 	text-align: center;
-
 	margin: 0;
 	margin-bottom: 4.44vh;
 }
@@ -594,9 +609,7 @@ Container for Lobby page
 	font-family: 'Roboto';
 	font-size: calc((10vh + 10vw) / 10.714);
 	color: var(--color-neutral-xx-light);
-
 	text-align: center;
-
 	margin: 0;
 	margin-bottom: 0.74vh;
 }
@@ -605,9 +618,7 @@ Container for Lobby page
 	font-family: 'Roboto';
 	font-size: calc((10vh + 10vw) / 7.5);
 	color: var(--color-neutral-xx-light);
-
 	text-align: center;
-
 	margin: 0;
 }
 
@@ -615,71 +626,40 @@ Container for Lobby page
 	font-family: 'Roboto';
 	font-size: calc((10vh + 10vw) / 10.714);
 	color: var(--color-neutral-xx-light);
-
 	text-align: center;
-
 	margin-top: 5vh;
 	margin-bottom: 0.74vh;
 }
 
 .c-button-add__lobby {
-	width: 40px;
-	height: 40px;
-	background-color: var(--color-beta-x-light);
+	width: calc(((100vw+100vh) / 2) / 6);
+	height: calc(((100vw+100vh) / 2) / 6);
+	background-color: var(--color-beta-xx-light);
+	border-radius: var(--radius-basic);
+	font-size: calc((10vh + 10vw) / 9.375);
+	font-weight: 600;
+	text-align: center;
 
-	border-radius: var(--radius-circle);
-
-	font-size: calc((10vh + 10vw) / 3.125);
 	color: var(--color-neutral-xx-light);
-
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
+	-ms-flex-item-align: center;
 	align-self: center;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
 	justify-content: center;
 }
 
-@media (min-width: 1024px) {
-	.c-button-add__lobby {
-		width: 80px;
-		height: 80px;
-		background-color: var(--color-beta-x-light);
-
-		border-radius: var(--radius-circle);
-
-		font-size: calc((10vh + 10vw) / 2.609);
-		color: var(--color-neutral-xx-light);
-
-		display: flex;
-		align-items: center;
-		align-self: center;
-		justify-content: center;
-	}
-}
-
-@media (min-width: 1200px) {
-	.c-button-add__lobby {
-		width: 112px;
-		height: 112px;
-		background-color: var(--color-beta-x-light);
-
-		border-radius: var(--radius-circle);
-
-		font-size: calc((10vh + 10vw) / 2.083);
-		color: var(--color-neutral-xx-light);
-
-		display: flex;
-		align-items: center;
-		align-self: center;
-		justify-content: center;
-	}
-}
-
 /*
-Components: Lobby
---- 
-Container for Lobby page
-
-*/
+  Components: Lobby
+  --- 
+  Container for Lobby page
+  
+  */
 .c-position {
 	width: 90%;
 	display: -webkit-box;
@@ -700,23 +680,30 @@ Container for Lobby page
 .c-position__options {
 	height: 37vh;
 	width: 18.23vw;
-	background-color: var(--color-beta-x-light);
+	background-color: var(--color-beta-xx-light);
 	border-radius: var(--radius-basic);
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
 	flex-direction: column;
+	-webkit-box-pack: end;
+	-ms-flex-pack: end;
 	justify-content: flex-end;
 	padding-bottom: 3vh;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
 	color: var(--color-neutral-xx-light);
 	font-size: calc((10vh + 10vw) / 6.818);
 }
 
-.c-positionchoice__radio:checked + .c-position__label div {
-	box-shadow: var(--shadow-neutral-inside);
-}
-
-.c-position__label {
-	display: block;
+.c-positionchoice__radio:checked + .c-position__label {
+	background-color: var(--color-beta-light);
+	transform: scale(1.1, 1.1);
+	box-shadow: var(--shadow-neutral);
 }
 
 .c-position__options-icon1 {
@@ -762,11 +749,11 @@ Container for Lobby page
 }
 
 /*
-Components: Avatar
---- 
-Container for avatar choice 
-
-*/
+  Components: Avatar
+  --- 
+  Container for avatar choice 
+  
+  */
 .c-avatar {
 	width: 90%;
 	height: 55vh;
@@ -789,7 +776,7 @@ Container for avatar choice
 	display: flex;
 	width: 100%;
 	-ms-flex-item-align: center;
-	align-self: center;
+	align-items: center;
 	-ms-flex-pack: distribute;
 	justify-content: space-around;
 }
@@ -801,9 +788,10 @@ Container for avatar choice
 }
 
 .c-avatarchoice__radio:checked + .c-avatarchoice__label div {
-	box-shadow: var(--shadow-neutral-inside);
-	border-radius: var(--radius-circle);
+	box-shadow: var(--shadow-neutral-inside), var(--shadow-neutral-inside-blue);
 
+	border-radius: var(--radius-circle);
+	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
 
@@ -858,12 +846,18 @@ Container for avatar choice
 	width: 100%;
 	background-color: var(--color-neutral-xx-light);
 	height: 70.37vh;
-
 	border-radius: var(--radius-basic);
+	-webkit-box-shadow: var(--shadow-neutral);
 	box-shadow: var(--shadow-neutral);
-
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
+	-webkit-box-orient: vertical;
+	-webkit-box-direction: normal;
+	-ms-flex-direction: column;
 	flex-direction: column;
 }
 
@@ -901,23 +895,19 @@ Container for avatar choice
 .c-scoreboard-popup__name-input {
 	width: 41.67vw;
 	height: 7.41vh;
-
 	background-color: var(--color-neutral-x-light);
-
 	border: none;
 	border-radius: var(--radius-basic);
-
 	margin-bottom: 4.63vh;
 }
 
 .c-scoreboard-popup__button {
 	width: 25.5vw;
 	height: 10.19vh;
-
 	border: 0;
 	border-radius: var(--radius-basic);
-
 	background-color: var(--color-beta-xxx-dark);
+	-webkit-box-shadow: var(--shadow-neutral);
 	box-shadow: var(--shadow-neutral);
 }
 
@@ -930,7 +920,6 @@ Container for avatar choice
 	font-family: 'Roboto';
 	font-size: calc((10vh + 10vw) / 6.818);
 	font-weight: 600;
-
 	color: var(--color-neutral-xx-light);
 }
 
@@ -950,26 +939,28 @@ Container for avatar choice
 
 .c-deathscreen-popup {
 	margin-top: 1vh;
-
+	display: -webkit-box;
+	display: -ms-flexbox;
 	display: flex;
+	-webkit-box-pack: center;
+	-ms-flex-pack: center;
 	justify-content: center;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
 	align-items: center;
-
 	background-color: var(--color-neutral-xx-light);
 	width: 60vw;
 	height: 12vh;
-
 	border-radius: var(--radius-basic);
+	-webkit-box-shadow: var(--shadow-neutral);
 	box-shadow: var(--shadow-neutral);
 }
 
 .c-deathscreen-popup__text {
 	color: var(--color-neutral-light);
-
 	text-align: center;
 	margin: 0;
 	margin-bottom: 1vh;
-
 	font-family: 'Roboto';
 	font-weight: 600;
 	font-size: calc((10vw + 10vh) / 9.375);
@@ -1143,7 +1134,9 @@ canvas {
 	r: var(--circle-radius);
 	cx: var(--circle-center);
 	cy: var(--circle-center);
+	-webkit-animation: rotateCircle calc(var(--animation-duration) + 0.25s) linear infinite, strokeCircle var(--animation-duration) infinite;
 	animation: rotateCircle calc(var(--animation-duration) + 0.25s) linear infinite, strokeCircle var(--animation-duration) infinite;
+	-webkit-transform-origin: center;
 	transform-origin: center;
 }
 
@@ -1191,3 +1184,5 @@ canvas {
 		stroke-dashoffset: calc(var(--circle-circumference) * -1);
 	}
 }
+
+/*# sourceMappingURL=screen.css.map */
