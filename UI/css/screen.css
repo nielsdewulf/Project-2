@@ -428,8 +428,7 @@ h2 {
 .c-vertical-grid {
   display: -ms-grid;
   display: grid;
-  -ms-grid-rows: (7vh)[5];
-      grid-template-rows: repeat(5, 7vh);
+  grid-template-rows: repeat(5, 7vh);
   grid-row-gap: 3vh;
   width: 100%;
 }
@@ -489,8 +488,7 @@ h2 {
 .c-vertical-grid-lobby {
   display: -ms-grid;
   display: grid;
-  -ms-grid-rows: (7vh)[2];
-      grid-template-rows: repeat(2, 7vh);
+  grid-template-rows: repeat(2, 7vh);
   grid-row-gap: 3vh;
   width: 100%;
 }
@@ -906,7 +904,6 @@ h2 {
   width: 25.5vw;
   height: 10.19vh;
   border: 0;
-  
   border-radius: var(--radius-basic);
   background-color: var(--color-beta-xxx-dark);
   -webkit-box-shadow: var(--shadow-neutral);
