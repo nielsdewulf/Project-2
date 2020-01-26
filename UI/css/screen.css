@@ -627,8 +627,8 @@ h2 {
 }
 
 .c-button-add__lobby {
-  width: calc(((100vw+100vh) / 2) / 6);
-  height: calc(((100vw+100vh) / 2) / 6);
+  width: calc(((100vw + 100vh) / 2)  / 7.5);
+  height: calc(((100vw + 100vh) / 2) / 7.5);
   background-color: var(--color-beta-xx-light);
   border-radius: var(--radius-basic);
   font-size: calc((10vh + 10vw) / 9.375);
