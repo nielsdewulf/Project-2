@@ -843,9 +843,9 @@ h2 {
 }
 
 .c-scoreboard-popup__box {
-  width: 100%;
+  width: calc(((100vh + 100vw) /2 ) / 1.071428571428571 );
+  height: calc(((100vh + 100vw) /2 ) / 1.90 );
   background-color: var(--color-neutral-xx-light);
-  height: 70.37vh;
   border-radius: var(--radius-basic);
   -webkit-box-shadow: var(--shadow-neutral);
   box-shadow: var(--shadow-neutral);
@@ -884,6 +884,7 @@ h2 {
   font-family: 'Roboto';
   font-size: calc((10vh + 10vw) / 9.375);
   color: var(--color-neutral-light);
+  margin-top:5vh;
 }
 
 .c-scoreboard-popup__question {
@@ -905,6 +906,7 @@ h2 {
   width: 25.5vw;
   height: 10.19vh;
   border: 0;
+  
   border-radius: var(--radius-basic);
   background-color: var(--color-beta-xxx-dark);
   -webkit-box-shadow: var(--shadow-neutral);
