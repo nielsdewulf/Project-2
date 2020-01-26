@@ -2223,6 +2223,11 @@ const initFramework = () => {
 			}
 		}
 	});
+	window.addEventListener('resize', () => {
+		if (isFullscreen && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
+			location.reload();
+		}
+	});
 
 	window.addEventListener('orientationchange', () => {
 		orientationCheck();
@@ -2248,8 +2253,6 @@ const initFramework = () => {
 				/**
 				 * Setup fullscreen
 				 */
-				document.querySelector('.js-main__start').classList.remove('u-hidden');
-				document.querySelector('.js-fullscreen').classList.add('u-hidden');
 
 				try {
 					if (document.documentElement.requestFullscreen) {
@@ -2284,6 +2287,8 @@ const initFramework = () => {
 				 * Initialise game object
 				 */
 				setTimeout(() => {
+					document.querySelector('.js-main__start').classList.remove('u-hidden');
+					document.querySelector('.js-fullscreen').classList.add('u-hidden');
 					/**
 					 * Request landscape mode
 					 */
@@ -2299,7 +2304,7 @@ const initFramework = () => {
 					try {
 						screen.mozLockOrientation.lock('landscape-primary');
 					} catch (ex) {}
-				}, 50);
+				}, 500);
 				setTimeout(() => {
 					initGame();
 				}, 1500);
@@ -2328,7 +2333,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function orientationCheck() {
 	if (game !== undefined) {
-		if (window.orientation == 0 || window.orientation == 180) location.reload();
+		if (window.orientation == 0 || window.orientation == 180) {
+			location.reload();
+		}
 	}
 	if (window.orientation == 90 || window.orientation == -90) {
 		if (isFullscreen) {
@@ -2349,7 +2356,7 @@ function orientationCheck() {
 	}
 }
 function exitHandler() {
-	if (isFullscreen && document.fullscreenElement == null) {
+	if (isFullscreen && document.fullscreenElement == null && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
 		if (isLoadingGame || started) {
 			if (currentScene != undefined) {
 				if (multiplayer && connectedCloud) {
