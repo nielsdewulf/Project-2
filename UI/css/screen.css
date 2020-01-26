@@ -862,8 +862,8 @@ h2 {
 }
 
 .c-scoreboard-popup__image {
-  width: 58.33vw;
-  height: 33.15vh;
+  width: calc(((100vh + 100vw) /2 ) / 1.339285714285714 );
+  height: calc(((100vh + 100vw) /2 ) / 4.24929178470255 );
   margin-top: -7.41vh;
 }
 
