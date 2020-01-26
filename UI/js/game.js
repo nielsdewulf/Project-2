@@ -2129,11 +2129,11 @@ const calcWidthHeight = () => {
  */
 const calcGameBounds = height => {
 	console.log(Math.abs(window.innerWidth - window.innerHeight));
-	console.log(window.innerHeight * 0.5);
-	if (Math.abs(window.innerWidth - window.innerHeight) > window.innerHeight * 0.5) {
+	console.log(window.innerHeight * 0.4);
+	if (Math.abs(window.innerWidth - window.innerHeight) > window.innerHeight * 0.4) {
 		return [height * 1.77, height];
 	} else {
-		return [height, height];
+		return [width, height];
 	}
 };
 
@@ -2302,7 +2302,7 @@ const initFramework = () => {
 				}, 50);
 				setTimeout(() => {
 					initGame();
-				}, 800);
+				}, 1500);
 				/**
 				 * Request gyroscope permission for iOS users
 				 */
