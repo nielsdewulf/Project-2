@@ -787,7 +787,7 @@ const get = async url => {
 };
 
 function exitLobbyHandler() {
-	if (isFullscreen && document.fullscreenElement == null) {
+	if (isFullscreen && document.fullscreenElement == null && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
 		if (currentLobby !== undefined) {
 			leaveLobby();
 		}

@@ -221,8 +221,8 @@ let buttonListeners = function() {
 		document.querySelectorAll('.js-singleplayer-avatar').forEach(el => {
 			if (el.checked) {
 				currentPlayer.avatar = parseInt(el.value);
-				initialiseNewGame(currentPlayer);
 				document.querySelector('.js-game__loader-avatar').style.backgroundImage = `url('${getPathById(parseInt(el.value))}')`;
+				initialiseNewGame(currentPlayer);
 			}
 		});
 	});
