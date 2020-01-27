@@ -2219,6 +2219,10 @@ const initFramework = () => {
 		// if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
 		// 	e.preventDefault();
 		// }
+		if (!document.querySelector('.js-fullscreen').classList.contains('u-hidden') || !document.querySelector('.js-turnpage').classList.contains('u-hidden')) {
+			document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
+			document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
+		}
 		if (
 			isFullscreen &&
 			document.fullscreenElement !== null &&
