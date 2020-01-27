@@ -298,7 +298,7 @@ function preload() {
 
 	this.load.image('heart', 'assets/heart.png');
 
-	this.load.audio('themesong', 'assets/AfloatBeat.wav');
+	this.load.audio('themesong', 'assets/afloatmusic.mp3');
 }
 
 /**
