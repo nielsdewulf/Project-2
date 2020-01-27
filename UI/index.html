@@ -704,10 +704,11 @@
     </div>
     <!--__________________________________Game_________________________________________-->
 
-    <div class="c-page u-hidden js-game">
+    <div class="c-page  js-game">
         <div class="c-game-overlay">
             <div class="c-game-overlay__row">
                 <div class="c-game-overlay__wrapper u-width-1-of-3-vw">
+                    <div class="c-game-overlay__left">
                     <div class="c-game-overlay__health">
                         <h3>Levens</h3>
                         <div class="c-game-overlay__content">
@@ -731,8 +732,20 @@
                             </svg>
                         </div>
                     </div>
+                    
+                    <div class="c-game-overlay__mute">
+                        <input class="c-game-overlay__mute-toggle js-mute-toggle" type="checkbox" name="mute" id="mute" >
 
-
+                        <label class="c-game-overlay__mute-label" for="mute">
+                            <svg class="c-game-overlay__mute-false" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 50">
+                                <path id="ic_volume_up_24px" d="M3,19.678v17.1H14.111L28,51.035V5.425L14.111,19.678ZM40.5,28.23a12.864,12.864,0,0,0-6.944-11.488V39.69A12.788,12.788,0,0,0,40.5,28.23Zm-6.944-25V9.1A19.908,19.908,0,0,1,47.444,28.23,19.908,19.908,0,0,1,33.556,47.358V53.23A25.509,25.509,0,0,0,53,28.23a25.509,25.509,0,0,0-19.444-25Z" transform="translate(-3 -3.23)" fill="#fff"/>
+                            </svg>
+                            <svg class="c-game-overlay__mute-true" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 50">
+                                <path id="ic_volume_off_24px" d="M40.5,28a12.5,12.5,0,0,0-6.944-11.194v6.139l6.806,6.806A11.755,11.755,0,0,0,40.5,28Zm6.944,0a19.007,19.007,0,0,1-1.5,7.333l4.194,4.194A24.434,24.434,0,0,0,53,28,24.991,24.991,0,0,0,33.556,3.639V9.361A19.459,19.459,0,0,1,47.444,28ZM6.528,3,3,6.528,16.139,19.667H3V36.333H14.111L28,50.222V31.528L39.806,43.333a19.232,19.232,0,0,1-6.25,3.278v5.722a24.971,24.971,0,0,0,10.25-5.028L49.472,53,53,49.472l-25-25ZM28,5.778l-5.806,5.806L28,17.389Z" transform="translate(-3 -3)" fill="#fff"/>
+                            </svg>
+                        </label>
+                    </div>
+                    </div>
                 </div>
                 <div class="c-game-overlay__score u-width-1-of-3-vw">
                     <h3>Score</h2>
@@ -787,7 +800,7 @@
     <!--__________________________________Turn page_________________________________________-->
 
 
-    <div class="c-page c-app__turnscreen u-hidden js-turnpage">
+    <div class="c-page u-hidden c-app__turnscreen u-hidden js-turnpage">
         <div class="c-app__turnscreen-content">
             <div class="c-app__turnscreen-logo"></div>
             Draai je scherm om te spelen
@@ -799,7 +812,7 @@
     <!--__________________________________Full screen page__________________________________-->
 
 
-    <div class="c-page c-app__turnscreen js-fullscreen">
+    <div class="c-page u-hidden c-app__turnscreen js-fullscreen">
         <div class="c-app__turnscreen-content">
             Tik op het scherm om te starten
         </div>
