@@ -2223,9 +2223,13 @@ const initFramework = () => {
 			}
 		}
 	});
-	window.addEventListener('resize', () => {
-		if (isFullscreen && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
+	window.addEventListener('resize', e => {
+		if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
+			e.preventDefault();
+		}
+		if (isFullscreen && document.querySelector('.js-fullscreen').classList.contains('u-hidden') && document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
 			location.reload();
+		} else {
 		}
 	});
 
