@@ -787,10 +787,16 @@ const get = async url => {
 };
 
 function exitLobbyHandler() {
-	if (isFullscreen && document.fullscreenElement == null && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
+	if (
+		isFullscreen &&
+		document.fullscreenElement == null &&
+		document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
+		document.querySelector('.js-main__score-results').classList.contains('u-hidden')
+	) {
 		if (currentLobby !== undefined) {
 			leaveLobby();
 		}
+		alert('reloading');
 		location.reload();
 	}
 }
