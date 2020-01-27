@@ -385,7 +385,38 @@ let buttonListeners = function() {
 	let resultsPopUpButton = document.querySelector('.js-button__score-results');
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Button Clicked');
-		document.querySelector('.js-main__score-results').classList.add('u-hidden');
+		try {
+			isFullscreen = false;
+			if (document.documentElement.requestFullscreen) {
+				document.documentElement.requestFullscreen();
+			} else if (document.documentElement.msRequestFullscreen) {
+				document.documentElement.msRequestFullscreen();
+			} else if (document.documentElement.mozRequestFullScreen) {
+				document.documentElement.mozRequestFullScreen();
+			} else if (document.documentElement.webkitRequestFullscreen) {
+				document.documentElement.webkitRequestFullscreen();
+			}
+		} catch (ex) {}
+
+		setTimeout(() => {
+			/**
+			 * Request landscape mode
+			 */
+			try {
+				screen.orientation.lock('landscape-primary');
+			} catch (ex) {}
+			try {
+				ScreenOrientation.lock('landscape-primary');
+			} catch (ex) {}
+			try {
+				screen.msLockOrientation.lock('landscape-primary');
+			} catch (ex) {}
+			try {
+				screen.mozLockOrientation.lock('landscape-primary');
+			} catch (ex) {}
+			isFullscreen = true;
+			document.querySelector('.js-main__score-results').classList.add('u-hidden');
+		}, 500);
 		let val = document
 			.querySelector('.js-scoreboard-popup__input')
 			.value.toString()

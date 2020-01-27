@@ -5,6 +5,11 @@ let width;
 let height;
 
 /**
+ * Requested Fullscreen
+ */
+let requestedFullscreen;
+
+/**
  * Width based on height multiplied by 16:9 ratio, height = screen height
  */
 let boundingWidth, boundingHeight;
@@ -163,8 +168,8 @@ let modi = [
 		minSpawnTime: 2300,
 		maxSpawnTime: 4000,
 		penguinChance: 0.3,
-		icicleChance: 0.6,
-		healthPowerupChance: 0.1,
+		icicleChance: 0.65,
+		healthPowerupChance: 0.05,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
@@ -181,8 +186,8 @@ let modi = [
 		minSpawnTime: 3500,
 		maxSpawnTime: 5500,
 		penguinChance: 0.2,
-		icicleChance: 0.7,
-		healthPowerupChance: 0.1,
+		icicleChance: 0.75,
+		healthPowerupChance: 0.05,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
@@ -199,8 +204,8 @@ let modi = [
 		minSpawnTime: 3500,
 		maxSpawnTime: 5500,
 		penguinChance: 0.2,
-		icicleChance: 0.7,
-		healthPowerupChance: 0.1,
+		icicleChance: 0.75,
+		healthPowerupChance: 0.05,
 		icicleConfig: {
 			gravity: 0.1, //10% of height
 			minSpawnOffset: 1.15,
@@ -2228,6 +2233,8 @@ const initFramework = () => {
 			e.preventDefault();
 		}
 		if (isFullscreen && document.querySelector('.js-fullscreen').classList.contains('u-hidden') && document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
+			alert('reloading resize');
+
 			location.reload();
 		} else {
 		}
@@ -2266,7 +2273,7 @@ const initFramework = () => {
 					} else if (document.documentElement.mozRequestFullScreen) {
 						document.documentElement.mozRequestFullScreen();
 					} else if (document.documentElement.webkitRequestFullscreen) {
-						document.documentElement.webkitRequestFullscreen();
+						document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
 					}
 				} catch (ex) {}
 
@@ -2293,6 +2300,9 @@ const initFramework = () => {
 				setTimeout(() => {
 					document.querySelector('.js-main__start').classList.remove('u-hidden');
 					document.querySelector('.js-fullscreen').classList.add('u-hidden');
+
+					document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
+					document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
 					/**
 					 * Request landscape mode
 					 */
@@ -2360,7 +2370,12 @@ function orientationCheck() {
 	}
 }
 function exitHandler() {
-	if (isFullscreen && document.fullscreenElement == null && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
+	if (
+		isFullscreen &&
+		document.fullscreenElement == null &&
+		document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
+		document.querySelector('.js-main__score-results').classList.contains('u-hidden')
+	) {
 		if (isLoadingGame || started) {
 			if (currentScene != undefined) {
 				if (multiplayer && connectedCloud) {
