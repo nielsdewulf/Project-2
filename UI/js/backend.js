@@ -796,7 +796,7 @@ function exitLobbyHandler() {
 		if (currentLobby !== undefined) {
 			leaveLobby();
 		}
-		alert('reloading');
+		// alert('reloading');
 		location.reload();
 	}
 }

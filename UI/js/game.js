@@ -298,7 +298,7 @@ function preload() {
 
 	this.load.image('heart', 'assets/heart.png');
 
-	this.load.audio('themesong', 'assets/AfloatBeat.wav');
+	this.load.audio('themesong', 'assets/afloatmusic.mp3');
 }
 
 /**
@@ -529,13 +529,7 @@ function create() {
 	let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 	if (!iOS) {
 		if (window.DeviceOrientationEvent) {
-			window.addEventListener(
-				'deviceorientation',
-				function(e) {
-					processGyro(e.alpha, e.beta, e.gamma);
-				},
-				true
-			);
+			window.addEventListener('deviceorientation', processGyro);
 			gyroscope = true;
 		} else {
 		}
@@ -545,26 +539,14 @@ function create() {
 				.then(response => {
 					if (response == 'granted') {
 						gyroscope = true;
-						window.addEventListener(
-							'deviceorientation',
-							function(e) {
-								processGyro(e.alpha, e.beta, e.gamma);
-							},
-							true
-						);
+						window.addEventListener('deviceorientation', processGyro);
 					}
 				})
 				.catch(console.error);
 		} else {
 			// non iOS 13+
 			if (window.DeviceOrientationEvent) {
-				window.addEventListener(
-					'deviceorientation',
-					function(e) {
-						processGyro(e.alpha, e.beta, e.gamma);
-					},
-					true
-				);
+				window.addEventListener('deviceorientation', processGyro);
 				gyroscope = true;
 			} else {
 			}
@@ -1399,7 +1381,9 @@ function initMqtt(gameObj) {
  * @param {Double} beta
  * @param {Double} gamma
  */
-function processGyro(alpha, beta, gamma) {
+function processGyro(e) {
+	let gamma = e.gamma;
+	let beta = e.beta;
 	//We should only process it if the player is still alive
 	if (alive) {
 		/**
@@ -1979,6 +1963,7 @@ const endGame = () => {
 
 		//Remove resize listener
 		window.removeEventListener('resize', resize);
+		window.removeEventListener('deviceorientation', processGyro);
 
 		//Hide game layer
 		document.querySelector('.js-game').classList.add('u-hidden');
@@ -2135,7 +2120,7 @@ const calcWidthHeight = () => {
 const calcGameBounds = height => {
 	console.log(Math.abs(window.innerWidth - window.innerHeight));
 	console.log(window.innerHeight * 0.4);
-	if (Math.abs(window.innerWidth - window.innerHeight) > window.innerHeight * 0.4) {
+	if (Math.abs(window.innerWidth - window.innerHeight) > window.innerHeight * 0.75) {
 		return [height * 1.77, height];
 	} else {
 		return [width, height];
@@ -2197,6 +2182,8 @@ const initGame = () => {
  * Initialises the framework
  */
 const initFramework = () => {
+	document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
+	document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
 	/**
 	 * Event when page gets closed
 	 */
@@ -2229,12 +2216,20 @@ const initFramework = () => {
 		}
 	});
 	window.addEventListener('resize', e => {
-		if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
-			e.preventDefault();
+		// if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
+		// 	e.preventDefault();
+		// }
+		if (!document.querySelector('.js-fullscreen').classList.contains('u-hidden') || !document.querySelector('.js-turnpage').classList.contains('u-hidden')) {
+			document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
+			document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
 		}
-		if (isFullscreen && document.querySelector('.js-fullscreen').classList.contains('u-hidden') && document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
-			alert('reloading resize');
-
+		if (
+			isFullscreen &&
+			document.fullscreenElement !== null &&
+			document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
+			document.querySelector('.js-main__score-results').classList.contains('u-hidden')
+		) {
+			// alert('reloading resize');
 			location.reload();
 		} else {
 		}
@@ -2264,28 +2259,29 @@ const initFramework = () => {
 				/**
 				 * Setup fullscreen
 				 */
+				let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+				if (!iOS) {
+					try {
+						if (document.documentElement.requestFullscreen) {
+							document.documentElement.requestFullscreen();
+						} else if (document.documentElement.msRequestFullscreen) {
+							document.documentElement.msRequestFullscreen();
+						} else if (document.documentElement.mozRequestFullScreen) {
+							document.documentElement.mozRequestFullScreen();
+						} else if (document.documentElement.webkitRequestFullscreen) {
+							document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
+						}
+					} catch (ex) {}
 
-				try {
-					if (document.documentElement.requestFullscreen) {
-						document.documentElement.requestFullscreen();
-					} else if (document.documentElement.msRequestFullscreen) {
-						document.documentElement.msRequestFullscreen();
-					} else if (document.documentElement.mozRequestFullScreen) {
-						document.documentElement.mozRequestFullScreen();
-					} else if (document.documentElement.webkitRequestFullscreen) {
-						document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
-					}
-				} catch (ex) {}
-
-				try {
-					if (document.addEventListener) {
-						document.addEventListener('fullscreenchange', exitHandler, false);
-						document.addEventListener('mozfullscreenchange', exitHandler, false);
-						document.addEventListener('MSFullscreenChange', exitHandler, false);
-						document.addEventListener('webkitfullscreenchange', exitHandler, false);
-					}
-				} catch (ex) {}
-
+					try {
+						if (document.addEventListener) {
+							document.addEventListener('fullscreenchange', exitHandler, false);
+							document.addEventListener('mozfullscreenchange', exitHandler, false);
+							document.addEventListener('MSFullscreenChange', exitHandler, false);
+							document.addEventListener('webkitfullscreenchange', exitHandler, false);
+						}
+					} catch (ex) {}
+				}
 				/**
 				 * Disable screen sleeping
 				 */
@@ -2303,21 +2299,23 @@ const initFramework = () => {
 
 					document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
 					document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
-					/**
-					 * Request landscape mode
-					 */
-					try {
-						screen.orientation.lock('landscape-primary');
-					} catch (ex) {}
-					try {
-						ScreenOrientation.lock('landscape-primary');
-					} catch (ex) {}
-					try {
-						screen.msLockOrientation.lock('landscape-primary');
-					} catch (ex) {}
-					try {
-						screen.mozLockOrientation.lock('landscape-primary');
-					} catch (ex) {}
+					if (!iOS) {
+						/**
+						 * Request landscape mode
+						 */
+						try {
+							screen.orientation.lock('landscape-primary');
+						} catch (ex) {}
+						try {
+							ScreenOrientation.lock('landscape-primary');
+						} catch (ex) {}
+						try {
+							screen.msLockOrientation.lock('landscape-primary');
+						} catch (ex) {}
+						try {
+							screen.mozLockOrientation.lock('landscape-primary');
+						} catch (ex) {}
+					}
 				}, 500);
 				setTimeout(() => {
 					initGame();
@@ -2370,12 +2368,10 @@ function orientationCheck() {
 	}
 }
 function exitHandler() {
-	if (
-		isFullscreen &&
-		document.fullscreenElement == null &&
-		document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
-		document.querySelector('.js-main__score-results').classList.contains('u-hidden')
-	) {
+	if (isFullscreen && (document.fullscreenElement === null || ShadowRoot.fullscreenElement === null) && document.querySelector('.js-fullscreen').classList.contains('u-hidden')) {
+		isFullscreen = false;
+		console.log('Disabled fullscreen');
+
 		if (isLoadingGame || started) {
 			if (currentScene != undefined) {
 				if (multiplayer && connectedCloud) {
