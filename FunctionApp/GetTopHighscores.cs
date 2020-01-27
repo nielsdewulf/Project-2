@@ -74,7 +74,7 @@ namespace afloat
             catch (Exception ex)
             {
 
-                log.LogError(ex, "Error at GetTopHighscores");
+                log.LogError("Error at GetTopHighscores: " + ex.ToString());
                 return new StatusCodeResult(500);
             }
         }
