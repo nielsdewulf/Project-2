@@ -21,7 +21,7 @@ namespace afloat {
             Highscore highscore = JsonConvert.DeserializeObject<Highscore> (stream);
             highscore.PlayerId = Guid.NewGuid ();
             if (string.IsNullOrWhiteSpace (highscore.Name) || string.IsNullOrEmpty (highscore.Name)) {
-                log.LogError ("Error at AddHighscore: Name cannot be empty or whitespace")
+                log.LogError ("Error at AddHighscore: Name cannot be empty or whitespace");
                 return new StatusCodeResult (400);
             }
             try {
