@@ -54,7 +54,7 @@ namespace afloat
             catch (Exception ex)
             {
 
-                log.LogError(ex, "Error at GetGame");
+                log.LogError("Error at GetGame: " + ex.ToString());
                 return new StatusCodeResult(500);
             }
         }

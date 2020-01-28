@@ -49,7 +49,7 @@ namespace afloat
             catch (Exception ex)
             {
 
-                log.LogError(ex, "Error at DeleteGame");
+                log.LogError("Error at DeleteGame: " + ex.ToString());
                 return new StatusCodeResult(500);
             }
         }

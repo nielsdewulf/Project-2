@@ -333,11 +333,10 @@ function create() {
 	/**
 	 * Audio
 	 */
-
 	music = this.sound.add('themesong');
 
 	music.loop = true;
-	music.play();
+	if (!document.querySelector('.js-mute-toggle').checked) music.play();
 	// this.sfx.sonido.loopFull();
 
 	/**
@@ -2215,6 +2214,21 @@ const initFramework = () => {
 			}
 		}
 	});
+
+	/**
+	 * Mute toggle
+	 */
+
+	document.querySelector('.js-mute-toggle').addEventListener('input', el => {
+		if ((currentScene !== undefined || isLoadingGame) && music !== undefined) {
+			if (el.target.checked) {
+				music.stop();
+			} else {
+				music.play();
+			}
+		}
+	});
+
 	window.addEventListener('resize', e => {
 		// if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
 		// 	e.preventDefault();
