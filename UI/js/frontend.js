@@ -382,8 +382,8 @@ let buttonListeners = function() {
 	});
 
 	/* Resultaten Popup Skip Button Event Listener */
-	let resultsPopUpButton = document.querySelector('.js-button__scoreboard-popup-skip');
-	resultsPopUpButton.addEventListener('click', function() {
+	let resultsSkipPopUpButton = document.querySelector('.js-button__scoreboard-popup-skip');
+	resultsSkipPopUpButton.addEventListener('click', function() {
 		console.log('Results Skip Button Clicked');
 		document.querySelector('.js-main__score-results').classList.add('u-hidden');
 		document.querySelector('.js-scoreboard-popup__input').value = '';
