@@ -855,7 +855,7 @@ h2 {
 
 .c-scoreboard-popup__box {
   width: calc(((var(--page-height) + var(--page-width)) /2) / 1.071428571428571);
-  height: calc(((var(--page-height) + var(--page-width)) /2) / 1.90);
+  height: calc(((var(--page-height) + var(--page-width)) /2) / 1.70);
   background-color: var(--color-neutral-xx-light);
   border-radius: var(--radius-basic);
   -webkit-box-shadow: var(--shadow-neutral);
@@ -910,7 +910,7 @@ h2 {
   background-color: var(--color-neutral-x-light);
   border: none;
   border-radius: var(--radius-basic);
-  margin-bottom: calc(var(--page-height) * .0463);
+  margin-bottom: calc(((var(--page-width) + var(--page-height)) /2 ) / 30);
 }
 
 .c-scoreboard-popup__button {
@@ -921,6 +921,7 @@ h2 {
   background-color: var(--color-beta-xxx-dark);
   -webkit-box-shadow: var(--shadow-neutral);
   box-shadow: var(--shadow-neutral);
+  margin-bottom: calc(((var(--page-width) + var(--page-height)) /2 ) / 40);
 }
 
 .c-scoreboard-popup__button:focus {
@@ -933,6 +934,14 @@ h2 {
   font-size: calc((var(--page-height) * .1 + var(--page-width) * .1) / 6.818);
   font-weight: 600;
   color: var(--color-neutral-xx-light);
+}
+
+.c-scoreboard-popup__skip {
+  border:none;
+  background: none;
+  text-decoration: underline;
+  font-family: 'Roboto';
+  font-size: calc((var(--page-height) * .1 + var(--page-width) * .1) / 6.818);
 }
 
 /* Deathscreen Pop-up */
