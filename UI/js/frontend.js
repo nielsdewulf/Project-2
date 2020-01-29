@@ -171,7 +171,7 @@ const showPlayers = data => {
 		}
 	}
 	let parent = document.querySelector('.js-multiplayer-lobby-grid');
-	console.log(result);
+	// console.log(result);
 	parent.innerHTML = result;
 };
 const clearPlayerList = () => {

@@ -162,6 +162,8 @@ const joinLobby = gameId => {
 				//Update playerCount
 				if (currentLobby.playerCount !== 2) currentLobby.playerCount++;
 
+				currentLobby.latestUpdate = new Date().getTime();
+
 				mqttClient.publish(
 					mainId,
 					JSON.stringify({
@@ -670,27 +672,24 @@ const initBackend = () => {
 			 */
 			if (data.status === 'connected') {
 				//If playerList exceeds 1 -> Reset
-				if (host && playerList.length == 2) {
-					// playerList = [];
-					// playerList.push(currentPlayer);
-				} else {
-					mqttClient.publish(
-						topic,
-						JSON.stringify({
-							clientId: clientId,
-							status: 'connectionRequest',
-							player: currentPlayer
-						})
-					);
-					console.log('Connection request from ' + data.clientId);
+				host = true;
 
-					//Set his offlinePlayer variable to false
-					data.player.offlinePlayer = false;
-					playerList.push(data.player);
-					if (data.player.avatar !== undefined) {
-						showPlayers(playerList);
-					}
+				mqttClient.publish(
+					topic,
+					JSON.stringify({
+						clientId: clientId,
+						status: 'connectionRequest',
+						player: currentPlayer
+					})
+				);
+				console.log('Connection request from ' + data.clientId);
+				//Set his offlinePlayer variable to false
+				data.player.offlinePlayer = false;
+				playerList.push(data.player);
+				if (data.player.avatar != undefined) {
+					showPlayers(playerList);
 				}
+				// }
 			}
 
 			/**
@@ -700,16 +699,13 @@ const initBackend = () => {
 			if (data.status === 'connectionRequest') {
 				//Set game host to false as they are
 				host = false;
-				if (playerList.length > 1) {
-					playerList = [];
-					playerList.push(currentPlayer);
-				}
+
 				console.log('Connection request from ' + data.clientId);
 				data.player.offlinePlayer = false;
 				playerList.push(data.player);
 
 				//If he already has an avatar -> show avatar
-				if (data.player.avatar !== undefined) {
+				if (data.player.avatar != undefined) {
 					showPlayers(playerList);
 				}
 			}
@@ -750,7 +746,8 @@ const initBackend = () => {
 			 * When other user disconnects from the lobby
 			 */
 			if (data.status === 'disconnect') {
-				playerList.pop(data.player);
+				playerList = [];
+				playerList.push(currentPlayer);
 				showPlayers(playerList);
 			}
 		}
