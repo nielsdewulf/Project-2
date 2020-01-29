@@ -2241,7 +2241,8 @@ const initFramework = () => {
 			isFullscreen &&
 			document.fullscreenElement !== null &&
 			document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
-			document.querySelector('.js-main__score-results').classList.contains('u-hidden')
+			document.querySelector('.js-main__score-results').classList.contains('u-hidden') &&
+			document.querySelector('.js-main__scoreboard').classList.contains('u-hidden')
 		) {
 			// alert('reloading resize');
 			location.reload();
@@ -2274,8 +2275,8 @@ const initFramework = () => {
 				 * Setup fullscreen
 				 */
 				let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-				if (!iOS) {
-					try {
+				try {
+					if (!iOS) {
 						if (document.documentElement.requestFullscreen) {
 							document.documentElement.requestFullscreen();
 						} else if (document.documentElement.msRequestFullscreen) {
@@ -2285,8 +2286,10 @@ const initFramework = () => {
 						} else if (document.documentElement.webkitRequestFullscreen) {
 							document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
 						}
-					} catch (ex) {}
-
+					}
+				} catch (ex) {
+					console.error(ex);
+				} finally {
 					try {
 						if (document.addEventListener) {
 							document.addEventListener('fullscreenchange', exitHandler, false);
@@ -2295,58 +2298,58 @@ const initFramework = () => {
 							document.addEventListener('webkitfullscreenchange', exitHandler, false);
 						}
 					} catch (ex) {}
+					/**
+					 * Disable screen sleeping
+					 */
+					noSleep.enable();
+
+					// Set fullscreen to true
+					isFullscreen = true;
+
+					/**
+					 * Initialise game object
+					 */
+					setTimeout(() => {
+						document.querySelector('.js-main__start').classList.remove('u-hidden');
+						document.querySelector('.js-fullscreen').classList.add('u-hidden');
+
+						document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
+						document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
+						if (!iOS) {
+							/**
+							 * Request landscape mode
+							 */
+							try {
+								screen.orientation.lock('landscape-primary');
+							} catch (ex) {}
+							try {
+								ScreenOrientation.lock('landscape-primary');
+							} catch (ex) {}
+							try {
+								screen.msLockOrientation.lock('landscape-primary');
+							} catch (ex) {}
+							try {
+								screen.mozLockOrientation.lock('landscape-primary');
+							} catch (ex) {}
+						}
+					}, 500);
+					setTimeout(() => {
+						initGame();
+					}, 1500);
+					/**
+					 * Request gyroscope permission for iOS users
+					 */
+					try {
+						if (typeof DeviceMotionEvent.requestPermission === 'function') {
+							DeviceMotionEvent.requestPermission()
+								.then(response => {
+									if (response == 'granted') {
+									}
+								})
+								.catch(console.error);
+						}
+					} catch (ex) {}
 				}
-				/**
-				 * Disable screen sleeping
-				 */
-				noSleep.enable();
-
-				// Set fullscreen to true
-				isFullscreen = true;
-
-				/**
-				 * Initialise game object
-				 */
-				setTimeout(() => {
-					document.querySelector('.js-main__start').classList.remove('u-hidden');
-					document.querySelector('.js-fullscreen').classList.add('u-hidden');
-
-					document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
-					document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
-					if (!iOS) {
-						/**
-						 * Request landscape mode
-						 */
-						try {
-							screen.orientation.lock('landscape-primary');
-						} catch (ex) {}
-						try {
-							ScreenOrientation.lock('landscape-primary');
-						} catch (ex) {}
-						try {
-							screen.msLockOrientation.lock('landscape-primary');
-						} catch (ex) {}
-						try {
-							screen.mozLockOrientation.lock('landscape-primary');
-						} catch (ex) {}
-					}
-				}, 500);
-				setTimeout(() => {
-					initGame();
-				}, 1500);
-				/**
-				 * Request gyroscope permission for iOS users
-				 */
-				try {
-					if (typeof DeviceMotionEvent.requestPermission === 'function') {
-						DeviceMotionEvent.requestPermission()
-							.then(response => {
-								if (response == 'granted') {
-								}
-							})
-							.catch(console.error);
-					}
-				} catch (ex) {}
 			}
 		},
 		true
