@@ -2247,16 +2247,19 @@ const initFramework = () => {
 		// 	}
 		// 	lastTimeResize = new Date().getTime();
 		// }
-		if (
-			isFullscreen &&
-			document.fullscreenElement !== null &&
-			document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
-			document.querySelector('.js-main__score-results').classList.contains('u-hidden') &&
-			document.querySelector('.js-main__scoreboard').classList.contains('u-hidden')
-		) {
-			// alert('reloading resize');
-			location.reload();
-		} else {
+		let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+		if (iOS) {
+			if (
+				isFullscreen &&
+				document.fullscreenElement !== null &&
+				document.querySelector('.js-fullscreen').classList.contains('u-hidden') &&
+				document.querySelector('.js-main__score-results').classList.contains('u-hidden') &&
+				document.querySelector('.js-main__scoreboard').classList.contains('u-hidden')
+			) {
+				// alert('reloading resize');
+				location.reload();
+			} else {
+			}
 		}
 	});
 
