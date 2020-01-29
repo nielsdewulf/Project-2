@@ -73,6 +73,9 @@ body {
   background-position: center;
   /* height: var(--page-height);
   overflow: hidden; */
+  overflow: hidden;
+  height: var(--page-height);
+  width: var(--page-width);
 }
 
 *,
@@ -910,7 +913,7 @@ h2 {
   background-color: var(--color-neutral-x-light);
   border: none;
   border-radius: var(--radius-basic);
-  margin-bottom: calc(((var(--page-width) + var(--page-height)) /2 ) / 30);
+  margin-bottom: calc(((var(--page-width) + var(--page-height)) /2) / 30);
 }
 
 .c-scoreboard-popup__button {
@@ -921,7 +924,7 @@ h2 {
   background-color: var(--color-beta-xxx-dark);
   -webkit-box-shadow: var(--shadow-neutral);
   box-shadow: var(--shadow-neutral);
-  margin-bottom: calc(((var(--page-width) + var(--page-height)) /2 ) / 40);
+  margin-bottom: calc(((var(--page-width) + var(--page-height)) /2) / 40);
 }
 
 .c-scoreboard-popup__button:focus {
@@ -937,7 +940,7 @@ h2 {
 }
 
 .c-scoreboard-popup__skip {
-  border:none;
+  border: none;
   background: none;
   text-decoration: underline;
   font-family: 'Roboto';
