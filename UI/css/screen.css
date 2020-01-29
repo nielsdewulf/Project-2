@@ -920,6 +920,8 @@ h2 {
   border: none;
   border-radius: var(--radius-basic);
   margin-bottom: calc(((var(--page-width) + var(--page-height)) /2) / 30);
+  outline: none;
+  padding: calc(var(--page-width) * .015);
 }
 
 .c-scoreboard-popup__button {
