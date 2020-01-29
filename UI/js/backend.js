@@ -325,6 +325,8 @@ const loadGame = () => {
 		})
 	);
 
+	currentPlayer.status = 'finalising';
+	currentPlayer.avatar = undefined;
 	//Reload lobby list
 	showNewLobbies(lobbies);
 
@@ -349,6 +351,7 @@ const endGameLobby = () => {
 	};
 	handleData(BASE_URL + `games/${lobbyId}`, data => {}, 'PUT', JSON.stringify(message));
 	leaveLobby();
+	getLobbies();
 };
 
 /**
@@ -737,7 +740,8 @@ const initBackend = () => {
 					if (!p.offlinePlayer) otherPlayer = p;
 				});
 				initialiseNewGame(currentPlayer, otherPlayer, true);
-
+				currentPlayer.status = 'finalising';
+				currentPlayer.avatar = undefined;
 				//Remove lobby from list
 				currentLobby.status = 1;
 			}
