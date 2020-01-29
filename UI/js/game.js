@@ -2229,6 +2229,7 @@ const initFramework = () => {
 		}
 	});
 
+	let lastTimeResize = new Date().getTime();
 	window.addEventListener('resize', e => {
 		// if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden')) {
 		// 	e.preventDefault();
@@ -2237,6 +2238,15 @@ const initFramework = () => {
 			document.documentElement.style.setProperty('--page-width', window.innerWidth + 'px');
 			document.documentElement.style.setProperty('--page-height', window.innerHeight + 'px');
 		}
+		// if (!document.querySelector('.js-main__score-results').classList.contains('u-hidden') && new Date().getTime() - lastTimeResize > 1000) {
+		// 	if (keyboardOpen) {
+		// 		document.querySelector('.js-scoreboard-popup').classList.remove('js-scoreboard-popup--open');
+		// 		keyboardOpen = false;
+		// 	} else {
+		// 		keyboardOpen = true;
+		// 	}
+		// 	lastTimeResize = new Date().getTime();
+		// }
 		if (
 			isFullscreen &&
 			document.fullscreenElement !== null &&
