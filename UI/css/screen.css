@@ -71,6 +71,7 @@ body {
   background: url("../img/png/Background.png") no-repeat;
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
   /* height: var(--page-height);
   overflow: hidden; */
   overflow: hidden;
@@ -856,6 +857,10 @@ h2 {
   align-items: center;
 }
 
+.js-scoreboard-popup--open {
+  margin-top: calc(var(--page-height) * -.8);
+}
+
 .c-scoreboard-popup__box {
   width: calc(((var(--page-height) + var(--page-width)) /2) / 1.071428571428571);
   height: calc(((var(--page-height) + var(--page-width)) /2) / 1.70);
@@ -873,6 +878,7 @@ h2 {
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  transition: margin 0.3s ease;
 }
 
 .c-scoreboard-popup__image {

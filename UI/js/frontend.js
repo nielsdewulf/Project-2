@@ -5,6 +5,7 @@
  * loadGame() : start van spel
  * getTopHighscores(5) : 5 = bv top 5
  */
+let keyboardOpen = false;
 
 const showLeaderBoardPopup = () => {
 	document.querySelector('.js-main__score-results').classList.remove('u-hidden');
@@ -409,6 +410,16 @@ let buttonListeners = function() {
 			saveHighscore(val, score, lobbyId, currentPlayer.avatar);
 			document.querySelector('.js-scoreboard-popup__input').value = '';
 		}
+	});
+
+	document.querySelector('.js-scoreboard-popup__input').addEventListener('focusin', () => {
+		document.querySelector('.js-scoreboard-popup').classList.add('js-scoreboard-popup--open');
+	});
+	// document.querySelector('.js-scoreboard-popup__input').addEventListener('click', () => {
+	// 	document.querySelector('.js-scoreboard-popup').classList.add('js-scoreboard-popup--open');
+	// });
+	document.querySelector('.js-scoreboard-popup__input').addEventListener('focusout', () => {
+		document.querySelector('.js-scoreboard-popup').classList.remove('js-scoreboard-popup--open');
 	});
 };
 
