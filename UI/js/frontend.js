@@ -413,13 +413,16 @@ let buttonListeners = function() {
 	});
 
 	document.querySelector('.js-scoreboard-popup__input').addEventListener('focusin', () => {
-		document.querySelector('.js-scoreboard-popup').classList.add('js-scoreboard-popup--open');
+		let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+		if (!iOS) {
+			document.querySelector('.js-scoreboard-popup').classList.add('js-scoreboard-popup--open');
+		}
 	});
-	// document.querySelector('.js-scoreboard-popup__input').addEventListener('click', () => {
-	// 	document.querySelector('.js-scoreboard-popup').classList.add('js-scoreboard-popup--open');
-	// });
 	document.querySelector('.js-scoreboard-popup__input').addEventListener('focusout', () => {
-		document.querySelector('.js-scoreboard-popup').classList.remove('js-scoreboard-popup--open');
+		let iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+		if (!iOS) {
+			document.querySelector('.js-scoreboard-popup').classList.remove('js-scoreboard-popup--open');
+		}
 	});
 };
 
