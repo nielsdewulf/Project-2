@@ -385,15 +385,22 @@ let buttonListeners = function() {
 	let resultsSkipPopUpButton = document.querySelector('.js-button__scoreboard-popup-skip');
 	resultsSkipPopUpButton.addEventListener('click', function() {
 		console.log('Results Skip Button Clicked');
-		document.querySelector('.js-main__score-results').classList.add('u-hidden');
-		document.querySelector('.js-scoreboard-popup__input').value = '';
+		try {
+			document.querySelector('.js-scoreboard-popup__input').blur();
+		} finally {
+			document.querySelector('.js-main__score-results').classList.add('u-hidden');
+			document.querySelector('.js-scoreboard-popup__input').value = '';
+		}
 	});
 	/* Resultaten Popup Button Event Listener */
 	let resultsPopUpButton = document.querySelector('.js-button__score-results');
 	resultsPopUpButton.addEventListener('click', function() {
 		console.log('Results Save Button Clicked');
-		document.querySelector('.js-main__score-results').classList.add('u-hidden');
-
+		try {
+			document.querySelector('.js-scoreboard-popup__input').blur();
+		} finally {
+			document.querySelector('.js-main__score-results').classList.add('u-hidden');
+		}
 		let val = document
 			.querySelector('.js-scoreboard-popup__input')
 			.value.toString()
